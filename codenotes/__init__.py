@@ -12,7 +12,7 @@ def main():
 
     add = subparsers.add_parser('add')
     add.add_argument('type', choices=['note', 'todo'], type=str)
-    add.add_argument('text', type=str)
+    add.add_argument('text', type=str, nargs='*', action='store')
 
     search = subparsers.add_parser('search')
     search.add_argument('type', choices=['note', 'todo'])
@@ -26,6 +26,9 @@ def main():
     args = parser.parse_args()
 
     if args.subargs == 'add':
-        pass
+        if args.type == 'todo':
+            pass
+        elif args.type == 'note':
+            pass
     elif args.subargs == 'search':
         pass

@@ -1,10 +1,21 @@
+import os
+import sqlite3
 import codenotes.db.utilities.notes as notes
+import codenotes.db.utilities.todo as todo
 
-from codenotes.db import SQLiteHelper
 
+class SQLiteConnection:
 
-class SQLiteConnection(SQLiteHelper):
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    DATABASE_NAME = 'codenotes.db'
+    DATABASE_PATH = os.path.join(BASE_DIR, DATABASE_NAME)
 
     def __init__(self):
-        super().__init__()
+        conn = sqlite3.connect(self.DATABASE_PATH)
+        self.cursor = conn.cursor()
+
         self.exec_sql(notes.CREATE_NOTES_TABLE)
+        self.exec_sql(todo.CREATE_TODOS_TABLE)
+
+    def exec_sql(self, sql: str):
+        self.cursor.execute(sql)
