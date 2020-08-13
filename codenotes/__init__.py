@@ -1,10 +1,11 @@
+import sys
 import argparse
 
 
 __version__ = '0.0.1'
 
 
-def main():
+def parse_args(args):
 
     parser = argparse.ArgumentParser(prog='codenotes')
     parser.add_argument('--version', '-v', action='version', version=__version__)
@@ -13,6 +14,7 @@ def main():
     add = subparsers.add_parser('add')
     add.add_argument('type', choices=['note', 'todo'], type=str)
     add.add_argument('text', type=str, nargs='*', action='store')
+    add.add_argument('--preview', '-p', action='store_true')
 
     search = subparsers.add_parser('search')
     search.add_argument('type', choices=['note', 'todo'])
@@ -23,7 +25,12 @@ def main():
     search_group.add_argument('--week', '-w', action='store_true')
     search_group.add_argument('--month', '-m', action='store_true')
 
-    args = parser.parse_args()
+    return parser.parse_args(args)
+
+
+def main():
+
+    args = parse_args(sys.argv[1:])
 
     if args.subargs == 'add':
         if args.type == 'todo':
