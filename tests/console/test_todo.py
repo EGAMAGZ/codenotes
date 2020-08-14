@@ -11,8 +11,8 @@ class TestOneTodo(unittest.TestCase):
         self.add_todo = AddTodo(args)
 
     def test_todo_text(self):
-        self.assertTrue(isinstance(self.add_todo.todo_text, str))
-        self.assertEqual(self.add_todo.todo_text, 'New todo task #1')
+        self.assertTrue(isinstance(self.add_todo.todo_task, str))
+        self.assertEqual(self.add_todo.todo_task, 'New todo task #1')
 
 
 class TestManyTodos(unittest.TestCase):
@@ -21,8 +21,8 @@ class TestManyTodos(unittest.TestCase):
         self.add_todo = AddTodo(args)
 
     def test_todo_text(self):
-        self.assertTrue(isinstance(self.add_todo.todo_text, List))
-        self.assertListEqual(self.add_todo.todo_text, ['New todo task #1', 'New todo task #2'])
+        self.assertTrue(isinstance(self.add_todo.todo_task, List))
+        self.assertListEqual(self.add_todo.todo_task, ['New todo task #1', 'New todo task #2'])
 
 
 if __name__ == '__main__':

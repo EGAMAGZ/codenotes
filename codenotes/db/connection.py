@@ -11,11 +11,14 @@ class SQLiteConnection:
     DATABASE_PATH = os.path.join(BASE_DIR, DATABASE_NAME)
 
     def __init__(self):
-        conn = sqlite3.connect(self.DATABASE_PATH)
-        self.cursor = conn.cursor()
+        self.conn = sqlite3.connect(self.DATABASE_PATH)
+        self.cursor = self.conn.cursor()
 
         self.exec_sql(notes.CREATE_NOTES_TABLE)
         self.exec_sql(todo.CREATE_TODOS_TABLE)
 
     def exec_sql(self, sql: str):
         self.cursor.execute(sql)
+
+    def get_cursor(self):
+        return self.cursor

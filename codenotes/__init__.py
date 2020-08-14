@@ -34,10 +34,13 @@ def main():
 
     args = parse_args(sys.argv[1:])
 
-    if args.subargs == 'add':
-        if args.type == 'todo':
-            AddTodo(args)
-        elif args.type == 'note':
+    if len(sys.argv) > 1:
+        if args.subargs == 'add':
+            if args.type == 'todo':
+                AddTodo.set_args(args)
+            elif args.type == 'note':
+                pass
+        elif args.subargs == 'search':
             pass
-    elif args.subargs == 'search':
-        pass
+    else:
+        print("Init PYCUI")
