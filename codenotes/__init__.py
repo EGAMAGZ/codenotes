@@ -1,6 +1,8 @@
 import sys
 import argparse
 
+from codenotes.console.todo import AddTodo
+
 
 __version__ = '0.0.1'
 
@@ -34,7 +36,7 @@ def main():
 
     if args.subargs == 'add':
         if args.type == 'todo':
-            pass
+            AddTodo(args)
         elif args.type == 'note':
             pass
     elif args.subargs == 'search':
