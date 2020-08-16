@@ -1,9 +1,11 @@
-from datetime import datetime
-from typing import List, Union, overload
-from rich.table import Table
-from rich.console import Console
 from rich import box
 from yaspin import yaspin
+from rich.table import Table
+from datetime import datetime
+from rich.console import Console
+from prompt_toolkit import HTML, print_formatted_text
+from prompt_toolkit.styles import Style
+from typing import List, Union, overload
 
 from codenotes.db.connection import SQLiteConnection
 import codenotes.db.utilities.todo as todo
@@ -50,6 +52,11 @@ class AddTodo:
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
         self.creation_date = datetime.now().date()
+        self.print = print_formatted_text  # Print use for prompt toolkit package
+        self.print_style = Style.from_dict({  # Style use for prints related with saving process
+            'msg': '#d898ed bold',
+            'task-txt': '#616161 italic'
+        })
 
         if args.text:
             self.todo_task = format_todo_text(args.text)
@@ -69,19 +76,28 @@ class AddTodo:
         creation_date = datetime.now().date()  # Actual date
 
         sql = f'INSERT INTO {todo.TABLE_NAME} ({todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_CREATION}) VALUES (?,?);'
+        with yaspin(text='Saving todo tasks', color='yellow') as spinner:
+            if isinstance(self.todo_task, List):
+                for task in self.todo_task:
+                    spinner.hide()
+                    values = (task, creation_date)
+                    self.cursor.execute(sql, values)
+                    self.db.conn.commit()
+                    self.print(HTML(
+                       u'<b>></b><msg>Todo task saved: </msg><task-txt>{}</task-txt>'.format(task[:30])
+                    ), style=self.print_style)
+                    spinner.show()
 
-        if isinstance(self.todo_task, List):
-            values = []
-            for sql_value in self.todo_task:
-                values.append((sql_value, creation_date))
-
-            self.cursor.executemany(sql, values)
-            self.db.conn.commit()
-
-        elif isinstance(self.todo_task, str):
-            values = (self.todo_task, creation_date)
-            self.cursor.execute(sql, values)
-            self.db.conn.commit()
+            elif isinstance(self.todo_task, str):
+                spinner.hide()
+                values = (self.todo_task, creation_date)
+                self.cursor.execute(sql, values)
+                self.db.conn.commit()
+                self.print(HTML(
+                    u'<b>></b><msg>Todo task saved: </msg><task-txt>{}</task-txt>'.format(self.todo_task[:30])
+                ), style=self.print_style)
+                spinner.show()
+            spinner.ok("✔")
 
     def _ask_confirmation(self) -> bool:
         """ Function that asks to the user to store or not
@@ -102,7 +118,8 @@ class AddTodo:
     def show_preview(self):
         """ Function that displays a table with the todo tasks written"""
         formatted_date = self.creation_date.strftime('%m-%d-%Y')
-        table = Table(title='Preview', title_style='bold purple', box=box.SIMPLE_HEAD)
+        self.console.rule('Preview', style='purple')
+        table = Table(box=box.SIMPLE_HEAD)
         table.add_column('Todo Task')
         table.add_column('Creation Date', justify='center', style='yellow')
         if isinstance(self.todo_task, List):
