@@ -1,7 +1,7 @@
 import sys
 import argparse
 
-from codenotes.console.todo import AddTodo
+from codenotes.console.todo import AddTodo, SearchTodo
 
 
 __version__ = '0.0.1'
@@ -41,6 +41,7 @@ def main():
             elif args.type == 'note':
                 pass
         elif args.subargs == 'search':
-            pass
+            if args.type == 'todo':
+                SearchTodo.set_args(args)
     else:
-        print("Init PYCUI")
+        pass
