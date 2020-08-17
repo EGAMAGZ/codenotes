@@ -1,3 +1,4 @@
+import py_cui
 from rich import box
 from yaspin import yaspin
 from rich.table import Table
@@ -7,8 +8,9 @@ from prompt_toolkit import HTML, print_formatted_text
 from prompt_toolkit.styles import Style
 from typing import List, Union, overload
 
-from codenotes.db.connection import SQLiteConnection
 import codenotes.db.utilities.todo as todo
+from codenotes.tui import AddTodoTUI, ImpPyCUI
+from codenotes.db.connection import SQLiteConnection
 
 
 @overload
@@ -65,7 +67,9 @@ class AddTodo:
             else:
                 self.save_todo()
         else:
-            pass
+            root = ImpPyCUI(5, 4)
+            wrapper = AddTodoTUI(root)
+            root.start()
 
     @classmethod
     def set_args(cls, args):
