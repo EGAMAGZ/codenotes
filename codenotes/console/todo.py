@@ -1,4 +1,3 @@
-import py_cui
 from rich import box
 from yaspin import yaspin
 from rich.table import Table
@@ -68,7 +67,7 @@ class AddTodo:
                 self.save_todo()
         else:
             root = ImpPyCUI(5, 4)
-            wrapper = AddTodoTUI(root)
+            AddTodoTUI.set_root(root)
             root.start()
 
     @classmethod
