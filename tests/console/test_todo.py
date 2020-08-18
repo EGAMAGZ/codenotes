@@ -25,5 +25,15 @@ class TestManyTodos(unittest.TestCase):
         self.assertListEqual(self.add_todo.todo_task, ['New todo task #1', 'New todo task #2'])
 
 
+class TestBadInputTodo(unittest.TestCase):
+    def setUp(self) -> None:
+        args = parse_args(['add', 'todo', ';'])
+        self.add_todo = AddTodo(args)
+
+    def test_todo_text(self):
+        self.assertTrue(isinstance(self.add_todo.todo_task, List))
+        self.assertListEqual(self.add_todo.todo_task, [])
+
+
 if __name__ == '__main__':
     unittest.main()

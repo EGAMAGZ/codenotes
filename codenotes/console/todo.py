@@ -3,9 +3,9 @@ from yaspin import yaspin
 from rich.table import Table
 from datetime import datetime
 from rich.console import Console
-from prompt_toolkit import HTML, print_formatted_text
 from prompt_toolkit.styles import Style
 from typing import List, Union, overload
+from prompt_toolkit import HTML, print_formatted_text
 
 import codenotes.db.utilities.todo as todo
 from codenotes.tui import AddTodoTUI, ImpPyCUI
@@ -79,7 +79,7 @@ class AddTodo:
         creation_date = datetime.now().date()  # Actual date
 
         sql = f'INSERT INTO {todo.TABLE_NAME} ({todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_CREATION}) VALUES (?,?);'
-        with yaspin(text='Saving todo tasks', color='yellow') as spinner:
+        with yaspin(text='Saving todo tasks', color='yellow') as spinner:   # TODO:THIS COULD BE TRANSFORM INTO FUNCTION
             if isinstance(self.todo_task, List):
                 for task in self.todo_task:
                     spinner.hide()
@@ -100,7 +100,9 @@ class AddTodo:
                     u'<b>></b><msg>Todo task saved: </msg><task-txt>{}</task-txt>'.format(self.todo_task[:30])
                 ), style=self.print_style)
                 spinner.show()
-            spinner.ok("✔")
+            spinner.ok("✔")  # TODO: WHEN TASK PASSED IS ;, DISPLAY 'NOT SAVED TASKS'
+        self.cursor.close()
+        self.db.conn.close()
 
     def _ask_confirmation(self) -> bool:
         """ Function that asks to the user to store or not
