@@ -1,15 +1,17 @@
 from rich import box
 from yaspin import yaspin
 from rich.table import Table
-from datetime import datetime
+from prompt_toolkit import HTML
 from rich.console import Console
 from prompt_toolkit.styles import Style
-from typing import List, Union, overload
-from prompt_toolkit import HTML, print_formatted_text
+from typing import List, Union, overload, Any
+from datetime import datetime, date, timedelta
 
 import codenotes.db.utilities.todo as todo
+from codenotes.console import PrintFormatted
 from codenotes.tui import AddTodoTUI, ImpPyCUI
 from codenotes.db.connection import SQLiteConnection
+
 
 
 @overload
@@ -45,6 +47,18 @@ def format_todo_text(text: str) -> Union[List[str], str]:
         return todo_text
 
 
+def dates_to_search(args) -> List[date]:
+    dates: List[date] = []
+    if args.today:
+        today_date = datetime.now().date()
+        dates.append(today_date)
+    if args.yesterday:
+        yesterday_date = datetime.now().date() - timedelta(days=1)
+        dates.append(yesterday_date)
+
+    return dates
+
+
 class AddTodo:
 
     def __init__(self, args):
@@ -53,11 +67,6 @@ class AddTodo:
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
         self.creation_date = datetime.now().date()
-        self.print = print_formatted_text  # Print use for prompt toolkit package
-        self.print_style = Style.from_dict({  # Style use for prints related with saving process
-            'msg': '#d898ed bold',
-            'task-txt': '#616161 italic'
-        })
 
         if args.text:
             self.todo_task = format_todo_text(args.text)
@@ -79,26 +88,22 @@ class AddTodo:
         creation_date = datetime.now().date()  # Actual date
 
         sql = f'INSERT INTO {todo.TABLE_NAME} ({todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_CREATION}) VALUES (?,?);'
-        with yaspin(text='Saving todo tasks', color='yellow') as spinner:   # TODO:THIS COULD BE TRANSFORM INTO FUNCTION
+        with yaspin(text='Saving todo tasks', color='yellow') as spinner:  # TODO:THIS COULD BE TRANSFORM INTO FUNCTION
             if isinstance(self.todo_task, List):
                 for task in self.todo_task:
-                    spinner.hide()
                     values = (task, creation_date)
                     self.cursor.execute(sql, values)
                     self.db.conn.commit()
-                    self.print(HTML(
-                       u'<b>></b><msg>Todo task saved: </msg><task-txt>{}</task-txt>'.format(task[:30])
-                    ), style=self.print_style)
+                    spinner.hide()
+                    PrintFormatted.print_tasks_storage(task)
                     spinner.show()
 
             elif isinstance(self.todo_task, str):
-                spinner.hide()
                 values = (self.todo_task, creation_date)
                 self.cursor.execute(sql, values)
                 self.db.conn.commit()
-                self.print(HTML(
-                    u'<b>></b><msg>Todo task saved: </msg><task-txt>{}</task-txt>'.format(self.todo_task[:30])
-                ), style=self.print_style)
+                spinner.hide()
+                PrintFormatted.print_tasks_storage(self.todo_task)
                 spinner.show()
             spinner.ok("✔")  # TODO: WHEN TASK PASSED IS ;, DISPLAY 'NOT SAVED TASKS'
         self.cursor.close()
@@ -137,11 +142,28 @@ class AddTodo:
             self.save_todo()
 
 
+def args_needed_empty(args) -> bool:
+    args_needed = [args.month, args.text, args.today, args.week, args.yesterday]
+    if any(args_needed):
+        return False
+    return True
+
+
 class SearchTodo:
 
     def __init__(self, args):
-        pass
+        self.console = Console()
+        self.db = SQLiteConnection()
+        self.cursor = self.db.get_cursor()
+        self.dates = dates_to_search(args)
 
     @classmethod
     def set_args(cls, args):
         return cls(args)
+
+    def search_todo(self):
+        base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT} from {todo.TABLE_NAME}'
+        for search_date in self.dates:
+            pass
+
+# select * from cn_todos where cn_todo_creation like date('2020-08-17');

@@ -20,7 +20,7 @@ def parse_args(args):
 
     search = subparsers.add_parser('search')
     search.add_argument('type', choices=['note', 'todo'])
-    search.add_argument('text', action='store', nargs='?')
+    search.add_argument('text', action='store', nargs='*')
     search_group = search.add_mutually_exclusive_group()
     search_group.add_argument('--today', '-t', action='store_true')
     search_group.add_argument('--yesterday', '-y', action='store_true')
@@ -33,7 +33,7 @@ def parse_args(args):
 def main():
 
     args = parse_args(sys.argv[1:])
-
+    print(args)
     if len(sys.argv) > 1:
         if args.subargs == 'add':
             if args.type == 'todo':
