@@ -5,6 +5,12 @@ import prompt_toolkit.output.win32 as prompt_toolkit
 
 
 def args_needed_empty(args) -> bool:
+    """ Check 
+    Returns
+    -------
+    empty : bool
+        Return boolean value if all related args to search are empty
+    """
     args_needed = [args.month, args.text, args.today, args.week, args.yesterday]
     if any(args_needed):
         return False
@@ -12,6 +18,12 @@ def args_needed_empty(args) -> bool:
 
 
 def dates_to_search(args) -> date:
+    """
+    Returns
+    -------
+    search_date : date
+        Returns date to search
+    """
     if args.today:
         return datetime.now().date()
     elif args.yesterday:

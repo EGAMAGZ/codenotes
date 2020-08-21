@@ -130,6 +130,7 @@ class AddTodo:
 class SearchTodo:
 
     def __init__(self, args):
+        """ SearchTodo Constructor """
         self.console = Console()
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
@@ -148,6 +149,7 @@ class SearchTodo:
         return cls(args)
 
     def search_todo(self):
+        """ Function that displays a table with the tasks searched """
         base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_STATUS} from {todo.TABLE_NAME}'
         if self.search_date:
             base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} like date("{self.search_date}")')
