@@ -140,7 +140,7 @@ class SearchTodo:
         self.console = Console()
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
-        self.search_dates = dates_to_search(args)
+        self.search_date = dates_to_search(args)
 
         if args_needed_empty(args):
             root = ImpPyCUI(3, 3)
