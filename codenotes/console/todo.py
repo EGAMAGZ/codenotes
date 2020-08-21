@@ -1,17 +1,14 @@
 from rich import box
 from yaspin import yaspin
 from rich.table import Table
-from prompt_toolkit import HTML
 from rich.console import Console
-from prompt_toolkit.styles import Style
-from typing import List, Union, overload, Any
+from typing import List, Union, overload
 from datetime import datetime, date, timedelta
 
 import codenotes.db.utilities.todo as todo
-from codenotes.console import PrintFormatted
-from codenotes.tui import AddTodoTUI, ImpPyCUI
+from codenotes.console import PrintFormatted, args_needed_empty
+from codenotes.tui import AddTodoTUI, ImpPyCUI, SearchTodoTUI
 from codenotes.db.connection import SQLiteConnection
-
 
 
 @overload
@@ -47,16 +44,11 @@ def format_todo_text(text: str) -> Union[List[str], str]:
         return todo_text
 
 
-def dates_to_search(args) -> List[date]:
-    dates: List[date] = []
+def dates_to_search(args) -> date:
     if args.today:
-        today_date = datetime.now().date()
-        dates.append(today_date)
-    if args.yesterday:
-        yesterday_date = datetime.now().date() - timedelta(days=1)
-        dates.append(yesterday_date)
-
-    return dates
+        return datetime.now().date()
+    elif args.yesterday:
+        return datetime.now().date() - timedelta(days=1)
 
 
 class AddTodo:
@@ -142,20 +134,20 @@ class AddTodo:
             self.save_todo()
 
 
-def args_needed_empty(args) -> bool:
-    args_needed = [args.month, args.text, args.today, args.week, args.yesterday]
-    if any(args_needed):
-        return False
-    return True
-
-
 class SearchTodo:
 
     def __init__(self, args):
         self.console = Console()
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
-        self.dates = dates_to_search(args)
+        self.search_dates = dates_to_search(args)
+
+        if args_needed_empty(args):
+            root = ImpPyCUI(3, 3)
+            SearchTodoTUI.set_root(root)
+            root.start()
+        else:
+            self.search_todo()
 
     @classmethod
     def set_args(cls, args):
@@ -163,7 +155,6 @@ class SearchTodo:
 
     def search_todo(self):
         base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT} from {todo.TABLE_NAME}'
-        for search_date in self.dates:
-            pass
+        self.console.rule(self.search_date.strftime('%m-%d-%Y'), style='purple')
 
 # select * from cn_todos where cn_todo_creation like date('2020-08-17');

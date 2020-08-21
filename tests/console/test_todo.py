@@ -5,7 +5,7 @@ from codenotes.console.todo import AddTodo
 from codenotes import parse_args
 
 
-class TestOneTodo(unittest.TestCase):
+class TestAddOneTodo(unittest.TestCase):
     def setUp(self) -> None:
         args = parse_args(['add', 'todo', 'New todo task #1'])
         self.add_todo = AddTodo(args)
@@ -15,7 +15,7 @@ class TestOneTodo(unittest.TestCase):
         self.assertEqual(self.add_todo.todo_task, 'New todo task #1')
 
 
-class TestManyTodos(unittest.TestCase):
+class TestAddManyTodos(unittest.TestCase):
     def setUp(self) -> None:
         args = parse_args(['add', 'todo', 'New todo task #1;New todo task #2'])
         self.add_todo = AddTodo(args)
@@ -25,7 +25,7 @@ class TestManyTodos(unittest.TestCase):
         self.assertListEqual(self.add_todo.todo_task, ['New todo task #1', 'New todo task #2'])
 
 
-class TestBadInputTodo(unittest.TestCase):
+class TestAddBadInputTodo(unittest.TestCase):
     def setUp(self) -> None:
         args = parse_args(['add', 'todo', ';'])
         self.add_todo = AddTodo(args)

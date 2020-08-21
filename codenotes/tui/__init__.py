@@ -91,6 +91,8 @@ class SearchTodoTUI:
     def __init__(self, root: ImpPyCUI):
         self.root = root
 
+        self.__config()
+
     @classmethod
     def set_root(cls, root: ImpPyCUI):
         return cls(root)

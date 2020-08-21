@@ -30,5 +30,22 @@ class TestAddTodoParseArgs(unittest.TestCase):
         self.assertDictEqual(args_vars, expected_vars)
 
 
+class TestSearchTodoParseArgs(unittest.TestCase):
+    
+    def test_search_two_dates(self):
+        self.assertRaises(SystemExit,parse_args,['search', 'todo', '--today','--month'])
+
+    def test_search_today_todo(self):
+        expected_vars = {'month':False, 'subargs':'search', 'text':[],'today':True, 'type':'todo','week':False,'yesterday':False}
+        args = parse_args(['search', 'todo', '--today'])
+        args_vars = vars(args)
+        self.assertDictEqual(args_vars, expected_vars)
+
+    def test_search_text_todo(self):
+        expected_vars = {'month':False, 'subargs':'search', 'text':['New','task'],'today':False, 'type':'todo','week':False,'yesterday':False}
+        args = parse_args(['search', 'todo', 'New', 'task'])
+        args_vars = vars(args)
+        self.assertDictEqual(args_vars, expected_vars)
+
 if __name__ == '__main__':
     unittest.main()
