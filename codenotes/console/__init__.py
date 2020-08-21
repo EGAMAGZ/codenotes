@@ -5,7 +5,7 @@ import prompt_toolkit.output.win32 as prompt_toolkit
 
 
 def args_needed_empty(args) -> bool:
-    """ Check 
+    """ Check if argumentes required to search are empty
     Returns
     -------
     empty : bool
@@ -18,7 +18,7 @@ def args_needed_empty(args) -> bool:
 
 
 def dates_to_search(args) -> date:
-    """
+    """ Returns date to search depending of the user selection
     Returns
     -------
     search_date : date
