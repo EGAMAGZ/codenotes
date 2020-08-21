@@ -22,3 +22,7 @@ class SQLiteConnection:
 
     def get_cursor(self):
         return self.cursor
+
+    def close(self):
+        self.conn.close()
+        self.cursor.close()

@@ -1,3 +1,4 @@
+from datetime import datetime, date, timedelta
 from prompt_toolkit.styles import Style
 from prompt_toolkit import HTML, print_formatted_text
 import prompt_toolkit.output.win32 as prompt_toolkit
@@ -8,6 +9,13 @@ def args_needed_empty(args) -> bool:
     if any(args_needed):
         return False
     return True
+
+
+def dates_to_search(args) -> date:
+    if args.today:
+        return datetime.now().date()
+    elif args.yesterday:
+        return datetime.now().date() - timedelta(days=1)
 
 
 class PrintFormatted:

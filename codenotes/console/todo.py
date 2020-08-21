@@ -1,12 +1,12 @@
 from rich import box
 from yaspin import yaspin
 from rich.table import Table
+from datetime import datetime
 from rich.console import Console
 from typing import List, Union, overload
-from datetime import datetime, date, timedelta
 
 import codenotes.db.utilities.todo as todo
-from codenotes.console import PrintFormatted, args_needed_empty
+from codenotes.console import PrintFormatted, args_needed_empty, dates_to_search
 from codenotes.tui import AddTodoTUI, ImpPyCUI, SearchTodoTUI
 from codenotes.db.connection import SQLiteConnection
 
@@ -42,13 +42,6 @@ def format_todo_text(text: str) -> Union[List[str], str]:
         return todo_tasks_list
     else:
         return todo_text
-
-
-def dates_to_search(args) -> date:
-    if args.today:
-        return datetime.now().date()
-    elif args.yesterday:
-        return datetime.now().date() - timedelta(days=1)
 
 
 class AddTodo:
@@ -98,8 +91,7 @@ class AddTodo:
                 PrintFormatted.print_tasks_storage(self.todo_task)
                 spinner.show()
             spinner.ok("✔")  # TODO: WHEN TASK PASSED IS ;, DISPLAY 'NOT SAVED TASKS'
-        self.cursor.close()
-        self.db.conn.close()
+        self.db.close()
 
     def _ask_confirmation(self) -> bool:
         """ Function that asks to the user to store or not
@@ -141,6 +133,7 @@ class SearchTodo:
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
         self.search_date = dates_to_search(args)
+        self.search_text = ' '.join(args.text)
 
         if args_needed_empty(args):
             root = ImpPyCUI(3, 3)
@@ -153,8 +146,23 @@ class SearchTodo:
     def set_args(cls, args):
         return cls(args)
 
+    def add_conditions_sql(self, sql: str, condition: str, type_condition: str = None):
+        if 'where' in sql.lower():
+            sql = sql + ' {} {}'.format(type_condition, condition)
+        else:
+            sql = sql + ' WHERE {}'.format(condition)
+        return sql
+
     def search_todo(self):
-        base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT} from {todo.TABLE_NAME}'
-        self.console.rule(self.search_date.strftime('%m-%d-%Y'), style='purple')
+        base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_STATUS} from {todo.TABLE_NAME}'
+        if self.search_date:
+            base_sql = self.add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} like date("{self.search_date}")')
+        if self.search_text:
+            base_sql = self.add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} LIKE "%{self.search_text}%"', 'AND')
+
+        for task in self.cursor.execute(base_sql):
+            print(task)
+        # self.console.rule(self.search_date.strftime('%m-%d-%Y'), style='purple')
+        self.db.close()
 
 # select * from cn_todos where cn_todo_creation like date('2020-08-17');
