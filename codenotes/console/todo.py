@@ -6,9 +6,10 @@ from rich.console import Console
 from typing import List, Union, overload
 
 import codenotes.db.utilities.todo as todo
-from codenotes.console import PrintFormatted, args_needed_empty, dates_to_search
-from codenotes.tui import AddTodoTUI, ImpPyCUI, SearchTodoTUI
+from codenotes.util.sql import add_conditions_sql
 from codenotes.db.connection import SQLiteConnection
+from codenotes.tui import AddTodoTUI, ImpPyCUI, SearchTodoTUI
+from codenotes.console import PrintFormatted, args_needed_empty, dates_to_search
 
 
 @overload
@@ -146,19 +147,12 @@ class SearchTodo:
     def set_args(cls, args):
         return cls(args)
 
-    def add_conditions_sql(self, sql: str, condition: str, type_condition: str = None):
-        if 'where' in sql.lower():
-            sql = sql + ' {} {}'.format(type_condition, condition)
-        else:
-            sql = sql + ' WHERE {}'.format(condition)
-        return sql
-
     def search_todo(self):
         base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_STATUS} from {todo.TABLE_NAME}'
         if self.search_date:
-            base_sql = self.add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} like date("{self.search_date}")')
+            base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} like date("{self.search_date}")')
         if self.search_text:
-            base_sql = self.add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} LIKE "%{self.search_text}%"', 'AND')
+            base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} LIKE "%{self.search_text}%"', 'AND')
 
         for task in self.cursor.execute(base_sql):
             print(task)
