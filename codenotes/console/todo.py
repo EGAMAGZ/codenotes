@@ -148,23 +148,27 @@ class SearchTodo:
     def set_args(cls, args):
         return cls(args)
 
+    def sql_query(self):
+        base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_STATUS} from {todo.TABLE_NAME}'
+        if self.search_date:
+            base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} like date("{self.search_date}")')
+        if self.search_text:
+            base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CONTENT} LIKE "%{self.search_text}%"', 'AND')
+        query = self.cursor.execute(base_sql)
+        
+        return query.fetchall()
+
     def search_todo(self):
         """ Function that displays a table with the tasks searched """
         table = Table()
         table.add_column('Tasks')
         table.add_column('Creation Date', justify='center', style='yellow')
 
-        base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_STATUS} from {todo.TABLE_NAME}'
-        if self.search_date:
-            base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} like date("{self.search_date}")')
-        if self.search_text:
-            base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} LIKE "%{self.search_text}%"', 'AND')
-
-        for task in self.cursor.execute(base_sql):
-            formatted_text = self.search_date.strftime('%m-%d-%Y')
-            table.add_row(task[0], formatted_text)
+        for task in self.sql_query():
+            #formatted_text = self.search_date.strftime('%m-%d-%Y')
+            table.add_row(task[0], 'formatted_text')
         self.console.print(table, justify='center')
         # self.console.rule(self.search_date.strftime('%m-%d-%Y'), style='purple')
-        self.db.close()
+        # self.db.close()
 
 # select * from cn_todos where cn_todo_creation like date('2020-08-17');
