@@ -150,6 +150,10 @@ class SearchTodo:
 
     def search_todo(self):
         """ Function that displays a table with the tasks searched """
+        table = Table()
+        table.add_column('Tasks')
+        table.add_column('Creation Date', justify='center', style='yellow')
+
         base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_STATUS} from {todo.TABLE_NAME}'
         if self.search_date:
             base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} like date("{self.search_date}")')
@@ -157,7 +161,9 @@ class SearchTodo:
             base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} LIKE "%{self.search_text}%"', 'AND')
 
         for task in self.cursor.execute(base_sql):
-            print(task)
+            formatted_text = self.search_date.strftime('%m-%d-%Y')
+            table.add_row(task[0], formatted_text)
+        self.console.print(table, justify='center')
         # self.console.rule(self.search_date.strftime('%m-%d-%Y'), style='purple')
         self.db.close()
 

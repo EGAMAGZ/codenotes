@@ -30,5 +30,5 @@ class SQLiteConnection:
 
     def close(self):
         """ Close database and cursor connection """
-        self.conn.close()
         self.cursor.close()
+        self.conn.close()
