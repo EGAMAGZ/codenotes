@@ -1,3 +1,4 @@
+from datetime import datetime
 import unittest
 from typing import List
 
@@ -28,26 +29,42 @@ class TestAddTodo(unittest.TestCase):
 
 class TestSearchTodo(unittest.TestCase):
 
+    def setUp(self) -> None:
+        self.date = datetime.now().date().strftime('%Y-%m-%d')
+
+    def test_search_text_date(self):
+        args = parse_args(['add', 'todo', 'Different','task'])
+        AddTodo.set_args(args)
+
+        expected_tasks=[('Different task', 0, self.date)]
+        args = parse_args(['search', 'todo', 'Different', '--today'])
+        query = SearchTodo(args).sql_query()
+        self.assertCountEqual(query, expected_tasks)
+
     def test_search_text_todo(self):
-        expected_tasks = [('New todo task #1', 0),('New todo task #2',0),('New todo task #3',0)]
-        args = parse_args(['search', 'todo', 'New','todo'])
+        expected_tasks = [
+            ('New todo task #1', 0, self.date),
+            ('New todo task #2', 0, self.date),
+            ('New todo task #3', 0, self.date)
+        ]
+        args = parse_args(['search', 'todo', 'New', 'todo'])
         query = SearchTodo(args).sql_query()
         self.assertCountEqual(query, expected_tasks)
 
     def test_search_today_todo(self):
-        expected_tasks = [('New todo task #1', 0),('New todo task #2',0),('New todo task #3',0)]
+        expected_tasks = [
+            ('New todo task #1', 0, self.date),
+            ('New todo task #2', 0, self.date),
+            ('New todo task #3', 0, self.date),
+            ('Different task', 0, self.date)
+        ]
         args = parse_args(['search', 'todo', '--today'])
         query = SearchTodo(args).sql_query()
         self.assertCountEqual(query, expected_tasks)
 
-    def test_search_yesterday_todo(self):
-        args = parse_args(['search','todo','--yesterday'])
+    def tearDown(self) -> None:
+        del self.date
 
-    def test_search_text_date(self):
-        args = parse_args(['search', 'todo', 'New', 'todo', 'task', '--today'])
-
-    def test_search_no_argument(self):
-        args = parse_args(['search', 'todo'])
 
 if __name__ == '__main__':
     unittest.main()

@@ -45,6 +45,15 @@ def format_todo_text(text: str) -> Union[List[str], str]:
         return todo_text
 
 
+def status_text(status: int) -> str:
+    if status == 0:
+        return 'Todo'
+    elif status == 1:
+        return 'Process'
+    elif status == 2:
+        return 'Finished'
+
+
 class AddTodo:
 
     def __init__(self, args):
@@ -112,7 +121,7 @@ class AddTodo:
 
     def show_preview(self):
         """ Function that displays a table with the todo tasks written"""
-        formatted_date = self.creation_date.strftime('%m-%d-%Y')
+        formatted_date = self.creation_date.strftime('%Y-%m-%d')
         self.console.rule('Preview', style='purple')
         table = Table(box=box.SIMPLE_HEAD)
         table.add_column('Todo Task')
@@ -149,9 +158,10 @@ class SearchTodo:
         return cls(args)
 
     def sql_query(self):
-        base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_STATUS} from {todo.TABLE_NAME}'
+
+        base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_STATUS}, {todo.COLUMN_TODO_CREATION} from "{todo.TABLE_NAME}"'
         if self.search_date:
-            base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} like date("{self.search_date}")')
+            base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} LIKE date("{self.search_date}")')
         if self.search_text:
             base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CONTENT} LIKE "%{self.search_text}%"', 'AND')
         query = self.cursor.execute(base_sql)
@@ -162,11 +172,11 @@ class SearchTodo:
         """ Function that displays a table with the tasks searched """
         table = Table()
         table.add_column('Tasks')
+        table.add_column('Status')
         table.add_column('Creation Date', justify='center', style='yellow')
 
         for task in self.sql_query():
-            #formatted_text = self.search_date.strftime('%m-%d-%Y')
-            table.add_row(task[0], 'formatted_text')
+            table.add_row(task[0], status_text(task[1]), task[2])
         self.console.print(table, justify='center')
         # self.console.rule(self.search_date.strftime('%m-%d-%Y'), style='purple')
         # self.db.close()
