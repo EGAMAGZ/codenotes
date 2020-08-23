@@ -1,7 +1,8 @@
 import py_cui
 import curses
+from typing import List
 from yaspin import yaspin
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 import codenotes.db.utilities.todo as todo
 from codenotes.console import PrintFormatted
@@ -88,8 +89,17 @@ class AddTodoTUI:
 
 class SearchTodoTUI:
 
+    DATE_OPTIONS: List[str] = ['None','Today','Yesterday']
+
+    date_search_button: py_cui.widgets.Button
+
+    search_date: date = None
+
     def __init__(self, root: ImpPyCUI):
+        """ Constructor of SearchTodoTUI class """
         self.root = root
+
+        self.date_search_button = self.root.add_button('Select Date', 0, 3, command=self._show_menu_date_popup)
 
         self.__config()
 
@@ -97,5 +107,23 @@ class SearchTodoTUI:
     def set_root(cls, root: ImpPyCUI):
         return cls(root)
 
+    def _show_menu_date_popup(self):
+        self.root.show_menu_popup('Date Options', menu_items=self.DATE_OPTIONS, command=self._set_date_option)
+
+    def _set_date_option(self, date_option):
+        if date_option == 'None':
+            title = 'Select Date'
+            self.search_date = None
+        elif date_option == 'Today':
+            title = 'Today'
+            self.search_date = datetime.now().date()
+        elif date_option == 'Yesterday':
+            title = 'Yesterday'
+            self.search_date = datetime.now().date() - timedelta(days=1)
+
+        self.date_search_button.set_title(title)
+
     def __config(self):
+        """ Function that configures the widgets of the root """
+
         self.root.set_title('Codenotes - Search TODO Tasks')

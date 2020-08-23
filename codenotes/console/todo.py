@@ -147,7 +147,7 @@ class SearchTodo:
         self.search_text = ' '.join(args.text)
 
         if args_needed_empty(args):
-            root = ImpPyCUI(3, 3)
+            root = ImpPyCUI(5, 4)
             SearchTodoTUI.set_root(root)
             root.start()
         else:
