@@ -159,7 +159,8 @@ class SearchTodo:
 
     def sql_query(self):
 
-        base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_STATUS}, {todo.COLUMN_TODO_CREATION} from "{todo.TABLE_NAME}"'
+        base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_STATUS}, {todo.COLUMN_TODO_CREATION} from' \
+                   f' "{todo.TABLE_NAME}"'
         if self.search_date:
             base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} LIKE date("{self.search_date}")')
         if self.search_text:
