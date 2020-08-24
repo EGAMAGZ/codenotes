@@ -70,7 +70,11 @@ class AddTodoTUI:
                 spinner.hide()
                 PrintFormatted.print_tasks_storage(task)
                 spinner.show()
-            spinner.ok("✔")
+            if todo_tasks_list:
+                spinner.ok("✔")
+            else:
+                spinner.text = 'No task saved'
+                spinner.fail("💥")
         self.cursor.close()
         self.db.conn.close()
 
@@ -92,14 +96,18 @@ class SearchTodoTUI:
     DATE_OPTIONS: List[str] = ['None','Today','Yesterday']
 
     date_search_button: py_cui.widgets.Button
+    task_search_text_box: py_cui.widgets.TextBox
 
     search_date: date = None
 
     def __init__(self, root: ImpPyCUI):
         """ Constructor of SearchTodoTUI class """
         self.root = root
+        self.db = SQLiteConnection()
+        self.cursor = self.db.get_cursor()
 
         self.date_search_button = self.root.add_button('Select Date', 0, 3, command=self._show_menu_date_popup)
+        self.task_search_text_box = self.root.add_text_box('Search task:', 0, 0)
 
         self.__config()
 

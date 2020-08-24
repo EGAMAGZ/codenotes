@@ -47,7 +47,7 @@ def format_todo_text(text: str) -> Union[List[str], str]:
 
 def status_text(status: int) -> str:
     if status == 0:
-        return 'Todo'
+        return 'Incomplete'
     elif status == 1:
         return 'Process'
     elif status == 2:
@@ -147,7 +147,7 @@ class SearchTodo:
         self.search_text = ' '.join(args.text)
 
         if args_needed_empty(args):
-            root = ImpPyCUI(5, 4)
+            root = ImpPyCUI(5, 6)
             SearchTodoTUI.set_root(root)
             root.start()
         else:
