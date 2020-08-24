@@ -3,7 +3,7 @@ import sqlite3
 from sqlite3.dbapi2 import Cursor
 
 import codenotes.db.utilities.notes as notes
-import codenotes.db.utilities.todo as todo
+import codenotes.db.utilities.tasks as tasks
 
 
 class SQLiteConnection:
@@ -18,7 +18,7 @@ class SQLiteConnection:
         self.cursor = self.conn.cursor()
 
         self.exec_sql(notes.CREATE_NOTES_TABLE)
-        self.exec_sql(todo.CREATE_TODOS_TABLE)
+        self.exec_sql(tasks.CREATE_TASKS_TABLE)
 
     def exec_sql(self, sql: str):
         """ Function that executes sql command """

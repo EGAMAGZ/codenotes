@@ -8,19 +8,19 @@ from codenotes import parse_args
 class TestArgsNeededEmpty(unittest.TestCase):
 
     def test_no_args(self):
-        args = parse_args(['search', 'todo'])
+        args = parse_args(['search', 'task'])
         self.assertTrue(args_needed_empty(args))
 
     def test_only_date(self):
-        args = parse_args(['search', 'todo', '--today'])
+        args = parse_args(['search', 'task', '--today'])
         self.assertFalse(args_needed_empty(args))
 
     def test_only_text(self):
-        args = parse_args(['search', 'todo', 'New', 'task', 'added'])
+        args = parse_args(['search', 'task', 'New', 'task', 'added'])
         self.assertFalse(args_needed_empty(args))
 
     def test_text_and_date(self):
-        args = parse_args(['search', 'todo', 'New', 'task', 'added', '--today'])
+        args = parse_args(['search', 'task', 'New', 'task', 'added', '--today'])
         self.assertFalse(args_needed_empty(args))
 
 
@@ -28,12 +28,12 @@ class TestDateToSearch(unittest.TestCase):
 
     def test_today(self):
         search_date = datetime.now().date()
-        args = parse_args(['search', 'todo', 'New', 'task', 'added', '--today'])
+        args = parse_args(['search', 'task', 'New', 'task', 'added', '--today'])
         self.assertEqual(dates_to_search(args), search_date)
 
     def test_yesterday(self):
         search_date = datetime.now().date() - timedelta(days=1)
-        args = parse_args(['search', 'todo', 'New', 'task', 'added', '--yesterday'])
+        args = parse_args(['search', 'task', 'New', 'task', 'added', '--yesterday'])
         self.assertEqual(dates_to_search(args), search_date)
 
 

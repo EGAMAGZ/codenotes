@@ -61,7 +61,7 @@ class PrintFormatted:
             Content of the task that is stored
         """
         custom_html = HTML(
-            u'<b>></b><msg>Todo task saved: </msg><task-txt>{}</task-txt>'.format(task_txt[:30])
+            u'<b>></b><msg>Task saved: </msg><task-txt>{}</task-txt>'.format(task_txt[:30])
         )
 
         custom_style = Style.from_dict({  # Style use for prints related with saving process

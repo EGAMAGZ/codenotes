@@ -5,22 +5,22 @@ from datetime import datetime
 from rich.console import Console
 from typing import List, Union, overload
 
-import codenotes.db.utilities.todo as todo
+import codenotes.db.utilities.tasks as tasks
 from codenotes.util.sql import add_conditions_sql
 from codenotes.db.connection import SQLiteConnection
-from codenotes.tui import AddTodoTUI, ImpPyCUI, SearchTodoTUI
+from codenotes.tui import AddTaskTUI, ImpPyCUI, SearchTaskTUI
 from codenotes.console import PrintFormatted, args_needed_empty, dates_to_search
 
 
 @overload
-def format_todo_text(text: str) -> List[str]: ...
+def format_task_text(text: str) -> List[str]: ...
 
 
 @overload
-def format_todo_text(text: str) -> str: ...
+def format_task_text(text: str) -> str: ...
 
 
-def format_todo_text(text: str) -> Union[List[str], str]:
+def format_task_text(text: str) -> Union[List[str], str]:
     """ Function that formats text passed through arguments
     Parameters
     ----------
@@ -28,21 +28,21 @@ def format_todo_text(text: str) -> Union[List[str], str]:
         Text written in the arguments of argparse
     Returns
     -------
-    todo_text : str
+    task_text : str
         Task of text passed in arguments and joined
-    todo_tasks_list : List[str]
+    tasks_list : List[str]
         List of texts of task joined and stripped
     """
-    todo_text = ' '.join(text)
-    if ';' in todo_text:
-        todo_tasks_list = []
-        for todo_task in todo_text.split(';'):
-            if todo_task and not todo_task.isspace():
+    task_text = ' '.join(text)
+    if ';' in task_text:
+        tasks_list = []
+        for task in task_text.split(';'):
+            if task and not task.isspace():
                 # Checks if is '' or ' ', and doesn't append it if so
-                todo_tasks_list.append(todo_task.strip())  # "Trim"
-        return todo_tasks_list
+                tasks_list.append(task.strip())  # "Trim"
+        return tasks_list
     else:
-        return todo_text
+        return task_text
 
 
 def status_text(status: int) -> str:
@@ -54,38 +54,38 @@ def status_text(status: int) -> str:
         return 'Finished'
 
 
-class AddTodo:
+class AddTask:
 
     def __init__(self, args):
-        """ Constructor fro AddTodo class """
+        """ Constructor fro AddTask class """
         self.console = Console()
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
         self.creation_date = datetime.now().date()
 
         if args.text:
-            self.todo_task = format_todo_text(args.text)
+            self.task = format_task_text(args.text)
             if args.preview:
                 self.show_preview()
             else:
-                self.save_todo()
+                self.save_task()
         else:
             root = ImpPyCUI(5, 4)
-            AddTodoTUI.set_root(root)
+            AddTaskTUI.set_root(root)
             root.start()
 
     @classmethod
     def set_args(cls, args):
         return cls(args)
 
-    def save_todo(self):
-        """ Function in charge to store the todo tasks in the database"""
+    def save_task(self):
+        """ Function in charge to store the tasks in the database"""
         creation_date = datetime.now().date()  # Actual date
 
-        sql = f'INSERT INTO {todo.TABLE_NAME} ({todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_CREATION}) VALUES (?,?);'
-        with yaspin(text='Saving todo tasks', color='yellow') as spinner:  # TODO:THIS COULD BE TRANSFORM INTO FUNCTION
-            if isinstance(self.todo_task, List):
-                for task in self.todo_task:
+        sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}) VALUES (?,?);'
+        with yaspin(text='Saving Tasks', color='yellow') as spinner:  # TODO:THIS COULD BE TRANSFORM INTO FUNCTION
+            if isinstance(self.task, List):
+                for task in self.task:
                     values = (task, creation_date)
                     self.cursor.execute(sql, values)
                     self.db.conn.commit()
@@ -93,12 +93,12 @@ class AddTodo:
                     PrintFormatted.print_tasks_storage(task)
                     spinner.show()
 
-            elif isinstance(self.todo_task, str):
-                values = (self.todo_task, creation_date)
+            elif isinstance(self.task, str):
+                values = (self.task, creation_date)
                 self.cursor.execute(sql, values)
                 self.db.conn.commit()
                 spinner.hide()
-                PrintFormatted.print_tasks_storage(self.todo_task)
+                PrintFormatted.print_tasks_storage(self.task)
                 spinner.show()
             spinner.ok("✔")  # TODO: WHEN TASK PASSED IS ;, DISPLAY 'NOT SAVED TASKS'
         self.db.close()
@@ -109,7 +109,7 @@ class AddTodo:
         Returns
         -------
         confirmed : bool
-            Boolean value that indicates the storage of the todo tasks written
+            Boolean value that indicates the storage of the tasks written
         """
         answer = self.console.input('Do you want to save them?(y/n):')
         while len(answer) > 0 and answer.lower() != 'n' and answer.lower() != 'y':
@@ -120,26 +120,26 @@ class AddTodo:
             return False
 
     def show_preview(self):
-        """ Function that displays a table with the todo tasks written"""
+        """ Function that displays a table with the tasks written"""
         formatted_date = self.creation_date.strftime('%Y-%m-%d')
         self.console.rule('Preview', style='purple')
         table = Table(box=box.SIMPLE_HEAD)
-        table.add_column('Todo Task')
+        table.add_column('Task')
         table.add_column('Creation Date', justify='center', style='yellow')
-        if isinstance(self.todo_task, List):
-            for task in self.todo_task:
+        if isinstance(self.task, List):
+            for task in self.task:
                 table.add_row(task, formatted_date)
-        elif isinstance(self.todo_task, str):
-            table.add_row(self.todo_task, formatted_date)
+        elif isinstance(self.task, str):
+            table.add_row(self.task, formatted_date)
         self.console.print(table, justify='center')
         if self._ask_confirmation():
-            self.save_todo()
+            self.save_task()
 
 
-class SearchTodo:
+class SearchTask:
 
     def __init__(self, args):
-        """ SearchTodo Constructor """
+        """ SearchTask Constructor """
         self.console = Console()
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
@@ -148,10 +148,10 @@ class SearchTodo:
 
         if args_needed_empty(args):
             root = ImpPyCUI(5, 6)
-            SearchTodoTUI.set_root(root)
+            SearchTaskTUI.set_root(root)
             root.start()
         else:
-            self.search_todo()
+            self.search_task()
 
     @classmethod
     def set_args(cls, args):
@@ -159,17 +159,17 @@ class SearchTodo:
 
     def sql_query(self):
 
-        base_sql = f'SELECT {todo.COLUMN_TODO_CONTENT},{todo.COLUMN_TODO_STATUS}, {todo.COLUMN_TODO_CREATION} from' \
-                   f' "{todo.TABLE_NAME}"'
+        base_sql = f'SELECT {tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_STATUS}, {tasks.COLUMN_TASK_CREATION} from' \
+                   f' "{tasks.TABLE_NAME}"'
         if self.search_date:
-            base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CREATION} LIKE date("{self.search_date}")')
+            base_sql = add_conditions_sql(base_sql, f'{tasks.COLUMN_TASK_CREATION} LIKE date("{self.search_date}")')
         if self.search_text:
-            base_sql = add_conditions_sql(base_sql, f'{todo.COLUMN_TODO_CONTENT} LIKE "%{self.search_text}%"', 'AND')
+            base_sql = add_conditions_sql(base_sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.search_text}%"', 'AND')
         query = self.cursor.execute(base_sql)
         
         return query.fetchall()
 
-    def search_todo(self):
+    def search_task(self):
         """ Function that displays a table with the tasks searched """
         table = Table()
         table.add_column('Tasks')
