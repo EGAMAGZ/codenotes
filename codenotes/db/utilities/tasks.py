@@ -1,5 +1,7 @@
 from typing import Final
 
+import codenotes.db.utilities.tasks_categories as categories
+
 
 TABLE_NAME: Final = 'cn_tasks'
 
@@ -11,9 +13,9 @@ COLUMN_TASK_CATEGORY: Final = 'cn_task_category'
 
 CREATE_TASKS_TABLE: Final = f'CREATE TABLE IF NOT EXISTS {TABLE_NAME} ({COLUMN_TASK_ID} INTEGER PRIMARY KEY ' \
                             f'AUTOINCREMENT NULL , {COLUMN_TASK_CONTENT} TEXT NOT NULL, {COLUMN_TASK_STATUS} ' \
-                            f'INTEGER NULL DEFAULT 0, {COLUMN_TASK_CREATION} DATE NOT NULL);'
-#, {COLUMN_TASK_CATEGORY} ' \
- #                           f'INTEGER, FOREIGN KEY({COLUMN_TASK_CATEGORY} REFERENCES )); '
+                            f'INTEGER NULL DEFAULT 0, {COLUMN_TASK_CREATION} DATE NOT NULL, {COLUMN_TASK_CATEGORY} ' \
+                            f'INTEGER, FOREIGN KEY({COLUMN_TASK_CATEGORY}) REFERENCES {categories.TABLE_NAME}' \
+                            f'({categories.COLUMN_CATEGORY_ID})); '
 
 
 # from datetime import datetime

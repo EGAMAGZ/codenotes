@@ -56,6 +56,8 @@ def status_text(status: int) -> str:
 
 class AddTask:
 
+    DEFAULT_CATEGORY_ID: int = 0
+
     def __init__(self, args):
         """ Constructor fro AddTask class """
         self.console = Console()
@@ -82,11 +84,12 @@ class AddTask:
         """ Function in charge to store the tasks in the database"""
         creation_date = datetime.now().date()  # Actual date
 
-        sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}) VALUES (?,?);'
+        sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, '\
+              f'{tasks.COLUMN_TASK_CATEGORY}) VALUES (?,?,?);'
         with yaspin(text='Saving Tasks', color='yellow') as spinner:  # TODO:THIS COULD BE TRANSFORM INTO FUNCTION
             if isinstance(self.task, List):
                 for task in self.task:
-                    values = (task, creation_date)
+                    values = (task, creation_date, self.DEFAULT_CATEGORY_ID)
                     self.cursor.execute(sql, values)
                     self.db.conn.commit()
                     spinner.hide()
@@ -94,13 +97,17 @@ class AddTask:
                     spinner.show()
 
             elif isinstance(self.task, str):
-                values = (self.task, creation_date)
+                values = (self.task, creation_date, self.DEFAULT_CATEGORY_ID)
                 self.cursor.execute(sql, values)
                 self.db.conn.commit()
                 spinner.hide()
                 PrintFormatted.print_tasks_storage(self.task)
                 spinner.show()
-            spinner.ok("✔")  # TODO: WHEN TASK PASSED IS ;, DISPLAY 'NOT SAVED TASKS'
+            if self.task:
+                spinner.ok("✔")
+            else:
+                spinner.text = 'No Task Saved'
+                spinner.fail("💥")
         self.db.close()
 
     def _ask_confirmation(self) -> bool:
