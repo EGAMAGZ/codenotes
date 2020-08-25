@@ -34,7 +34,7 @@ class AddTaskTUI:
     task_text_block: py_cui.widgets.TextBox
 
     categories_list: List[Category] = []
-    category_id: int = None
+    selected_category: Category = None
 
     def __init__(self, root: ImpPyCUI):
         """ Constructor of AddTaskTUI class"""
@@ -43,7 +43,7 @@ class AddTaskTUI:
         self.cursor = self.db.get_cursor()
 
         self.task_text_block = self.root.add_text_box('New Task', 0, 0, column_span=4)
-        self.task_categories_menu = self.root.add_scroll_menu('Categories', 1, 0, row_span=3)
+        self.task_categories_menu = self.root.add_scroll_menu('Categories', 1, 0, row_span=4)
         self.tasks_list_menu = self.root.add_scroll_menu('Tasks to add', 1, 1, column_span=3, row_span=4)
 
         self.__config()
@@ -65,9 +65,22 @@ class AddTaskTUI:
 
     def _select_category(self):
         """ Function that is executed when a category is selected """
-        category: Category = self.task_categories_menu.get()
-        self.category_id = category.category_id
-        self.task_categories_menu.set_title(f'Categories: {category}')
+        self.selected_category = self.task_categories_menu.get()
+        self.task_categories_menu.set_title(f'{self.selected_category}')
+
+    def _ask_new_category(self):
+        """ Shows text box popup """
+        self.root.show_text_box_popup('Enter new category name (Max. 30):',command=self._add_category)
+
+    def _add_category(self, category: str):
+        """ Adds new category to categories menu and saves it in database """
+        if category and len(category) <= 30:
+            sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
+            self.cursor.execute(sql, (category,))
+            category_id = self.cursor.lastrowid
+            self.task_categories_menu.add_item(Category(category_id, category))
+        else:
+            self._ask_new_category()
 
     def _add_task(self):
         """  Adds task to tasks_list_menu widget """
@@ -83,11 +96,11 @@ class AddTaskTUI:
         """ Function that stores the tasks added in tasks_list_menu widget """
         creation_date = datetime.now().date()
         tasks_list = self.tasks_list_menu.get_item_list()
-        sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}) VALUES ' \
-              f'(?,?); '
+        sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, {tasks.COLUMN_TASK_CATEGORY}) VALUES ' \
+              f'(?,?,?); '
         with yaspin(text='Saving Tasks') as spinner:
             for task in tasks_list:
-                values = (task, creation_date)
+                values = (task, creation_date, self.selected_category.category_id)
                 self.cursor.execute(sql, values)
                 spinner.hide()
                 PrintFormatted.print_tasks_storage(task)
@@ -100,8 +113,6 @@ class AddTaskTUI:
 
         self.db.conn.commit()
         self.db.close()
-        # self.cursor.close()
-        # self.db.conn.close()
 
     def __config(self):
         """ Function that configures the widgets of the root """
@@ -114,9 +125,11 @@ class AddTaskTUI:
         self.tasks_list_menu.set_focus_text('|Backspace - Remove Task|')
 
         self.task_categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._select_category)
+        self.task_categories_menu.add_key_command(py_cui.keys.KEY_N_LOWER, self._ask_new_category)
 
         self.root.set_title('Codenotes - Add Tasks')
         self.root.status_bar.set_text('|q-Quit & Save Tasks| Arrows keys - Move| Enter - Enter Focus Mode|')
+
         self.root.run_on_exit(self._save_tasks)
 
 
