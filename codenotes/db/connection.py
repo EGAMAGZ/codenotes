@@ -1,10 +1,12 @@
 import os
 import sqlite3
 from sqlite3.dbapi2 import Cursor
+from typing import overload, Union
 
 import codenotes.db.utilities.notes as notes
 import codenotes.db.utilities.tasks as tasks
 import codenotes.db.utilities.tasks_categories as categories
+
 
 class SQLiteConnection:
 
@@ -19,10 +21,17 @@ class SQLiteConnection:
 
         self.exec_sql(notes.CREATE_NOTES_TABLE)
         self.exec_sql(categories.CREATE_TODOS_CATEGORY_TABLE)
-        self.exec_sql(categories.INSERT_DEFAULT_CATEGORY)
+        self.cursor.execute(categories.INSERT_DEFAULT_CATEGORY)
         self.exec_sql(tasks.CREATE_TASKS_TABLE)
+        self.conn.commit()
 
-    def exec_sql(self, sql: str):
+    @overload
+    def exec_sql(self, sql: str) -> Cursor: ...
+
+    @overload
+    def exec_sql(self, sql: str) -> None: ...
+
+    def exec_sql(self, sql: str) -> Union[Cursor, None]:
         """ Function that executes sql command """
         self.cursor.execute(sql)
 

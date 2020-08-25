@@ -1,12 +1,14 @@
 import py_cui
 import curses
-from typing import List
 from yaspin import yaspin
+from typing import List, Tuple
 from datetime import date, datetime, timedelta
 
+from codenotes.db.utilities import Category
 import codenotes.db.utilities.tasks as tasks
 from codenotes.console import PrintFormatted
 from codenotes.db.connection import SQLiteConnection
+import codenotes.db.utilities.tasks_categories as categories
 
 
 WHITE_ON_MAGENTA = 11
@@ -31,6 +33,9 @@ class AddTaskTUI:
     tasks_list_menu: py_cui.widgets.ScrollMenu
     task_text_block: py_cui.widgets.TextBox
 
+    categories_list: List[Category] = []
+    category_id: int = None
+
     def __init__(self, root: ImpPyCUI):
         """ Constructor of AddTaskTUI class"""
         self.root = root
@@ -46,6 +51,23 @@ class AddTaskTUI:
     @classmethod
     def set_root(cls, root: ImpPyCUI):
         return cls(root)
+
+    def get_categories(self) -> List[Tuple[str]]:
+        """ Gets all categories stored in database """
+        sql = f'SELECT {categories.COLUMN_CATEGORY_ID},{categories.COLUMN_CATEGORY_NAME} FROM {categories.TABLE_NAME};'
+        query = self.cursor.execute(sql)
+        return query.fetchall()
+
+    def _load_menu_categories(self):
+        """ Functions that creates a list of tasks and added it to the categories menu """
+        self.categories_list = [Category(category[0], category[1]) for category in self.get_categories()]
+        self.task_categories_menu.add_item_list(self.categories_list)
+
+    def _select_category(self):
+        """ Function that is executed when a category is selected """
+        category: Category = self.task_categories_menu.get()
+        self.category_id = category.category_id
+        self.task_categories_menu.set_title(f'Categories: {category}')
 
     def _add_task(self):
         """  Adds task to tasks_list_menu widget """
@@ -67,7 +89,6 @@ class AddTaskTUI:
             for task in tasks_list:
                 values = (task, creation_date)
                 self.cursor.execute(sql, values)
-                self.db.conn.commit()
                 spinner.hide()
                 PrintFormatted.print_tasks_storage(task)
                 spinner.show()
@@ -76,16 +97,23 @@ class AddTaskTUI:
             else:
                 spinner.text = 'No Task Saved'
                 spinner.fail("💥")
-        self.cursor.close()
-        self.db.conn.close()
+
+        self.db.conn.commit()
+        self.db.close()
+        # self.cursor.close()
+        # self.db.conn.close()
 
     def __config(self):
         """ Function that configures the widgets of the root """
+        self._load_menu_categories()
+
         self.task_text_block.add_key_command(py_cui.keys.KEY_ENTER, self._add_task)
         self.task_text_block.set_focus_text('|Enter - Add New Task|')
 
         self.tasks_list_menu.add_key_command(py_cui.keys.KEY_BACKSPACE, self._remove_task)
         self.tasks_list_menu.set_focus_text('|Backspace - Remove Task|')
+
+        self.task_categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._select_category)
 
         self.root.set_title('Codenotes - Add Tasks')
         self.root.status_bar.set_text('|q-Quit & Save Tasks| Arrows keys - Move| Enter - Enter Focus Mode|')

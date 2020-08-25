@@ -3,7 +3,7 @@ from yaspin import yaspin
 from rich.table import Table
 from datetime import datetime
 from rich.console import Console
-from typing import List, Union, overload
+from typing import List, Union, overload, Tuple
 
 import codenotes.db.utilities.tasks as tasks
 from codenotes.util.sql import add_conditions_sql
@@ -86,12 +86,11 @@ class AddTask:
 
         sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, '\
               f'{tasks.COLUMN_TASK_CATEGORY}) VALUES (?,?,?);'
-        with yaspin(text='Saving Tasks', color='yellow') as spinner:  # TODO:THIS COULD BE TRANSFORM INTO FUNCTION
+        with yaspin(text='Saving Tasks', color='yellow') as spinner:
             if isinstance(self.task, List):
                 for task in self.task:
                     values = (task, creation_date, self.DEFAULT_CATEGORY_ID)
                     self.cursor.execute(sql, values)
-                    self.db.conn.commit()
                     spinner.hide()
                     PrintFormatted.print_tasks_storage(task)
                     spinner.show()
@@ -99,7 +98,6 @@ class AddTask:
             elif isinstance(self.task, str):
                 values = (self.task, creation_date, self.DEFAULT_CATEGORY_ID)
                 self.cursor.execute(sql, values)
-                self.db.conn.commit()
                 spinner.hide()
                 PrintFormatted.print_tasks_storage(self.task)
                 spinner.show()
@@ -108,6 +106,7 @@ class AddTask:
             else:
                 spinner.text = 'No Task Saved'
                 spinner.fail("💥")
+        self.db.conn.commit()
         self.db.close()
 
     def _ask_confirmation(self) -> bool:
@@ -164,7 +163,7 @@ class SearchTask:
     def set_args(cls, args):
         return cls(args)
 
-    def sql_query(self):
+    def sql_query(self) -> List[Tuple[str]]:
 
         base_sql = f'SELECT {tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_STATUS}, {tasks.COLUMN_TASK_CREATION} from' \
                    f' "{tasks.TABLE_NAME}"'
@@ -173,7 +172,7 @@ class SearchTask:
         if self.search_text:
             base_sql = add_conditions_sql(base_sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.search_text}%"', 'AND')
         query = self.cursor.execute(base_sql)
-        
+
         return query.fetchall()
 
     def search_task(self):
