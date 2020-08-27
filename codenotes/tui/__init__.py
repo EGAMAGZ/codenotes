@@ -63,10 +63,12 @@ class AddTaskTUI:
         return query.fetchall()
 
     def _show_category_name(self):
+        """ Shows message popup to display complete the whole category name """
         category = self.task_categories_menu.get()
         self.root.show_message_popup('Category Name:', category.category_name)
     
     def _show_missing_category(self):
+        """ Shows warning popup to advice the user that he hasn't choose a category where to save the tasks """
         self.root.show_warning_popup("You Haven't Choose a Category", 'Please Select Category Where to Save the Tasks')
 
     def _load_menu_categories(self):
@@ -108,17 +110,18 @@ class AddTaskTUI:
         """ Function that stores the tasks added in tasks_list_menu widget """
         tasks_list = self.tasks_list_menu.get_item_list()
         creation_date = datetime.now().date()
-        sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, {tasks.COLUMN_TASK_CATEGORY}) VALUES ' \
-            f'(?,?,?); '
+        sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, '\
+              f'{tasks.COLUMN_TASK_CATEGORY}) VALUES (?,?,?); '
         with yaspin(text='Saving Tasks') as spinner:
             if tasks_list:
                 if self.selected_category is not None:
+                    # Selected a category
                     self.root.stop()
                     for task in tasks_list:
                         values = (task, creation_date, self.selected_category.category_id)
                         self.cursor.execute(sql, values)
                         spinner.hide()
-                        PrintFormatted.print_tasks_storage(task, self.selected_category)
+                        PrintFormatted.print_tasks_storage(task, self.selected_category.category_name)
                         spinner.show()
                     spinner.ok("✔")
 
@@ -127,6 +130,7 @@ class AddTaskTUI:
                 else:
                     self._show_missing_category()
             else:
+                # Empty list of tasks
                 self.root.stop()
                 spinner.text = 'No Task Saved'
                 spinner.fail("💥")
