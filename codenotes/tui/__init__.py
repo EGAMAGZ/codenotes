@@ -42,9 +42,13 @@ class AddTaskTUI:
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
 
+        # -| Text Blocks |-
         self.task_text_block = self.root.add_text_box('New Task', 0, 0, column_span=4)
+        # -| Scroll Menus |-
         self.task_categories_menu = self.root.add_scroll_menu('Categories', 1, 0, row_span=4)
-        self.tasks_list_menu = self.root.add_scroll_menu('Tasks to add', 1, 1, column_span=3, row_span=4)
+        self.tasks_list_menu = self.root.add_scroll_menu('Tasks to add', 1, 1, column_span=3, row_span=3)
+        # -| Buttons |-
+        self.save_button = self.root.add_button('Save Tasks', 4, 1, column_span=3, command=self.save_tasks)
 
         self.__config()
 
@@ -58,6 +62,13 @@ class AddTaskTUI:
         query = self.cursor.execute(sql)
         return query.fetchall()
 
+    def _show_category_name(self):
+        category = self.task_categories_menu.get()
+        self.root.show_message_popup('Category Name:', category.category_name)
+    
+    def _show_missing_category(self):
+        self.root.show_warning_popup("You Haven't Choose a Category", 'Please Select Category Where to Save the Tasks')
+
     def _load_menu_categories(self):
         """ Functions that creates a list of tasks and added it to the categories menu """
         self.categories_list = [Category(category[0], category[1]) for category in self.get_categories()]
@@ -70,7 +81,7 @@ class AddTaskTUI:
 
     def _ask_new_category(self):
         """ Shows text box popup """
-        self.root.show_text_box_popup('Enter new category name (Max. 30):',command=self._add_category)
+        self.root.show_text_box_popup('Enter new category name (Max. 30):', command=self._add_category)
 
     def _add_category(self, category: str):
         """ Adds new category to categories menu and saves it in database """
@@ -79,6 +90,7 @@ class AddTaskTUI:
             self.cursor.execute(sql, (category,))
             category_id = self.cursor.lastrowid
             self.task_categories_menu.add_item(Category(category_id, category))
+            self.db.conn.commit()
         else:
             self._ask_new_category()
 
@@ -92,45 +104,51 @@ class AddTaskTUI:
         """ Removes task from list """
         self.tasks_list_menu.remove_selected_item()
 
-    def _save_tasks(self):
+    def save_tasks(self):
         """ Function that stores the tasks added in tasks_list_menu widget """
-        creation_date = datetime.now().date()
         tasks_list = self.tasks_list_menu.get_item_list()
+        creation_date = datetime.now().date()
         sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, {tasks.COLUMN_TASK_CATEGORY}) VALUES ' \
-              f'(?,?,?); '
+            f'(?,?,?); '
         with yaspin(text='Saving Tasks') as spinner:
-            for task in tasks_list:
-                values = (task, creation_date, self.selected_category.category_id)
-                self.cursor.execute(sql, values)
-                spinner.hide()
-                PrintFormatted.print_tasks_storage(task)
-                spinner.show()
             if tasks_list:
-                spinner.ok("✔")
+                if self.selected_category is not None:
+                    self.root.stop()
+                    for task in tasks_list:
+                        values = (task, creation_date, self.selected_category.category_id)
+                        self.cursor.execute(sql, values)
+                        spinner.hide()
+                        PrintFormatted.print_tasks_storage(task, self.selected_category)
+                        spinner.show()
+                    spinner.ok("✔")
+
+                    self.db.conn.commit()
+                    self.db.close()
+                else:
+                    self._show_missing_category()
             else:
+                self.root.stop()
                 spinner.text = 'No Task Saved'
                 spinner.fail("💥")
-
-        self.db.conn.commit()
-        self.db.close()
+                self.db.close()
 
     def __config(self):
         """ Function that configures the widgets of the root """
         self._load_menu_categories()
 
         self.task_text_block.add_key_command(py_cui.keys.KEY_ENTER, self._add_task)
-        self.task_text_block.set_focus_text('|Enter - Add New Task|')
+        self.task_text_block.set_focus_text('|Enter - Add New Task| Esc - Exit|')
 
         self.tasks_list_menu.add_key_command(py_cui.keys.KEY_BACKSPACE, self._remove_task)
-        self.tasks_list_menu.set_focus_text('|Backspace - Remove Task|')
+        self.tasks_list_menu.set_focus_text('|Backspace - Remove Task|Esc - Exit |')
 
         self.task_categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._select_category)
         self.task_categories_menu.add_key_command(py_cui.keys.KEY_N_LOWER, self._ask_new_category)
+        self.task_categories_menu.add_key_command(py_cui.keys.KEY_SPACE, self._show_category_name)
+        self.task_categories_menu.set_focus_text('|n - New Category|Enter - Select Category|Space - Show category|Up/Down - Move|Esc - Exit|')
 
         self.root.set_title('Codenotes - Add Tasks')
-        self.root.status_bar.set_text('|q-Quit & Save Tasks| Arrows keys - Move| Enter - Enter Focus Mode|')
-
-        self.root.run_on_exit(self._save_tasks)
+        self.root.status_bar.set_text('|q-Quit Without Saving Tasks| Arrows keys - Move| Enter - Enter Focus Mode|')
 
 
 class SearchTaskTUI:
@@ -161,6 +179,7 @@ class SearchTaskTUI:
         self.root.show_menu_popup('Date Options', menu_items=self.DATE_OPTIONS, command=self._set_date_option)
 
     def _set_date_option(self, date_option):
+        title = ''
         if date_option == 'None':
             title = 'Select Date'
             self.search_date = None

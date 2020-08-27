@@ -56,7 +56,7 @@ def status_text(status: int) -> str:
 
 class AddTask:
 
-    DEFAULT_CATEGORY_ID: int = 0
+    DEFAULT_CATEGORY_ID: int = 1
 
     def __init__(self, args):
         """ Constructor fro AddTask class """

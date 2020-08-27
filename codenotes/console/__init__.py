@@ -53,15 +53,17 @@ class PrintFormatted:
         return cls(html_text, styles)
 
     @classmethod
-    def print_tasks_storage(cls, task_txt: str):
+    def print_tasks_storage(cls, task_txt: str, task_category: str = 'TODO Tasks'):
         """ Class method used to print the process of tasks storage
         Parameters
         ----------
         task_txt : str
             Content of the task that is stored
+        task_category : str
+            Category where the task is stored
         """
         custom_html = HTML(
-            u'<b>></b><msg>Task saved: </msg><task-txt>{}</task-txt>'.format(task_txt[:30])
+            u'<b>></b><msg>Task saved[{}]: </msg><task-txt>{}</task-txt>'.format(task_category, task_txt)
         )
 
         custom_style = Style.from_dict({  # Style use for prints related with saving process
