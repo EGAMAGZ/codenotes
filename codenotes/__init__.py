@@ -14,14 +14,18 @@ def parse_args(args):
     subparsers = parser.add_subparsers(dest='subargs')
 
     add = subparsers.add_parser('add')
+
     add.add_argument('type', choices=['note', 'task'], type=str)
     add.add_argument('text', type=str, nargs='*', action='store')
     add.add_argument('--preview', '-p', action='store_true')
 
     search = subparsers.add_parser('search')
+
     search.add_argument('type', choices=['note', 'task'])
     search.add_argument('text', action='store', nargs='*')
+    
     search_group = search.add_mutually_exclusive_group()
+
     search_group.add_argument('--today', '-t', action='store_true')
     search_group.add_argument('--yesterday', '-y', action='store_true')
     search_group.add_argument('--week', '-w', action='store_true')

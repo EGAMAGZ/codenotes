@@ -19,10 +19,11 @@ class SQLiteConnection:
         self.conn = sqlite3.connect(self.DATABASE_PATH)
         self.cursor = self.conn.cursor()
 
-        self.exec_sql(notes.CREATE_NOTES_TABLE)
-        self.exec_sql(categories.CREATE_TODOS_CATEGORY_TABLE)
-        self.cursor.execute(categories.INSERT_DEFAULT_CATEGORY)
-        self.exec_sql(tasks.CREATE_TASKS_TABLE)
+        self.exec_sql(notes.CREATE_NOTES_TABLE)  # Notes Table
+        self.exec_sql(categories.CREATE_TODOS_CATEGORY_TABLE)  # Task Category Table
+        self.cursor.execute(categories.INSERT_DEFAULT_CATEGORY)  # Insert Default Category
+        self.exec_sql(tasks.CREATE_TASKS_TABLE)  # Tasks Table
+
         self.conn.commit()
 
     @overload
@@ -32,11 +33,28 @@ class SQLiteConnection:
     def exec_sql(self, sql: str) -> None: ...
 
     def exec_sql(self, sql: str) -> Union[Cursor, None]:
-        """ Function that executes sql command """
+        """ Function that executes sql command 
+        
+        Parameters
+        ----------
+        sql : str
+            SQL statement to be executed
+
+        Returns
+        -------
+        cursor : Union[Cursor, None]
+            Method will return None or Cursor, depending of the statement executed
+        """
         self.cursor.execute(sql)
 
     def get_cursor(self) -> Cursor:
-        """ Return cursor created """
+        """ Return cursor created 
+        
+        Returns
+        -------
+        cursor : Cursor
+            Returns the cursor of the class
+        """
         return self.cursor
 
     def close(self):

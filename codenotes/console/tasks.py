@@ -35,18 +35,28 @@ def format_task_text(text: str) -> Union[List[str], str]:
         List of texts of task joined and stripped
     """
     task_text = ' '.join(text)
+
     if ';' in task_text:
         tasks_list = []
+
         for task in task_text.split(';'):
             if task and not task.isspace():
                 # Checks if is '' or ' ', and doesn't append it if so
                 tasks_list.append(task.strip())  # "Trim"
+
         return tasks_list
     else:
         return task_text
 
 
 def status_text(status: int) -> str:
+    """ Functions that returns the status in text 
+    
+    Parameters
+    ----------
+    status : int
+        Int status of the task
+    """
     if status == 0:
         return 'Incomplete'
     elif status == 1:
@@ -60,7 +70,13 @@ class AddTask:
     DEFAULT_CATEGORY_ID: int = 1
 
     def __init__(self, args):
-        """ Constructor fro AddTask class """
+        """ Constructor fro AddTask class 
+        
+        Parameters
+        ----------
+        args : NameSpace
+            Arguments of argparse
+        """
         self.console = Console()
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
@@ -68,6 +84,7 @@ class AddTask:
 
         if args.text:
             self.task = format_task_text(args.text)
+
             if args.preview:
                 self.show_preview()
             else:
@@ -79,6 +96,13 @@ class AddTask:
 
     @classmethod
     def set_args(cls, args):
+        """ Set args and initialize class
+        
+        Parameters
+        ----------
+        args : NameSpace
+            Arguments of argparse
+        """
         return cls(args)
 
     def save_task(self):
@@ -87,6 +111,7 @@ class AddTask:
 
         sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, '\
               f'{tasks.COLUMN_TASK_CATEGORY}) VALUES (?,?,?);'
+
         with yaspin(text='Saving Tasks', color='yellow') as spinner:
             if isinstance(self.task, List):
                 for task in self.task:
@@ -102,11 +127,13 @@ class AddTask:
                 spinner.hide()
                 PrintFormatted.print_tasks_storage(self.task)
                 spinner.show()
+
             if self.task:
                 spinner.ok("✔")
             else:
                 spinner.text = 'No Task Saved'
                 spinner.fail("💥")
+
         self.db.conn.commit()
         self.db.close()
 
@@ -129,16 +156,21 @@ class AddTask:
     def show_preview(self):
         """ Function that displays a table with the tasks written"""
         formatted_date = self.creation_date.strftime('%Y-%m-%d')
+        
         self.console.rule('Preview', style='purple')
+        
         table = Table(box=box.SIMPLE_HEAD)
         table.add_column('Task')
         table.add_column('Creation Date', justify='center', style='yellow')
+        
         if isinstance(self.task, List):
             for task in self.task:
                 table.add_row(task, formatted_date)
         elif isinstance(self.task, str):
             table.add_row(self.task, formatted_date)
+
         self.console.print(table, justify='center')
+
         if self._ask_confirmation():
             self.save_task()
 
@@ -146,7 +178,13 @@ class AddTask:
 class SearchTask:
 
     def __init__(self, args):
-        """ SearchTask Constructor """
+        """ SearchTask Constructor 
+        
+        Parameters
+        ----------
+        args : NameSpace
+            Arguments of argparse
+        """
         self.console = Console()
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
@@ -162,6 +200,13 @@ class SearchTask:
 
     @classmethod
     def set_args(cls, args):
+        """ Set args and initialize class
+        
+        Parameters
+        ----------
+        args : NameSpace
+            Arguments of argparse
+        """
         return cls(args)
 
     def sql_query(self) -> List[Tuple[str]]:

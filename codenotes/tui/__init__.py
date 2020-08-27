@@ -59,14 +59,17 @@ class AddTaskTUI:
     def get_categories(self) -> List[Tuple[str]]:
         """ Gets all categories stored in database """
         sql = f'SELECT {categories.COLUMN_CATEGORY_ID},{categories.COLUMN_CATEGORY_NAME} FROM {categories.TABLE_NAME};'
+
         query = self.cursor.execute(sql)
+
         return query.fetchall()
 
     def _show_category_name(self):
         """ Shows message popup to display complete the whole category name """
         category = self.task_categories_menu.get()
+
         self.root.show_message_popup('Category Name:', category.category_name)
-    
+
     def _show_missing_category(self):
         """ Shows warning popup to advice the user that he hasn't choose a category where to save the tasks """
         self.root.show_warning_popup("You Haven't Choose a Category", 'Please Select Category Where to Save the Tasks')
@@ -74,11 +77,13 @@ class AddTaskTUI:
     def _load_menu_categories(self):
         """ Functions that creates a list of tasks and added it to the categories menu """
         self.categories_list = [Category(category[0], category[1]) for category in self.get_categories()]
+
         self.task_categories_menu.add_item_list(self.categories_list)
 
     def _select_category(self):
         """ Function that is executed when a category is selected """
         self.selected_category = self.task_categories_menu.get()
+
         self.task_categories_menu.set_title(f'{self.selected_category}')
 
     def _ask_new_category(self):
@@ -89,9 +94,12 @@ class AddTaskTUI:
         """ Adds new category to categories menu and saves it in database """
         if category and len(category) <= 30:
             sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
+
             self.cursor.execute(sql, (category,))
+
             category_id = self.cursor.lastrowid
             self.task_categories_menu.add_item(Category(category_id, category))
+
             self.db.conn.commit()
         else:
             self._ask_new_category()
@@ -99,6 +107,7 @@ class AddTaskTUI:
     def _add_task(self):
         """  Adds task to tasks_list_menu widget """
         text = self.task_text_block.get()
+
         self.tasks_list_menu.add_item(text)
         self.task_text_block.clear()
 
@@ -110,8 +119,10 @@ class AddTaskTUI:
         """ Function that stores the tasks added in tasks_list_menu widget """
         tasks_list = self.tasks_list_menu.get_item_list()
         creation_date = datetime.now().date()
+
         sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, '\
               f'{tasks.COLUMN_TASK_CATEGORY}) VALUES (?,?,?); '
+
         with yaspin(text='Saving Tasks') as spinner:
             if tasks_list:
                 if self.selected_category is not None:
@@ -119,6 +130,7 @@ class AddTaskTUI:
                     self.root.stop()
                     for task in tasks_list:
                         values = (task, creation_date, self.selected_category.category_id)
+
                         self.cursor.execute(sql, values)
                         spinner.hide()
                         PrintFormatted.print_tasks_storage(task, self.selected_category.category_name)
@@ -167,7 +179,13 @@ class SearchTaskTUI:
     search_date: date = None
 
     def __init__(self, root: ImpPyCUI):
-        """ Constructor of SearchTaskTUI class """
+        """ Constructor of SearchTaskTUI class 
+
+        Parameters
+        ----------
+        root : ImpPyCUI
+            Root for TUI
+        """
         self.root = root
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
@@ -180,6 +198,13 @@ class SearchTaskTUI:
 
     @classmethod
     def set_root(cls, root: ImpPyCUI):
+        """ Sets root and initialize class
+        
+        Parameters
+        ----------
+        root : ImpPyCUI
+            Root for TUI
+        """
         return cls(root)
 
     def _show_menu_date_popup(self):

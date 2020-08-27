@@ -12,6 +12,7 @@ def args_needed_empty(args) -> bool:
         Return boolean value if all related args to search are empty
     """
     args_needed = [args.month, args.text, args.today, args.week, args.yesterday]
+
     if any(args_needed):
         return False
     return True
@@ -70,4 +71,5 @@ class PrintFormatted:
             'msg': '#d898ed bold',
             'task-txt': '#616161 italic'
         })
+
         return cls(custom_html, custom_style)
