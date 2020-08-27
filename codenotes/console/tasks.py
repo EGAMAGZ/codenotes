@@ -7,6 +7,7 @@ from typing import List, Union, overload, Tuple
 
 from codenotes.db import add_conditions_sql
 import codenotes.db.utilities.tasks as tasks
+import codenotes.db.utilities.tasks_categories as categories
 from codenotes.db.connection import SQLiteConnection
 from codenotes.tui import AddTaskTUI, ImpPyCUI, SearchTaskTUI
 from codenotes.console import PrintFormatted, args_needed_empty, dates_to_search
@@ -164,26 +165,34 @@ class SearchTask:
         return cls(args)
 
     def sql_query(self) -> List[Tuple[str]]:
+        """ Function that makes a query of related information of tasks"""
+        sql = f'SELECT {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CONTENT},{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_STATUS}, ' \
+              f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CREATION}, ' \
+              f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_NAME} FROM {tasks.TABLE_NAME} INNER JOIN ' \
+              f'{categories.TABLE_NAME} ON {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CATEGORY} = ' \
+              f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_ID}'
 
-        base_sql = f'SELECT {tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_STATUS}, {tasks.COLUMN_TASK_CREATION} from' \
-                   f' "{tasks.TABLE_NAME}"'
         if self.search_date:
-            base_sql = add_conditions_sql(base_sql, f'{tasks.COLUMN_TASK_CREATION} LIKE date("{self.search_date}")')
+            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} LIKE date("{self.search_date}")')
+
         if self.search_text:
-            base_sql = add_conditions_sql(base_sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.search_text}%"', 'AND')
-        query = self.cursor.execute(base_sql)
+            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.search_text}%"', 'AND')
+
+        query = self.cursor.execute(sql)
 
         return query.fetchall()
 
     def search_task(self):
         """ Function that displays a table with the tasks searched """
         table = Table()
+
         table.add_column('Tasks')
         table.add_column('Status')
+        table.add_column('Category')
         table.add_column('Creation Date', justify='center', style='yellow')
 
         for task in self.sql_query():
-            table.add_row(task[0], status_text(task[1]), task[2])
+            table.add_row(task[0], status_text(task[1]), task[3], task[2])
         self.console.print(table, justify='center')
         # self.console.rule(self.search_date.strftime('%m-%d-%Y'), style='purple')
         # self.db.close()
