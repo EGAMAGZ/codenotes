@@ -44,7 +44,7 @@ class TestSearchTodo(unittest.TestCase):
         args = parse_args(['add', 'task', 'Different', 'task'])
         AddTask.set_args(args)
 
-        expected_tasks=[('Different task', 0, self.date)]
+        expected_tasks=[('Different task', 1, self.date)]
         args = parse_args(['search', 'task', 'Different', '--today'])
         query = SearchTask(args).sql_query()
 
@@ -53,11 +53,10 @@ class TestSearchTodo(unittest.TestCase):
     def test_search_text_task(self):
         """ Test that search all tasks that match to some keywords  """
         expected_tasks = [
-            ('New task #1', 0, self.date),
-            ('New task #2', 0, self.date),
-            ('New task #3', 0, self.date)
+            ('New task #1', 1, self.date),
+            ('New task #2', 1, self.date),
+            ('New task #3', 1, self.date)
         ]
-
         args = parse_args(['search', 'task', 'New', 'task'])
         query = SearchTask(args).sql_query()
         self.assertCountEqual(query, expected_tasks)
@@ -65,10 +64,10 @@ class TestSearchTodo(unittest.TestCase):
     def test_search_today_task(self):
         """ Test that search for the four tasks added """
         expected_tasks = [
-            ('New task #1', 0, self.date),
-            ('New task #2', 0, self.date),
-            ('New task #3', 0, self.date),
-            ('Different task', 0, self.date)
+            ('New task #1', 1, self.date),
+            ('New task #2', 1, self.date),
+            ('New task #3', 1, self.date),
+            ('Different task', 1, self.date)
         ]
 
         args = parse_args(['search', 'task', '--today'])
