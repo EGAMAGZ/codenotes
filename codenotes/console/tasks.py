@@ -5,8 +5,8 @@ from datetime import datetime
 from rich.console import Console
 from typing import List, Union, overload, Tuple
 
+from codenotes.db import add_conditions_sql
 import codenotes.db.utilities.tasks as tasks
-from codenotes.util.sql import add_conditions_sql
 from codenotes.db.connection import SQLiteConnection
 from codenotes.tui import AddTaskTUI, ImpPyCUI, SearchTaskTUI
 from codenotes.console import PrintFormatted, args_needed_empty, dates_to_search

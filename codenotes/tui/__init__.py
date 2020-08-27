@@ -145,7 +145,9 @@ class AddTaskTUI:
         self.task_categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._select_category)
         self.task_categories_menu.add_key_command(py_cui.keys.KEY_N_LOWER, self._ask_new_category)
         self.task_categories_menu.add_key_command(py_cui.keys.KEY_SPACE, self._show_category_name)
-        self.task_categories_menu.set_focus_text('|n - New Category|Enter - Select Category|Space - Show category|Up/Down - Move|Esc - Exit|')
+        self.task_categories_menu.set_focus_text(
+            '|n - New Category|Enter - Select Category|Space - Show category|Up/Down - Move|Esc - Exit|'
+        )
 
         self.root.set_title('Codenotes - Add Tasks')
         self.root.status_bar.set_text('|q-Quit Without Saving Tasks| Arrows keys - Move| Enter - Enter Focus Mode|')
@@ -165,8 +167,9 @@ class SearchTaskTUI:
         self.root = root
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
-
+        # -| Buttons |-
         self.date_search_button = self.root.add_button('Select Date', 0, 3, command=self._show_menu_date_popup)
+        # -| Text Boxes |-
         self.task_search_text_box = self.root.add_text_box('Search task:', 0, 0)
 
         self.__config()
