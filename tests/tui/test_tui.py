@@ -3,11 +3,13 @@ import unittest
 from codenotes.db.utilities import Category
 from codenotes.tui import AddTaskTUI, ImpPyCUI
 
+
 class TestAddTodoTUI(unittest.TestCase):
 
     def setUp(self) -> None:
         self.root = ImpPyCUI(5, 4)
         self.add_todo_tui = AddTaskTUI(self.root)
+
 
 class TestDefaultCategory(TestAddTodoTUI):
 
@@ -39,7 +41,7 @@ class TestDefaultCategory(TestAddTodoTUI):
         self.assertCountEqual(self.add_todo_tui.categories_list, expected_categories_menu)
 
     def test_save_tasks(self):
-        #! EVERYTIME A TEST IS EXECUTED, THE SETUP METHOD IS ALSO EXECUTED
+        # ! EVERYTIME A TEST IS EXECUTED, THE SETUP METHOD IS ALSO EXECUTED
         expected_tasks_added = [
             'TODO Task #1',
             'TODO Task #2',
@@ -88,7 +90,7 @@ class TestNewCategory(TestAddTodoTUI):
     def test_initial_categories(self):
         self.assertEqual(self.add_todo_tui.selected_category, None)
 
-        expected_categories=[
+        expected_categories = [
             (1, 'TODO Tasks'),
             (2, 'Custom Category')
         ]
@@ -115,5 +117,5 @@ class TestNewCategory(TestAddTodoTUI):
 
         self.assertCountEqual(self.add_todo_tui.tasks_list_menu.get_item_list(), expected_tasks_added)
 
-        self.add_todo_tui.selected_category = Category(2 ,'Custom Category')
+        self.add_todo_tui.selected_category = Category(2, 'Custom Category')
         self.add_todo_tui.save_tasks()

@@ -1,11 +1,13 @@
-from datetime import datetime, date, timedelta
+import calendar
 from prompt_toolkit.styles import Style
-from prompt_toolkit import HTML, print_formatted_text
+from typing import overload, List, Union
+from datetime import datetime, date, timedelta
 import prompt_toolkit.output.win32 as prompt_toolkit
+from prompt_toolkit import HTML, print_formatted_text
 
 
 def args_needed_empty(args) -> bool:
-    """ Check if argumentes required to search are empty
+    """ Check if arguments required to search are empty
     Returns
     -------
     empty : bool
@@ -18,7 +20,15 @@ def args_needed_empty(args) -> bool:
     return True
 
 
-def dates_to_search(args) -> date:
+@overload
+def dates_to_search(args) -> List[date]: ...
+
+
+@overload
+def dates_to_search(args) -> date: ...
+
+
+def dates_to_search(args) -> Union[List[date], date]:
     """ Returns date to search depending of the user selection
     Returns
     -------
@@ -27,8 +37,23 @@ def dates_to_search(args) -> date:
     """
     if args.today:
         return datetime.now().date()
+
     elif args.yesterday:
         return datetime.now().date() - timedelta(days=1)
+
+    elif args.week:
+        pass
+    elif args.month:
+        now = datetime.now()
+        year = now.year
+        month = now.month
+        num_days = calendar.monthrange(year, month)[1]
+        days = [
+            date(year, month, 1),
+            date(year, month, num_days)
+        ]
+
+        return days
 
 
 class PrintFormatted:

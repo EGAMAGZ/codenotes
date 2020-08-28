@@ -1,7 +1,7 @@
 import os
 import sqlite3
+from typing import Optional
 from sqlite3.dbapi2 import Cursor
-from typing import overload, Union
 
 import codenotes.db.utilities.notes as notes
 import codenotes.db.utilities.tasks as tasks
@@ -26,13 +26,7 @@ class SQLiteConnection:
 
         self.conn.commit()
 
-    @overload
-    def exec_sql(self, sql: str) -> Cursor: ...
-
-    @overload
-    def exec_sql(self, sql: str) -> None: ...
-
-    def exec_sql(self, sql: str) -> Union[Cursor, None]:
+    def exec_sql(self, sql: str) -> Optional[Cursor]:
         """ Function that executes sql command 
         
         Parameters

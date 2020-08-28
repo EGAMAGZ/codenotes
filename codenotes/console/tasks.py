@@ -1,7 +1,7 @@
 from rich import box
 from yaspin import yaspin
 from rich.table import Table
-from datetime import datetime
+from datetime import datetime, date
 from rich.console import Console
 from typing import List, Union, overload, Tuple
 
@@ -107,7 +107,6 @@ class AddTask:
 
     def save_task(self):
         """ Function in charge to store the tasks in the database"""
-        creation_date = datetime.now().date()  # Actual date
 
         sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, '\
               f'{tasks.COLUMN_TASK_CATEGORY}) VALUES (?,?,?);'
@@ -115,14 +114,14 @@ class AddTask:
         with yaspin(text='Saving Tasks', color='yellow') as spinner:
             if isinstance(self.task, List):
                 for task in self.task:
-                    values = (task, creation_date, self.DEFAULT_CATEGORY_ID)
+                    values = (task, self.creation_date, self.DEFAULT_CATEGORY_ID)
                     self.cursor.execute(sql, values)
                     spinner.hide()
                     PrintFormatted.print_tasks_storage(task)
                     spinner.show()
 
             elif isinstance(self.task, str):
-                values = (self.task, creation_date, self.DEFAULT_CATEGORY_ID)
+                values = (self.task, self.creation_date, self.DEFAULT_CATEGORY_ID)
                 self.cursor.execute(sql, values)
                 spinner.hide()
                 PrintFormatted.print_tasks_storage(self.task)
@@ -218,8 +217,12 @@ class SearchTask:
               f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_ID}'
 
         if self.search_date:
-            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} LIKE date("{self.search_date}")')
-
+            if isinstance(self.search_date, date):
+                sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} LIKE date("{self.search_date}")')
+            elif isinstance(self.search_date, list):
+                first_day, last_day = self.search_date
+                sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} BETWEEN date("{first_day}") '
+                                              f'AND date("{last_day}")')
         if self.search_text:
             sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.search_text}%"', 'AND')
 
