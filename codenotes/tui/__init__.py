@@ -88,9 +88,9 @@ class AddTaskTUI:
 
     def _ask_new_category(self):
         """ Shows text box popup """
-        self.root.show_text_box_popup('Enter new category name (Max. 30):', command=self._add_category)
+        self.root.show_text_box_popup('Enter new category name (Max. 30):', command=self.add_category)
 
-    def _add_category(self, category: str):
+    def add_category(self, category: str):
         """ Adds new category to categories menu and saves it in database """
         if category and len(category) <= 30:
             sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
@@ -104,14 +104,14 @@ class AddTaskTUI:
         else:
             self._ask_new_category()
 
-    def _add_task(self):
+    def add_task(self):
         """  Adds task to tasks_list_menu widget """
         text = self.task_text_block.get()
 
         self.tasks_list_menu.add_item(text)
         self.task_text_block.clear()
 
-    def _remove_task(self):
+    def remove_task(self):
         """ Removes task from list """
         self.tasks_list_menu.remove_selected_item()
 
@@ -152,10 +152,10 @@ class AddTaskTUI:
         """ Function that configures the widgets of the root """
         self._load_menu_categories()
 
-        self.task_text_block.add_key_command(py_cui.keys.KEY_ENTER, self._add_task)
+        self.task_text_block.add_key_command(py_cui.keys.KEY_ENTER, self.add_task)
         self.task_text_block.set_focus_text('|Enter - Add New Task| Esc - Exit|')
 
-        self.tasks_list_menu.add_key_command(py_cui.keys.KEY_BACKSPACE, self._remove_task)
+        self.tasks_list_menu.add_key_command(py_cui.keys.KEY_BACKSPACE, self.remove_task)
         self.tasks_list_menu.set_focus_text('|Backspace - Remove Task|Esc - Exit |')
 
         self.task_categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._select_category)
