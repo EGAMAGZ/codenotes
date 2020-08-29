@@ -42,7 +42,14 @@ def dates_to_search(args) -> Union[List[date], date]:
         return datetime.now().date() - timedelta(days=1)
 
     elif args.week:
-        pass
+        now = datetime.now().date()
+        first_day = now - timedelta(days=now.weekday())
+        last_day = first_day + timedelta(days=6)
+
+        days = [first_day, last_day]
+
+        return days
+
     elif args.month:
         now = datetime.now()
         num_days = calendar.monthrange(now.year, now.month)[1]

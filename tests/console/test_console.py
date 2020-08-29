@@ -55,6 +55,15 @@ class TestDateToSearch(unittest.TestCase):
 
         self.assertListEqual(dates_to_search(args), days)
 
+    def test_week(self):
+        now = datetime.now().date()
+        first_day = now - timedelta(days=now.weekday())
+        last_day = first_day + timedelta(days=6)
+        days = [first_day, last_day]
+
+        args = parse_args(['search', 'task', '--week'])
+
+        self.assertListEqual(dates_to_search(args), days)
 
 if __name__ == "__main__":
     unittest.main()
