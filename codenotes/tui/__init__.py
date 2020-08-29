@@ -108,7 +108,7 @@ class AddTaskTUI:
         """  Adds task to tasks_list_menu widget """
         text = self.task_text_block.get()
 
-        self.tasks_list_menu.add_item(text)
+        self.tasks_list_menu.add_item(text)  # TODO: ADD TRIM AND TO CATEGORY
         self.task_text_block.clear()
 
     def remove_task(self):
@@ -171,7 +171,8 @@ class AddTaskTUI:
 
 class SearchTaskTUI:
 
-    DATE_OPTIONS: List[str] = ['None', 'Today', 'Yesterday']
+    DATE_OPTIONS: List[str] = ['None', 'Today', 'Yesterday', 'Week', 'Month']
+    CATEGORY_OPTIONS: List[Category] = []
 
     date_search_button: py_cui.widgets.Button
     task_search_text_box: py_cui.widgets.TextBox
@@ -190,9 +191,14 @@ class SearchTaskTUI:
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
         # -| Buttons |-
-        self.date_search_button = self.root.add_button('Select Date', 0, 3, command=self._show_menu_date_popup)
+        self.date_search_button = self.root.add_button('Select Date', 0, 5, command=self._show_menu_date_popup)
+        self.category_search_button = self.root.add_button('Select Category', 0,4 , command=self._show_menu_category_popup)
         # -| Text Boxes |-
-        self.task_search_text_box = self.root.add_text_box('Search task:', 0, 0)
+        self.task_search_text_box = self.root.add_text_box('Search task:', 0, 0, column_span=4)
+        # -| Scroll Menu |-
+        self.incomplete_tasks_menu = self.root.add_scroll_menu('Incomplete Tasks', 1, 0, row_span=4, column_span=2)
+        self.process_tasks_menu = self.root.add_scroll_menu('In Proccess Tasks', 1, 2, row_span=4, column_span=2)
+        self.finished_tasks_menu = self.root.add_scroll_menu('Finished Tasks', 1 , 4, row_span=4, column_span=2)
 
         self.__config()
 
@@ -210,19 +216,26 @@ class SearchTaskTUI:
     def _show_menu_date_popup(self):
         self.root.show_menu_popup('Date Options', menu_items=self.DATE_OPTIONS, command=self._set_date_option)
 
-    def _set_date_option(self, date_option):
-        title = ''
-        if date_option == 'None':
-            title = 'Select Date'
-            self.search_date = None
-        elif date_option == 'Today':
-            title = 'Today'
-            self.search_date = datetime.now().date()
-        elif date_option == 'Yesterday':
-            title = 'Yesterday'
-            self.search_date = datetime.now().date() - timedelta(days=1)
+    def _show_menu_category_popup(self):
+        self.root.show_menu_popup('Category Options', menu_items=self.CATEGORY_OPTIONS, command=self._set_category_option)
 
+    def _set_date_option(self, date_option: str):
+        if date_option == self.DATE_OPTIONS[0]:
+            self.search_date = None
+        elif date_option == self.DATE_OPTIONS[1]:
+            self.search_date = datetime.now().date()
+        elif date_option == self.DATE_OPTIONS[2]:
+            self.search_date = datetime.now().date() - timedelta(days=1)
+        elif date_option == self.DATE_OPTIONS[3]:
+            pass
+        elif date_option == self.DATE_OPTIONS[4]:
+            pass
+
+        title = date_option
         self.date_search_button.set_title(title)
+
+    def _set_category_option(self, catery_option: Category):
+        pass
 
     def __config(self):
         """ Function that configures the widgets of the root """

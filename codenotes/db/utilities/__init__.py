@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from codenotes.util import abbreviate_menu_text
+from codenotes.util.menu import abbreviate_menu_text
 
 
 @dataclass
