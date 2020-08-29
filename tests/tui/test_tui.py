@@ -25,6 +25,9 @@ class TestDefaultCategory(TestAddTodoTUI):
         self.assertCountEqual(self.add_todo_tui.tasks_list_menu.get_item_list(), expected_categories)
         self.assertEqual(self.add_todo_tui.task_text_block.get(), '')
 
+        self.add_todo_tui.selected_category = Category(1, 'TODO Tasks')
+        self.add_todo_tui.save_tasks()
+
     def test_initial_categories(self):
         self.assertEqual(self.add_todo_tui.selected_category, None)
 
@@ -43,11 +46,9 @@ class TestDefaultCategory(TestAddTodoTUI):
     def test_save_tasks(self):
         # ! EVERYTIME A TEST IS EXECUTED, THE SETUP METHOD IS ALSO EXECUTED
         expected_tasks_added = [
-            'TODO Task #1',
             'TODO Task #2',
             'TODO Task #3'
         ]
-        self.add_todo_tui.tasks_list_menu.add_item('TODO Task #1')
         self.add_todo_tui.tasks_list_menu.add_item('TODO Task #2')
         self.add_todo_tui.tasks_list_menu.add_item('TODO Task #3')
 
@@ -87,6 +88,9 @@ class TestNewCategory(TestAddTodoTUI):
         self.assertCountEqual(self.add_todo_tui.tasks_list_menu.get_item_list(), expected_categories)
         self.assertEqual(self.add_todo_tui.task_text_block.get(), '')
 
+        self.add_todo_tui.selected_category = Category(2, 'Custom Category')
+        self.add_todo_tui.save_tasks()
+
     def test_initial_categories(self):
         self.assertEqual(self.add_todo_tui.selected_category, None)
 
@@ -106,12 +110,10 @@ class TestNewCategory(TestAddTodoTUI):
 
     def test_save_tasks(self):
         expected_tasks_added = [
-            'Custom Task #1',
             'Custom Task #2',
             'Custom Task #3'
         ]
 
-        self.add_todo_tui.tasks_list_menu.add_item('Custom Task #1')
         self.add_todo_tui.tasks_list_menu.add_item('Custom Task #2')
         self.add_todo_tui.tasks_list_menu.add_item('Custom Task #3')
 
