@@ -45,12 +45,10 @@ def dates_to_search(args) -> Union[List[date], date]:
         pass
     elif args.month:
         now = datetime.now()
-        year = now.year
-        month = now.month
-        num_days = calendar.monthrange(year, month)[1]
+        num_days = calendar.monthrange(now.year, now.month)[1]
         days = [
-            date(year, month, 1),
-            date(year, month, num_days)
+            date(now.year, now.month, 1),
+            date(now.year, now.month, num_days)
         ]
 
         return days
