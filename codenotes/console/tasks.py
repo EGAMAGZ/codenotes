@@ -60,7 +60,7 @@ def status_text(status: int) -> str:
     if status == 0:
         return 'Incomplete'
     elif status == 1:
-        return 'Process'
+        return 'In Process'
     elif status == 2:
         return 'Finished'
 

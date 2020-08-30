@@ -173,6 +173,7 @@ class AddTaskTUI:
 class SearchTaskTUI:
 
     DATE_OPTIONS: List[str] = ['None', 'Today', 'Yesterday', 'Week', 'Month']
+    STATUS_OPTION: List[str] = ['All', 'Incomplete', 'In Process', 'Finished']
     BASE_SQL: str = f'SELECT {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CONTENT},{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_STATUS}, ' \
               f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CREATION}, ' \
               f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_NAME} FROM {tasks.TABLE_NAME} INNER JOIN ' \
@@ -181,8 +182,9 @@ class SearchTaskTUI:
 
     task_search_text_box: py_cui.widgets.TextBox
     tasks_list_menu: py_cui.widgets.ScrollMenu
-    process_tasks_menu: py_cui.widgets.ScrollMenu
-    finished_tasks_menu: py_cui.widgets.ScrollMenu
+    task_categories_menu: py_cui.widgets.ScrollMenu
+    task_date_menu: py_cui.widgets.ScrollMenu
+    task_status_menu: py_cui.widgets.ScrollMenu
 
     search_date: Optional[date] = None
     category_options: List[Category]
@@ -203,6 +205,9 @@ class SearchTaskTUI:
         self.task_search_text_box = self.root.add_text_box('Search task:', 0, 1, column_span=5)
         # -| Scroll Menu |-
         self.tasks_list_menu = self.root.add_scroll_menu('', 1, 1, row_span=5, column_span=5)
+        self.task_categories_menu = self.root.add_scroll_menu('Category', 0, 0, row_span=2)
+        self.task_date_menu = self.root.add_scroll_menu('Date', 2, 0, row_span=2)
+        self.task_status_menu = self.root.add_scroll_menu('Status', 4 , 0, row_span=2)
 
         self.__config()
 
@@ -216,6 +221,14 @@ class SearchTaskTUI:
             Root for TUI
         """
         return cls(root)
+
+    def get_categories(self) -> List[Tuple[str]]:
+        """ Gets all categories stored in database """
+        sql = f'SELECT {categories.COLUMN_CATEGORY_ID},{categories.COLUMN_CATEGORY_NAME} FROM {categories.TABLE_NAME};'
+
+        query = self.cursor.execute(sql)
+
+        return query.fetchall()
 
     def _set_date_option(self, date_option: str):
         if date_option == self.DATE_OPTIONS[0]:
@@ -255,10 +268,21 @@ class SearchTaskTUI:
 
         #Status
 
+    def _load_menu_categories(self):
+        """ Functions that creates a list of tasks and added it to the categories menu """
+        self.categories_list = [Category(category[0], category[1]) for category in self.get_categories()]
+
+        self.task_categories_menu.add_item_list(self.categories_list)
+
 
     def __config(self):
         """ Function that configures the widgets of the root """
         self._load_all_tasks()
+        self._load_menu_categories()
+
+        self.task_status_menu.add_item_list(self.STATUS_OPTION)
+
+        self.task_date_menu.add_item_list(self.DATE_OPTIONS)
 
         self.root.add_key_command(py_cui.keys.KEY_S_LOWER, self._load_all_tasks)
         self.root.set_title('Codenotes - Search Tasks')
