@@ -45,10 +45,10 @@ class TestSearchTodo(unittest.TestCase):
         AddTask.set_args(args)
 
         expected_tasks = [
-            ('New task #1', 1, self.date, self.default_category_name),
-            ('New task #2', 1, self.date, self.default_category_name),
-            ('New task #3', 1, self.date, self.default_category_name),
-            ('Different task', 1, self.date, self.default_category_name)
+            ('New task #1', 0, self.date, self.default_category_name),
+            ('New task #2', 0, self.date, self.default_category_name),
+            ('New task #3', 0, self.date, self.default_category_name),
+            ('Different task', 0, self.date, self.default_category_name)
         ]
 
         args = parse_args(['search', 'task', '--month'])
@@ -59,7 +59,9 @@ class TestSearchTodo(unittest.TestCase):
     def test_search_text_date(self):
         """ Test that search only one task by keywords and date in common """
 
-        expected_tasks=[('Different task', 1, self.date, self.default_category_name)]
+        expected_tasks=[
+            ('Different task', 0, self.date, self.default_category_name)
+        ]
         args = parse_args(['search', 'task', 'Different', '--today'])
         query = SearchTask(args).sql_query()
 
@@ -68,9 +70,9 @@ class TestSearchTodo(unittest.TestCase):
     def test_search_text_task(self):
         """ Test that search all tasks that match to some keywords  """
         expected_tasks = [
-            ('New task #1', 1, self.date, self.default_category_name),
-            ('New task #2', 1, self.date, self.default_category_name),
-            ('New task #3', 1, self.date, self.default_category_name)
+            ('New task #1', 0, self.date, self.default_category_name),
+            ('New task #2', 0, self.date, self.default_category_name),
+            ('New task #3', 0, self.date, self.default_category_name)
         ]
         args = parse_args(['search', 'task', 'New', 'task'])
         query = SearchTask(args).sql_query()
@@ -80,10 +82,10 @@ class TestSearchTodo(unittest.TestCase):
     def test_search_today_task(self):
         """ Test that search for the four tasks added """
         expected_tasks = [
-            ('New task #1', 1, self.date, self.default_category_name),
-            ('New task #2', 1, self.date, self.default_category_name),
-            ('New task #3', 1, self.date, self.default_category_name),
-            ('Different task', 1, self.date, self.default_category_name)
+            ('New task #1', 0, self.date, self.default_category_name),
+            ('New task #2', 0, self.date, self.default_category_name),
+            ('New task #3', 0, self.date, self.default_category_name),
+            ('Different task', 0, self.date, self.default_category_name)
         ]
 
         args = parse_args(['search', 'task', '--today'])
