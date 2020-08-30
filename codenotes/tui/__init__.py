@@ -1,9 +1,10 @@
 import py_cui
 import curses
 from yaspin import yaspin
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from datetime import date, datetime, timedelta
 
+from codenotes.db import add_conditions_sql
 from codenotes.db.utilities import Category
 import codenotes.db.utilities.tasks as tasks
 from codenotes.console import PrintFormatted
@@ -172,12 +173,20 @@ class AddTaskTUI:
 class SearchTaskTUI:
 
     DATE_OPTIONS: List[str] = ['None', 'Today', 'Yesterday', 'Week', 'Month']
-    CATEGORY_OPTIONS: List[Category] = []
+    BASE_SQL: str = f'SELECT {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CONTENT},{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_STATUS}, ' \
+              f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CREATION}, ' \
+              f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_NAME} FROM {tasks.TABLE_NAME} INNER JOIN ' \
+              f'{categories.TABLE_NAME} ON {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CATEGORY} = ' \
+              f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_ID}'
 
-    date_search_button: py_cui.widgets.Button
     task_search_text_box: py_cui.widgets.TextBox
+    tasks_list_menu: py_cui.widgets.ScrollMenu
+    process_tasks_menu: py_cui.widgets.ScrollMenu
+    finished_tasks_menu: py_cui.widgets.ScrollMenu
 
-    search_date: date = None
+    search_date: Optional[date] = None
+    category_options: List[Category]
+    selected_category: Category = None
 
     def __init__(self, root: ImpPyCUI):
         """ Constructor of SearchTaskTUI class 
@@ -190,15 +199,10 @@ class SearchTaskTUI:
         self.root = root
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
-        # -| Buttons |-
-        self.date_search_button = self.root.add_button('Select Date', 0, 5, command=self._show_menu_date_popup)
-        self.category_search_button = self.root.add_button('Select Category', 0,4 , command=self._show_menu_category_popup)
         # -| Text Boxes |-
-        self.task_search_text_box = self.root.add_text_box('Search task:', 0, 0, column_span=4)
+        self.task_search_text_box = self.root.add_text_box('Search task:', 0, 1, column_span=5)
         # -| Scroll Menu |-
-        self.incomplete_tasks_menu = self.root.add_scroll_menu('Incomplete Tasks', 1, 0, row_span=4, column_span=2)
-        self.process_tasks_menu = self.root.add_scroll_menu('In Proccess Tasks', 1, 2, row_span=4, column_span=2)
-        self.finished_tasks_menu = self.root.add_scroll_menu('Finished Tasks', 1 , 4, row_span=4, column_span=2)
+        self.tasks_list_menu = self.root.add_scroll_menu('', 1, 1, row_span=5, column_span=5)
 
         self.__config()
 
@@ -212,12 +216,6 @@ class SearchTaskTUI:
             Root for TUI
         """
         return cls(root)
-
-    def _show_menu_date_popup(self):
-        self.root.show_menu_popup('Date Options', menu_items=self.DATE_OPTIONS, command=self._set_date_option)
-
-    def _show_menu_category_popup(self):
-        self.root.show_menu_popup('Category Options', menu_items=self.CATEGORY_OPTIONS, command=self._set_category_option)
 
     def _set_date_option(self, date_option: str):
         if date_option == self.DATE_OPTIONS[0]:
@@ -234,10 +232,33 @@ class SearchTaskTUI:
         title = date_option
         self.date_search_button.set_title(title)
 
-    def _set_category_option(self, catery_option: Category):
+    def _set_category_option(self, category_option: Category):
         pass
+
+    def _load_all_tasks(self):
+        sql = self.BASE_SQL
+
+        if self.search_date is not None:
+            if isinstance(self.search_date, date):
+                sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} LIKE date("{self.search_date}")')
+
+            elif isinstance(self.search_date, list):
+                first_day, last_day = self.search_date
+                sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} BETWEEN date("{first_day}") '
+                                              f'AND date("{last_day}")')
+
+        if self.selected_category is not None:
+            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CATEGORY} = {self.selected_category.category_id}', 'AND')
+
+        if self.task_search_text_box.get():
+            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.task_search_text_box.get()}%"')
+
+        #Status
+
 
     def __config(self):
         """ Function that configures the widgets of the root """
+        self._load_all_tasks()
 
+        self.root.add_key_command(py_cui.keys.KEY_S_LOWER, self._load_all_tasks)
         self.root.set_title('Codenotes - Search Tasks')

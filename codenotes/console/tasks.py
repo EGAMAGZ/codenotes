@@ -191,7 +191,7 @@ class SearchTask:
         self.search_text = ' '.join(args.text)
 
         if args_needed_empty(args):
-            root = ImpPyCUI(5, 6)
+            root = ImpPyCUI(6, 6)
             SearchTaskTUI.set_root(root)
             root.start()
         else:
@@ -219,6 +219,7 @@ class SearchTask:
         if self.search_date:
             if isinstance(self.search_date, date):
                 sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} LIKE date("{self.search_date}")')
+
             elif isinstance(self.search_date, list):
                 first_day, last_day = self.search_date
                 sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} BETWEEN date("{first_day}") '
@@ -243,6 +244,5 @@ class SearchTask:
             table.add_row(task[0], status_text(task[1]), task[3], task[2])
         self.console.print(table, justify='center')
         # self.console.rule(self.search_date.strftime('%m-%d-%Y'), style='purple')
-        # self.db.close()
 
 # select * from cn_todos where cn_todo_creation like date('2020-08-17');
