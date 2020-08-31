@@ -4,13 +4,13 @@ from yaspin import yaspin
 from typing import List, Tuple, Optional
 from datetime import date, datetime, timedelta
 
+from codenotes.util import status_text
 from codenotes.db import add_conditions_sql
-from codenotes.db.utilities import Category
 import codenotes.db.utilities.tasks as tasks
 from codenotes.console import PrintFormatted
+from codenotes.db.utilities import Category, Task
 from codenotes.db.connection import SQLiteConnection
 import codenotes.db.utilities.tasks_categories as categories
-
 
 WHITE_ON_MAGENTA = 11
 
@@ -174,11 +174,12 @@ class SearchTaskTUI:
 
     DATE_OPTIONS: List[str] = ['None', 'Today', 'Yesterday', 'Week', 'Month']
     STATUS_OPTION: List[str] = ['All', 'Incomplete', 'In Process', 'Finished']
-    BASE_SQL: str = f'SELECT {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CONTENT},{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_STATUS}, ' \
-              f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CREATION}, ' \
-              f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_NAME} FROM {tasks.TABLE_NAME} INNER JOIN ' \
-              f'{categories.TABLE_NAME} ON {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CATEGORY} = ' \
-              f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_ID}'
+    BASE_SQL: str = f'SELECT {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_ID},' \
+                    f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CONTENT},{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_STATUS},' \
+                    f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_NAME},' \
+                    f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CREATION} FROM {tasks.TABLE_NAME} INNER JOIN ' \
+                    f'{categories.TABLE_NAME} ON {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CATEGORY} = ' \
+                    f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_ID}'
 
     task_search_text_box: py_cui.widgets.TextBox
     tasks_list_menu: py_cui.widgets.ScrollMenu
@@ -187,8 +188,9 @@ class SearchTaskTUI:
     task_status_menu: py_cui.widgets.ScrollMenu
 
     search_date: Optional[date] = None
-    category_options: List[Category]
-    selected_category: Category = None
+    selected_category: Optional[Category] = None
+    selected_status: Optional[int] = None
+    tasks_list: List[Task]
 
     def __init__(self, root: ImpPyCUI):
         """ Constructor of SearchTaskTUI class 
@@ -204,10 +206,10 @@ class SearchTaskTUI:
         # -| Text Boxes |-
         self.task_search_text_box = self.root.add_text_box('Search task:', 0, 1, column_span=5)
         # -| Scroll Menu |-
-        self.tasks_list_menu = self.root.add_scroll_menu('', 1, 1, row_span=5, column_span=5)
+        self.tasks_list_menu = self.root.add_scroll_menu('Task', 1, 1, row_span=5, column_span=5)
         self.task_categories_menu = self.root.add_scroll_menu('Category', 0, 0, row_span=2)
         self.task_date_menu = self.root.add_scroll_menu('Date', 2, 0, row_span=2)
-        self.task_status_menu = self.root.add_scroll_menu('Status', 4 , 0, row_span=2)
+        self.task_status_menu = self.root.add_scroll_menu('Status', 4, 0, row_span=2)
 
         self.__config()
 
@@ -243,12 +245,13 @@ class SearchTaskTUI:
             pass
 
         title = date_option
-        self.date_search_button.set_title(title)
 
     def _set_category_option(self, category_option: Category):
         pass
 
     def _load_all_tasks(self):
+        self.tasks_list = []
+        self.tasks_list_menu.clear()
         sql = self.BASE_SQL
 
         if self.search_date is not None:
@@ -263,17 +266,27 @@ class SearchTaskTUI:
         if self.selected_category is not None:
             sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CATEGORY} = {self.selected_category.category_id}', 'AND')
 
+        if self.selected_status is not None:
+            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_STATUS} = {self.selected_status}')
+
         if self.task_search_text_box.get():
             sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.task_search_text_box.get()}%"')
 
-        #Status
+        query = self.cursor.execute(sql)
+
+        for task in query.fetchall():
+            dataclass_task = Task(task[0], task[1], task[2], task[3], task[4])
+            self.tasks_list.append(dataclass_task)
+
+            self.tasks_list_menu.add_item(
+                f'{task[1]}[{status_text(task[2])}][{task[3]}]-{task[4]}'
+            )
 
     def _load_menu_categories(self):
         """ Functions that creates a list of tasks and added it to the categories menu """
         self.categories_list = [Category(category[0], category[1]) for category in self.get_categories()]
 
         self.task_categories_menu.add_item_list(self.categories_list)
-
 
     def __config(self):
         """ Function that configures the widgets of the root """
@@ -283,6 +296,13 @@ class SearchTaskTUI:
         self.task_status_menu.add_item_list(self.STATUS_OPTION)
 
         self.task_date_menu.add_item_list(self.DATE_OPTIONS)
+
+        self.tasks_list_menu.add_text_color_rule('Incomplete', py_cui.RED_ON_BLACK, rule_type='contains',
+                                                 match_type='regex')
+        self.tasks_list_menu.add_text_color_rule('In Process', py_cui.YELLOW_ON_BLACK, rule_type='contains',
+                                                 match_type='regex')
+        self.tasks_list_menu.add_text_color_rule('Finished', py_cui.GREEN_ON_BLACK, rule_type='contains',
+                                                 match_type='regex')
 
         self.root.add_key_command(py_cui.keys.KEY_S_LOWER, self._load_all_tasks)
         self.root.set_title('Codenotes - Search Tasks')

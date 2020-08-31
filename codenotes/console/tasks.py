@@ -11,6 +11,7 @@ import codenotes.db.utilities.tasks_categories as categories
 from codenotes.db.connection import SQLiteConnection
 from codenotes.tui import AddTaskTUI, ImpPyCUI, SearchTaskTUI
 from codenotes.console import PrintFormatted, args_needed_empty, dates_to_search
+from codenotes.util import status_text
 
 
 @overload
@@ -47,22 +48,6 @@ def format_task_text(text: str) -> Union[List[str], str]:
         return tasks_list
     else:
         return task_text
-
-
-def status_text(status: int) -> str:
-    """ Functions that returns the status in text 
-    
-    Parameters
-    ----------
-    status : int
-        Int status of the task
-    """
-    if status == 0:
-        return 'Incomplete'
-    elif status == 1:
-        return 'In Process'
-    elif status == 2:
-        return 'Finished'
 
 
 class AddTask:
