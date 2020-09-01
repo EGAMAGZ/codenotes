@@ -1,6 +1,6 @@
-from codenotes.util.menu import abbreviate_menu_text
 import py_cui
 import curses
+import calendar
 from yaspin import yaspin
 from typing import List, Tuple, Optional, Any
 from datetime import date, datetime, timedelta
@@ -11,6 +11,7 @@ import codenotes.db.utilities.tasks as tasks
 from codenotes.console import PrintFormatted
 from codenotes.db.utilities import Category, Task
 from codenotes.db.connection import SQLiteConnection
+from codenotes.util.menu import abbreviate_menu_text
 import codenotes.db.utilities.tasks_categories as categories
 
 WHITE_ON_MAGENTA = 11
@@ -189,7 +190,7 @@ class SearchTaskTUI:
     task_date_menu: py_cui.widgets.ScrollMenu
     task_status_menu: py_cui.widgets.ScrollMenu
 
-    search_date: Optional[date] = None
+    selected_date: Optional[date] = None
     selected_category: Optional[Category] = None
     selected_status: Optional[int] = None
     tasks_list: List[Task]
@@ -235,8 +236,41 @@ class SearchTaskTUI:
 
         return query.fetchall()
 
+    def _set_status_option(self):
+        index = self.task_status_menu.get_selected_item_index()
+        if index == 0:
+            self.selected_status = None
+        else:
+            self.selected_status = index - 1
+
+        self._load_all_tasks()
+
     def _set_date_option(self):
-        pass
+        index = self.task_date_menu.get_selected_item_index()
+        now = datetime.now().date()
+
+        if index == 0:  # Any Date
+            self.selected_date = None
+        
+        elif index == 1:  # Today
+            self.selected_date = now
+
+        elif index == 2:  # Yesterday
+            self.selected_date = now - timedelta(days=1)
+
+        elif index == 3:  # Week
+            first_day = now - timedelta(days=now.weekday())
+            last_day = first_day + timedelta(days=6)
+
+            self.selected_date = [first_day, last_day]
+
+        elif index == 4:  # Month
+            num_days = calendar.monthrange(now.year, now.month)[1]
+            self.selected_date = [
+                date(now.year, now.month, 1),
+                date(now.year, now.month, num_days)
+            ]
+        self._load_all_tasks()
 
     def _set_category_option(self):
         if self.task_categories_menu.get_selected_item_index() != 0:
@@ -249,6 +283,8 @@ class SearchTaskTUI:
             self.selected_category = None
             self.task_categories_menu.set_title('Category')
 
+        self._load_all_tasks()
+
     def _show_category_popup(self):
         category = self.task_categories_menu.get()
         self.root.show_message_popup('Category Name:', category.category_name)
@@ -258,12 +294,12 @@ class SearchTaskTUI:
         self.tasks_list_menu.clear()
         sql = self.BASE_SQL
 
-        if self.search_date is not None:
-            if isinstance(self.search_date, date):
-                sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} LIKE date("{self.search_date}")')
+        if self.selected_date is not None:
+            if isinstance(self.selected_date, date):
+                sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} LIKE date("{self.selected_date}")')
 
-            elif isinstance(self.search_date, list):
-                first_day, last_day = self.search_date
+            elif isinstance(self.selected_date, list):
+                first_day, last_day = self.selected_date
                 sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} BETWEEN date("{first_day}") '
                                               f'AND date("{last_day}")')
 
@@ -271,12 +307,14 @@ class SearchTaskTUI:
             sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CATEGORY} = {self.selected_category.category_id}', 'AND')
 
         if self.selected_status is not None:
-            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_STATUS} = {self.selected_status}')
+            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_STATUS} = {self.selected_status}', 'AND')
 
         if self.task_search_text_box.get():
-            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.task_search_text_box.get()}%"')
+            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.task_search_text_box.get()}%"', 'AND')
 
         query = self.cursor.execute(sql)
+
+        print(sql)
 
         for task in query.fetchall():
             dataclass_task = Task(task[0], task[1], task[2], task[3], task[4])
@@ -302,6 +340,7 @@ class SearchTaskTUI:
         self.task_categories_menu.add_key_command(py_cui.keys.KEY_SPACE, self._show_category_popup)
 
         self.task_status_menu.add_item_list(self.STATUS_OPTION)
+        self.task_status_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_status_option)
 
         self.task_date_menu.add_item_list(self.DATE_OPTIONS)
         self.task_date_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_date_option)

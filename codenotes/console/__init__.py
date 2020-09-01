@@ -35,14 +35,14 @@ def dates_to_search(args) -> Union[List[date], date]:
     search_date : date
         Returns date to search
     """
+    now = datetime.now().date()
     if args.today:
-        return datetime.now().date()
+        return now
 
     elif args.yesterday:
-        return datetime.now().date() - timedelta(days=1)
+        return now - timedelta(days=1)
 
     elif args.week:
-        now = datetime.now().date()
         first_day = now - timedelta(days=now.weekday())
         last_day = first_day + timedelta(days=6)
 
@@ -51,7 +51,6 @@ def dates_to_search(args) -> Union[List[date], date]:
         return days
 
     elif args.month:
-        now = datetime.now()
         num_days = calendar.monthrange(now.year, now.month)[1]
         days = [
             date(now.year, now.month, 1),
