@@ -1,7 +1,8 @@
+from codenotes.util.menu import abbreviate_menu_text
 import py_cui
 import curses
 from yaspin import yaspin
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Any
 from datetime import date, datetime, timedelta
 
 from codenotes.util import status_text
@@ -68,6 +69,7 @@ class AddTaskTUI:
     def _show_category_name(self):
         """ Shows message popup to display complete the whole category name """
         category = self.task_categories_menu.get()
+        print(type(category))
 
         self.root.show_message_popup('Category Name:', category.category_name)
 
@@ -96,7 +98,7 @@ class AddTaskTUI:
         if category and len(category) <= 30:
             sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
 
-            self.cursor.execute(sql, (category,))
+            self.cursor.execute(sql, (category.strip(),))
 
             category_id = self.cursor.lastrowid
             self.task_categories_menu.add_item(Category(category_id, category))
@@ -109,7 +111,7 @@ class AddTaskTUI:
         """  Adds task to tasks_list_menu widget """
         text = self.task_text_block.get()
 
-        self.tasks_list_menu.add_item(text)  # TODO: ADD TRIM AND TO CATEGORY
+        self.tasks_list_menu.add_item(text.strip())
         self.task_text_block.clear()
 
     def remove_task(self):
@@ -172,7 +174,7 @@ class AddTaskTUI:
 
 class SearchTaskTUI:
 
-    DATE_OPTIONS: List[str] = ['None', 'Today', 'Yesterday', 'Week', 'Month']
+    DATE_OPTIONS: List[str] = ['Any Date', 'Today', 'Yesterday', 'Week', 'Month']
     STATUS_OPTION: List[str] = ['All', 'Incomplete', 'In Process', 'Finished']
     BASE_SQL: str = f'SELECT {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_ID},' \
                     f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CONTENT},{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_STATUS},' \
@@ -191,6 +193,7 @@ class SearchTaskTUI:
     selected_category: Optional[Category] = None
     selected_status: Optional[int] = None
     tasks_list: List[Task]
+    category_options: List[Any] = ['All']
 
     def __init__(self, root: ImpPyCUI):
         """ Constructor of SearchTaskTUI class 
@@ -232,22 +235,23 @@ class SearchTaskTUI:
 
         return query.fetchall()
 
-    def _set_date_option(self, date_option: str):
-        if date_option == self.DATE_OPTIONS[0]:
-            self.search_date = None
-        elif date_option == self.DATE_OPTIONS[1]:
-            self.search_date = datetime.now().date()
-        elif date_option == self.DATE_OPTIONS[2]:
-            self.search_date = datetime.now().date() - timedelta(days=1)
-        elif date_option == self.DATE_OPTIONS[3]:
-            pass
-        elif date_option == self.DATE_OPTIONS[4]:
-            pass
-
-        title = date_option
-
-    def _set_category_option(self, category_option: Category):
+    def _set_date_option(self):
         pass
+
+    def _set_category_option(self):
+        if self.task_categories_menu.get_selected_item_index() != 0:
+            category = self.task_categories_menu.get()
+
+            self.selected_category = category
+            self.task_categories_menu.set_title(category.category_name)  # TODO: ADD ABBREVIATION
+
+        else:
+            self.selected_category = None
+            self.task_categories_menu.set_title('Category')
+
+    def _show_category_popup(self):
+        category = self.task_categories_menu.get()
+        self.root.show_message_popup('Category Name:', category.category_name)
 
     def _load_all_tasks(self):
         self.tasks_list = []
@@ -285,6 +289,7 @@ class SearchTaskTUI:
     def _load_menu_categories(self):
         """ Functions that creates a list of tasks and added it to the categories menu """
         self.categories_list = [Category(category[0], category[1]) for category in self.get_categories()]
+        self.categories_list.insert(0,'All')
 
         self.task_categories_menu.add_item_list(self.categories_list)
 
@@ -293,9 +298,13 @@ class SearchTaskTUI:
         self._load_all_tasks()
         self._load_menu_categories()
 
+        self.task_categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_category_option)
+        self.task_categories_menu.add_key_command(py_cui.keys.KEY_SPACE, self._show_category_popup)
+
         self.task_status_menu.add_item_list(self.STATUS_OPTION)
 
         self.task_date_menu.add_item_list(self.DATE_OPTIONS)
+        self.task_date_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_date_option)
 
         self.tasks_list_menu.add_text_color_rule('Incomplete', py_cui.RED_ON_BLACK, rule_type='contains',
                                                  match_type='regex')
