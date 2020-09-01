@@ -2,7 +2,7 @@ import py_cui
 import curses
 import calendar
 from yaspin import yaspin
-from typing import List, Tuple, Optional, Any
+from typing import List, Tuple, Optional, Any, Union
 from datetime import date, datetime, timedelta
 
 from codenotes.util import status_text
@@ -11,7 +11,6 @@ import codenotes.db.utilities.tasks as tasks
 from codenotes.console import PrintFormatted
 from codenotes.db.utilities import Category, Task
 from codenotes.db.connection import SQLiteConnection
-from codenotes.util.menu import abbreviate_menu_text
 import codenotes.db.utilities.tasks_categories as categories
 
 WHITE_ON_MAGENTA = 11
@@ -190,7 +189,7 @@ class SearchTaskTUI:
     task_date_menu: py_cui.widgets.ScrollMenu
     task_status_menu: py_cui.widgets.ScrollMenu
 
-    selected_date: Optional[date] = None
+    selected_date: Union[Optional[date], Optional[List[date, int]]] = None
     selected_category: Optional[Category] = None
     selected_status: Optional[int] = None
     tasks_list: List[Task]
@@ -270,6 +269,7 @@ class SearchTaskTUI:
                 date(now.year, now.month, 1),
                 date(now.year, now.month, num_days)
             ]
+
         self._load_all_tasks()
 
     def _set_category_option(self):
@@ -310,7 +310,8 @@ class SearchTaskTUI:
             sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_STATUS} = {self.selected_status}', 'AND')
 
         if self.task_search_text_box.get():
-            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.task_search_text_box.get()}%"', 'AND')
+            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.task_search_text_box.get()}%"',
+                                     'AND')
 
         query = self.cursor.execute(sql)
 
@@ -327,7 +328,7 @@ class SearchTaskTUI:
     def _load_menu_categories(self):
         """ Functions that creates a list of tasks and added it to the categories menu """
         self.categories_list = [Category(category[0], category[1]) for category in self.get_categories()]
-        self.categories_list.insert(0,'All')
+        self.categories_list.insert(0, 'All')
 
         self.task_categories_menu.add_item_list(self.categories_list)
 
