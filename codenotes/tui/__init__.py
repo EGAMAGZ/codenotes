@@ -189,7 +189,7 @@ class SearchTaskTUI:
     task_date_menu: py_cui.widgets.ScrollMenu
     task_status_menu: py_cui.widgets.ScrollMenu
 
-    selected_date: Union[Optional[date], Optional[List[date, int]]] = None
+    selected_date: Union[Optional[date], Optional[List[date]]] = None
     selected_category: Optional[Category] = None
     selected_status: Optional[int] = None
     tasks_list: List[Task]
