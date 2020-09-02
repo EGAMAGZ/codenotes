@@ -193,7 +193,7 @@ class SearchTaskTUI:
     selected_category: Optional[Category] = None
     selected_status: Optional[int] = None
     tasks_list: List[Task]
-    category_options: List[Any] = ['All']
+    categories_list: List[Any]
 
     def __init__(self, root: ImpPyCUI):
         """ Constructor of SearchTaskTUI class 
@@ -314,8 +314,6 @@ class SearchTaskTUI:
                                      'AND')
 
         query = self.cursor.execute(sql)
-
-        print(sql)
 
         for task in query.fetchall():
             dataclass_task = Task(task[0], task[1], task[2], task[3], task[4])
