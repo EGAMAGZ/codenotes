@@ -325,7 +325,7 @@ class TestSearchTaskTUI(unittest.TestCase):
         self.search_task_tui._set_date_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_task)
 
-        expected_tasks = []
+        expected_task = []
 
         # Yesterday
         self.search_task_tui.task_date_menu.set_selected_item_index(2)
