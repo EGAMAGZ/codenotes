@@ -187,7 +187,20 @@ class TestSearchTaskTUI(unittest.TestCase):
         self.assertIsInstance(self.search_task_tui.selected_date, list)
 
     def test_category_widget(self):
-        pass
+        # All
+        self.search_task_tui.task_categories_menu.set_selected_item_index(0)
+        self.search_task_tui._set_category_option()
+        self.assertEqual(self.search_task_tui.selected_category, None)
+        
+        # Todo Tasks
+        self.search_task_tui.task_categories_menu.set_selected_item_index(1)
+        self.search_task_tui._set_category_option()
+        self.assertEqual(self.search_task_tui.selected_category, Category(1,'TODO Tasks'))
+
+        # Custom Category
+        self.search_task_tui.task_categories_menu.set_selected_item_index(2)
+        self.search_task_tui._set_category_option()
+        self.assertEqual(self.search_task_tui.selected_category, Category(2, 'Custom Category'))
 
     def test_search_all_tasks(self):
         pass
