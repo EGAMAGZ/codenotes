@@ -145,7 +145,7 @@ class TestSearchTaskTUI(unittest.TestCase):
         ]
         self.assertCountEqual(self.search_task_tui.categories_list, expected_categories)
 
-        expected_task = [
+        expected_tasks = [
             f'New task #1[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
@@ -159,7 +159,7 @@ class TestSearchTaskTUI(unittest.TestCase):
             f'Custom Task #2[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Custom Task #3[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}'
         ]
-        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_task)
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
     def test_date_widget(self):
         # Any date
@@ -225,7 +225,7 @@ class TestSearchTaskTUI(unittest.TestCase):
         self.assertEqual(self.search_task_tui.selected_status, 2)
 
     def test_search_all_tasks(self):
-        expected_task = [
+        expected_tasks = [
             f'New task #1[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
@@ -241,11 +241,11 @@ class TestSearchTaskTUI(unittest.TestCase):
         ]
         self.search_task_tui._load_all_tasks()
 
-        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_task)
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
     def test_search_by_category(self):
         # Any Category
-        expected_task = [
+        expected_tasks = [
             f'New task #1[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
@@ -261,10 +261,10 @@ class TestSearchTaskTUI(unittest.TestCase):
         ]
         self.search_task_tui.task_categories_menu.set_selected_item_index(0)
         self.search_task_tui._set_category_option()
-        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_task)
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
         
         # TODO Tasks
-        expected_task = [
+        expected_tasks = [
             f'New task #1[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
@@ -277,20 +277,20 @@ class TestSearchTaskTUI(unittest.TestCase):
 
         self.search_task_tui.task_categories_menu.set_selected_item_index(1)
         self.search_task_tui._set_category_option()
-        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_task)
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
         # Custom Category
-        expected_task = [
+        expected_tasks = [
             f'Custom Task #1[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Custom Task #2[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Custom Task #3[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}'
         ]
         self.search_task_tui.task_categories_menu.set_selected_item_index(2)
         self.search_task_tui._set_category_option()
-        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_task)
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
     def test_search_by_date(self):
-        expected_task = [
+        expected_tasks = [
             f'New task #1[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
@@ -308,31 +308,62 @@ class TestSearchTaskTUI(unittest.TestCase):
         # Any Date
         self.search_task_tui.task_date_menu.set_selected_item_index(0)
         self.search_task_tui._set_date_option()
-        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_task)
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
         
         # Today
         self.search_task_tui.task_date_menu.set_selected_item_index(1)
         self.search_task_tui._set_date_option()
-        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_task)
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
         # Week
         self.search_task_tui.task_date_menu.set_selected_item_index(3)
         self.search_task_tui._set_date_option()
-        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_task)
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
         # Month
         self.search_task_tui.task_date_menu.set_selected_item_index(4)
         self.search_task_tui._set_date_option()
-        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_task)
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
-        expected_task = []
+        expected_tasks = []
 
         # Yesterday
         self.search_task_tui.task_date_menu.set_selected_item_index(2)
         self.search_task_tui._set_date_option()
-        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_task)
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
+    def test_search_by_status(self):
+        expected_tasks = [
+            f'New task #1[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
+            f'New task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
+            f'New task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
+            f'Different task[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
 
+            f'TODO Task #1[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
+            f'TODO Task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
+            f'TODO Task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
+
+            f'Custom Task #1[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}',
+            f'Custom Task #2[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}',
+            f'Custom Task #3[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}'
+        ]
+        self.search_task_tui.task_status_menu.set_selected_item_index(0)
+        self.search_task_tui._set_status_option()
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
+
+        self.search_task_tui.task_status_menu.set_selected_item_index(1)
+        self.search_task_tui._set_status_option()
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
+
+        expected_tasks = []
+
+        self.search_task_tui.task_status_menu.set_selected_item_index(2)
+        self.search_task_tui._set_status_option()
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
+
+        self.search_task_tui.task_status_menu.set_selected_item_index(3)
+        self.search_task_tui._set_status_option()
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
     def tearDown(self) -> None:
         del self.root
