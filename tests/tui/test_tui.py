@@ -1,3 +1,4 @@
+from datetime import date
 import unittest
 
 from codenotes.db.utilities import Category
@@ -125,6 +126,7 @@ class TestNewCategory(TestAddTaskTUI):
 class TestSearchTaskTUI(unittest.TestCase):
 
     def setUp(self) -> None:
+        self.maxDiff = None
         self.root = ImpPyCUI(6, 6)
         self.search_task_tui = SearchTaskTUI.set_root(self.root)
 
@@ -133,6 +135,59 @@ class TestSearchTaskTUI(unittest.TestCase):
         self.assertEqual(self.search_task_tui.selected_date, None)
         self.assertEqual(self.search_task_tui.selected_status, None)
         self.assertEqual(self.search_task_tui.task_search_text_box.get(), '')
+
+        expected_categories = [
+            'All',
+            Category(1, 'TODO Tasks'),
+            Category(2, 'Custom Category')
+        ]
+        self.assertCountEqual(self.search_task_tui.categories_list, expected_categories)
+
+        expected_task = [
+            'New task #1[Incomplete][TODO Tasks]-2020-09-02',
+            'New task #2[Incomplete][TODO Tasks]-2020-09-02',
+            'New task #3[Incomplete][TODO Tasks]-2020-09-02',
+            'Different task[Incomplete][TODO Tasks]-2020-09-02',
+
+            'TODO Task #1[Incomplete][TODO Tasks]-2020-09-02',
+            'TODO Task #2[Incomplete][TODO Tasks]-2020-09-02',
+            'TODO Task #3[Incomplete][TODO Tasks]-2020-09-02',
+
+            'Custom Task #1[Incomplete][Custom Category]-2020-09-02',
+            'Custom Task #2[Incomplete][Custom Category]-2020-09-02',
+            'Custom Task #3[Incomplete][Custom Category]-2020-09-02'
+        ]
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_task)
+
+    def test_date_widget(self):
+
+        # Any date
+        self.search_task_tui.task_date_menu.set_selected_item_index(0)
+        self.search_task_tui._set_date_option()
+        self.assertEqual(self.search_task_tui.selected_date, None)
+
+        # Today
+        self.search_task_tui.task_date_menu.set_selected_item_index(1)
+        self.search_task_tui._set_date_option()
+        self.assertIsInstance(self.search_task_tui.selected_date, date)
+
+        # Yesterday
+        self.search_task_tui.task_date_menu.set_selected_item_index(2)
+        self.search_task_tui._set_date_option()
+        self.assertIsInstance(self.search_task_tui.selected_date, date)
+
+        # Week
+        self.search_task_tui.task_date_menu.set_selected_item_index(3)
+        self.search_task_tui._set_date_option()
+        self.assertIsInstance(self.search_task_tui.selected_date, list)
+
+        #Month
+        self.search_task_tui.task_date_menu.set_selected_item_index(4)
+        self.search_task_tui._set_date_option()
+        self.assertIsInstance(self.search_task_tui.selected_date, list)
+
+    def test_category_widget(self):
+        pass
 
     def test_search_all_tasks(self):
         pass
