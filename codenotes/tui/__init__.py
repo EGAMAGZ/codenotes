@@ -245,10 +245,10 @@ class SearchTaskTUI:
     def _set_status_option(self):
         """ Sets the selected status from status menu """
         index = self.task_status_menu.get_selected_item_index()
-        if index == 0:
+        if index == 0:  # All
             self.selected_status = None
         else:
-            self.selected_status = index - 1
+            self.selected_status = index - 1  # Status code that goes from 0 to 2
 
         self._load_all_tasks()
 
@@ -352,12 +352,15 @@ class SearchTaskTUI:
 
         self.task_categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_category_option)
         self.task_categories_menu.add_key_command(py_cui.keys.KEY_SPACE, self._show_category_popup)
+        self.task_categories_menu.set_focus_text('|Enter - Select Category|Up/Down - Move|Esc - Exit|')
 
         self.task_status_menu.add_item_list(self.STATUS_OPTION)
         self.task_status_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_status_option)
+        self.task_status_menu.set_focus_text('|Enter - Select Status|Up/Down - Move|Esc - Exit|')
 
         self.task_date_menu.add_item_list(self.DATE_OPTIONS)
         self.task_date_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_date_option)
+        self.task_date_menu.set_focus_text('|Enter - Select Date|Up/Down - Move|Esc - Exit|')
 
         self.tasks_list_menu.add_text_color_rule('Incomplete', py_cui.RED_ON_BLACK, rule_type='contains',
                                                  match_type='regex')
