@@ -15,9 +15,15 @@ def parse_args(args):
 
     add = subparsers.add_parser('add')
 
-    add.add_argument('type', choices=['note', 'task'], type=str)
-    add.add_argument('text', type=str, nargs='*', action='store')
-    add.add_argument('--preview', '-p', action='store_true')
+    type_file = add.add_subparsers(dest='type')
+
+    task = type_file.add_parser('task')
+    task.add_argument('text', type=str, nargs='*', action='store')
+    task.add_argument('--preview', '-p', action='store_true')
+
+    note = type_file.add_parser('note')
+    note.add_argument('text', type=str, nargs='*', action='store')
+    note.add_argument('--preview', '-p', action='store_true')
 
     search = subparsers.add_parser('search')
 
