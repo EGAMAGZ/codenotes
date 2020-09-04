@@ -56,6 +56,13 @@ class AddTaskTUI:
 
     @classmethod
     def set_root(cls, root: ImpPyCUI):
+        """ Sets root and initialize class
+        
+        Parameters
+        ----------
+        root : ImpPyCUI
+            Root for TUI
+        """
         return cls(root)
 
     def get_categories(self) -> List[Tuple[str]]:
@@ -83,7 +90,7 @@ class AddTaskTUI:
 
         self.task_categories_menu.add_item_list(self.categories_list)
 
-    def _select_category(self):
+    def _set_category_option(self):
         """ Function that is executed when a category is selected """
         self.selected_category = self.task_categories_menu.get()
 
@@ -161,7 +168,7 @@ class AddTaskTUI:
         self.tasks_list_menu.add_key_command(py_cui.keys.KEY_BACKSPACE, self.remove_task)
         self.tasks_list_menu.set_focus_text('|Backspace - Remove Task|Esc - Exit |')
 
-        self.task_categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._select_category)
+        self.task_categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_category_option)
         self.task_categories_menu.add_key_command(py_cui.keys.KEY_N_LOWER, self._ask_new_category)
         self.task_categories_menu.add_key_command(py_cui.keys.KEY_SPACE, self._show_category_name)
         self.task_categories_menu.set_focus_text(
@@ -236,6 +243,7 @@ class SearchTaskTUI:
         return query.fetchall()
 
     def _set_status_option(self):
+        """ Sets the selected status from status menu """
         index = self.task_status_menu.get_selected_item_index()
         if index == 0:
             self.selected_status = None
@@ -245,6 +253,7 @@ class SearchTaskTUI:
         self._load_all_tasks()
 
     def _set_date_option(self):
+        """ Sets the selected date from date menu """
         index = self.task_date_menu.get_selected_item_index()
         now = datetime.now().date()
 
@@ -273,7 +282,8 @@ class SearchTaskTUI:
         self._load_all_tasks()
 
     def _set_category_option(self):
-        if self.task_categories_menu.get_selected_item_index() != 0:
+        """ Sets the selected category from category menu """
+        if self.task_categories_menu.get_selected_item_index() != 0:  # All Categories
             category = self.task_categories_menu.get()
 
             self.selected_category = category
@@ -286,10 +296,15 @@ class SearchTaskTUI:
         self._load_all_tasks()
 
     def _show_category_popup(self):
+        """ Shows message popup to display the complete category name """
         category = self.task_categories_menu.get()
         self.root.show_message_popup('Category Name:', category.category_name)
 
     def _load_all_tasks(self):
+        """ Loads tasks to the task list menu
+        
+        Will also generate the sql statement for the query
+        """
         self.tasks_list = []
         self.tasks_list_menu.clear()
         sql = self.BASE_SQL
