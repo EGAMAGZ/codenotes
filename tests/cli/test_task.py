@@ -2,7 +2,7 @@ import unittest
 from typing import List
 from datetime import datetime
 
-from codenotes.console.tasks import AddTask, SearchTask
+from codenotes.cli.tasks import AddTask, SearchTask
 from codenotes import parse_args
 
 

@@ -10,7 +10,7 @@ import codenotes.db.utilities.tasks as tasks
 import codenotes.db.utilities.tasks_categories as categories
 from codenotes.db.connection import SQLiteConnection
 from codenotes.tui import AddTaskTUI, ImpPyCUI, SearchTaskTUI
-from codenotes.console import PrintFormatted, args_needed_empty, dates_to_search
+from codenotes.cli import PrintFormatted, args_needed_empty, dates_to_search
 from codenotes.util import status_text
 
 
@@ -228,6 +228,6 @@ class SearchTask:
         for task in self.sql_query():
             table.add_row(task[0], status_text(task[1]), task[3], task[2])
         self.console.print(table, justify='center')
-        # self.console.rule(self.search_date.strftime('%m-%d-%Y'), style='purple')
+        # self.cli.rule(self.search_date.strftime('%m-%d-%Y'), style='purple')
 
 # select * from cn_todos where cn_todo_creation like date('2020-08-17');

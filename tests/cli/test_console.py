@@ -2,7 +2,7 @@ import unittest
 import calendar
 from datetime import datetime, timedelta, date
 
-from codenotes.console import args_needed_empty, dates_to_search
+from codenotes.cli import args_needed_empty, dates_to_search
 from codenotes import parse_args
 
 
