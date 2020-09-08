@@ -1,7 +1,7 @@
 import sys
 import argparse
 
-from codenotes.console.tasks import AddTask, SearchTask
+from codenotes.cli.tasks import AddTask, SearchTask
 
 
 __version__ = '0.0.1'
@@ -15,13 +15,14 @@ def parse_args(args):
 
     add = subparsers.add_parser('add')
 
-    type_file = add.add_subparsers(dest='type')
+    add_type_file = add.add_subparsers(dest='type')
 
-    task = type_file.add_parser('task')
+    task = add_type_file.add_parser('task')
     task.add_argument('text', type=str, nargs='*', action='store')
+    task.add_argument('--new-category', type=str, nargs='*', action='store')
     task.add_argument('--preview', '-p', action='store_true')
 
-    note = type_file.add_parser('note')
+    note = add_type_file.add_parser('note')
     note.add_argument('text', type=str, nargs='*', action='store')
     note.add_argument('--preview', '-p', action='store_true')
 

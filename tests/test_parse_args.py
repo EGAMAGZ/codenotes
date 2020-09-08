@@ -3,34 +3,81 @@ import unittest
 from codenotes import parse_args
 
 
-class TestAddTodoParseArgs(unittest.TestCase):
+class TestAddTaskParseArgs(unittest.TestCase):
+    def test_add_new_category(self):
+        expected_vars = {
+            'subargs': 'add',
+            'type': 'task',
+            'text': [],
+            'new_category': ['CLI', 'Category'],
+            'preview': False
+        }
+        args = parse_args(['add', 'task', '--new-category', 'CLI', 'Category'])
+        args_vars = vars(args)
+        self.assertDictEqual(args_vars, expected_vars)
+
+    def test_add_new_category_empty(self):
+        expected_vars = {
+            'subargs': 'add',
+            'type': 'task',
+            'text': [],
+            'new_category': [],
+            'preview': False
+        }
+        args = parse_args(['add', 'task', '--new-category'])
+        args_vars = vars(args)
+        self.assertDictEqual(args_vars, expected_vars)
 
     def test_add_task_empty(self):
-        expected_vars = {'subargs': 'add', 'type': 'task', 'text': [], 'preview': False}
+        expected_vars = {
+            'subargs': 'add',
+            'type': 'task',
+            'text': [],
+            'new_category': None,
+            'preview': False
+        }
         args = parse_args(['add', 'task'])
         args_vars = vars(args)
         self.assertDictEqual(args_vars, expected_vars)
 
     def test_add_task_one(self):
-        expected_vars = {'subargs': 'add', 'type': 'task', 'text': ['New', 'task', '#1'], 'preview': False}
+        expected_vars = {
+            'subargs': 'add',
+            'type': 'task',
+            'text': ['New', 'task', '#1'],
+            'new_category': None,
+            'preview': False
+        }
         args = parse_args(['add', 'task', 'New', 'task', '#1'])
         args_vars = vars(args)
         self.assertDictEqual(args_vars, expected_vars)
 
     def test_add_task_many(self):
-        expected_vars = {'subargs': 'add', 'type': 'task', 'text': ['New', 'task', '#1;', 'New', 'task', 'task', '#2'], 'preview': False}
+        expected_vars = {
+            'subargs': 'add',
+            'type': 'task',
+            'text': ['New', 'task', '#1;', 'New', 'task', 'task', '#2'],
+            'new_category': None,
+            'preview': False
+        }
         args = parse_args(['add', 'task', 'New', 'task', '#1;', 'New', 'task', 'task', '#2'])
         args_vars = vars(args)
         self.assertDictEqual(args_vars, expected_vars)
 
     def test_add_task_preview(self):
-        expected_vars = {'subargs': 'add', 'type': 'task', 'text': ['New', 'task', '#1'], 'preview': True}
+        expected_vars = {
+            'subargs': 'add',
+            'type': 'task',
+            'text': ['New', 'task', '#1'],
+            'new_category': None,
+            'preview': True
+        }
         args = parse_args(['add', 'task', 'New', 'task', '#1', '-p'])
         args_vars = vars(args)
         self.assertDictEqual(args_vars, expected_vars)
 
 
-class TestSearchTodoParseArgs(unittest.TestCase):
+class TestSearchTaskParseArgs(unittest.TestCase):
     
     def test_search_two_dates(self):
         self.assertRaises(SystemExit, parse_args, ['search', 'task', '--today', '--month'])
