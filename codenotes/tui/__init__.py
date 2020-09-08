@@ -8,7 +8,7 @@ from datetime import date, datetime, timedelta
 from codenotes.util import status_text
 from codenotes.db import add_conditions_sql
 import codenotes.db.utilities.tasks as tasks
-from codenotes.console import PrintFormatted
+from codenotes.cli import PrintFormatted
 from codenotes.db.utilities import Category, Task
 from codenotes.db.connection import SQLiteConnection
 import codenotes.db.utilities.tasks_categories as categories
