@@ -24,6 +24,8 @@ def parse_args(args):
 
     note = add_type_file.add_parser('note')
     note.add_argument('text', type=str, nargs='*', action='store')
+    note.add_argument('--title', '-t', type=str, nargs='*', action='store')
+    note.add_argument('--new-category', type=str, nargs='*', action='store')
     note.add_argument('--preview', '-p', action='store_true')
 
     search = subparsers.add_parser('search')

@@ -78,7 +78,12 @@ class AddTask:
         self.cursor = self.db.get_cursor()
         self.creation_date = datetime.now().date()
 
-        if not add_task_args_empty(args):
+        if add_task_args_empty(args):
+            root = ImpPyCUI(5, 4)
+            AddTaskTUI.set_root(root)
+            root.start()
+
+        else:
 
             if args.new_category:
                 category = ' '.join(args.new_category)
@@ -91,11 +96,6 @@ class AddTask:
                     self.show_preview()
                 else:
                     self.save_task()
-
-        else:
-            root = ImpPyCUI(5, 4)
-            AddTaskTUI.set_root(root)
-            root.start()
 
     @classmethod
     def set_args(cls, args):
@@ -115,7 +115,7 @@ class AddTask:
 
             self.category_id = self.cursor.lastrowid
 
-            self.db.conn.commit()
+            self.db.commit()
         else:
             self._ask_category()
 
@@ -147,7 +147,7 @@ class AddTask:
                 spinner.text = 'No Task Saved'
                 spinner.fail("💥")
 
-        self.db.conn.commit()
+        self.db.commit()
         self.db.close()
 
     def _ask_confirmation(self) -> bool:
@@ -158,19 +158,23 @@ class AddTask:
         confirmed : bool
             Boolean value that indicates the storage of the tasks written
         """
-        answer = self.console.input('Do you want to save them?(y/n):')
+        text = 'Do you want to save them?(y/n):'
+        answer = self.console.input(text)
         while len(answer) > 0 and answer.lower() != 'n' and answer.lower() != 'y':
-            answer = self.console.input('Do you want to save them?(y/n):')
+            answer = self.console.input(text)
         else:
             if answer.lower() == 'y':
                 return True
             return False
 
     def _ask_category(self):
-        category = self.console.input('Category name is too long(Max. 30). Write another name:')
+        """ Function that asks to the user to introduce different category name """
+
+        text = 'Category name is too long(Max. 30). Write another name:'
+        category = self.console.input(text)
 
         while len(category) == 0 or len(category) > 30:
-            category = self.console.input('Category name too long(Max. 30). Write another name:')
+            category = self.console.input(text)
         else:
             self.save_category(category)
 

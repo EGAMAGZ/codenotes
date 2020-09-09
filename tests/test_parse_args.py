@@ -95,5 +95,86 @@ class TestSearchTaskParseArgs(unittest.TestCase):
         self.assertDictEqual(args_vars, expected_vars)
 
 
+class TestAddNoteParseArgs(unittest.TestCase):
+
+    def test_add_new_category(self):
+        expected_vars = {
+            'subargs': 'add',
+            'type': 'note',
+            'text': [],
+            'title': None,
+            'new_category': ['New', 'category'],
+            'preview': False
+        }
+        args = parse_args(['add', 'note', '--new-category', 'New', 'category'])
+        args_vars = vars(args)
+        self.assertDictEqual(args_vars, expected_vars)
+
+    def test_add_new_category_empty(self):
+        expected_vars = {
+            'subargs': 'add',
+            'type': 'note',
+            'text': [],
+            'title': None,
+            'new_category': [],
+            'preview': False
+        }
+        args = parse_args(['add', 'note', '--new-category'])
+        args_vars = vars(args)
+        self.assertDictEqual(args_vars, expected_vars)
+
+    def test_add_new_note(self):
+        expected_vars = {
+            'subargs': 'add',
+            'type': 'note',
+            'text': ['New', 'task'],
+            'title': None,
+            'new_category': None,
+            'preview': False
+        }
+        args = parse_args(['add', 'note', 'New', 'task'])
+        args_vars = vars(args)
+        self.assertDictEqual(args_vars, expected_vars)
+
+    def test_add_new_note_empty(self):
+        expected_vars = {
+            'subargs': 'add',
+            'type': 'note',
+            'text': [],
+            'title': None,
+            'new_category': None,
+            'preview': False
+        }
+        args = parse_args(['add', 'note'])
+        args_vars = vars(args)
+        self.assertDictEqual(args_vars, expected_vars)
+
+    def test_add_new_note_preview(self):
+        expected_vars = {
+            'subargs': 'add',
+            'type': 'note',
+            'text': [],
+            'title': None,
+            'new_category': None,
+            'preview': True
+        }
+        args = parse_args(['add', 'note', '--preview'])
+        args_vars = vars(args)
+        self.assertDictEqual(args_vars, expected_vars)
+
+    def test_add_new_note_title(self):
+        expected_vars = {
+            'subargs': 'add',
+            'type': 'note',
+            'text': ['New', 'task'],
+            'title': ['Task','title'],
+            'new_category': None,
+            'preview': False
+        }
+        args = parse_args(['add', 'note', 'New', 'task', '--title', 'Task', 'title'])
+        args_vars = vars(args)
+        self.assertDictEqual(args_vars, expected_vars)
+
+
 if __name__ == '__main__':
     unittest.main()

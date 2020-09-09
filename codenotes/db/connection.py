@@ -51,6 +51,9 @@ class SQLiteConnection:
         """
         return self.cursor
 
+    def commit(self):
+        self.conn.commit()
+
     def close(self):
         """ Close database and cursor connection """
         self.cursor.close()
