@@ -1,5 +1,4 @@
 import unittest
-from typing import List
 from datetime import datetime
 
 from codenotes.cli.tasks import AddTask, SearchTask
@@ -13,15 +12,21 @@ class TestAddTodo(unittest.TestCase):
         args = parse_args(['add', 'task', ';'])
         add_task = AddTask(args)
 
-        self.assertTrue(isinstance(add_task.task, List))
+        self.assertTrue(isinstance(add_task.task, list))
         self.assertListEqual(add_task.task, [])
+
+    def test_add_task_and_category(self):
+        args = parse_args(['add', 'task', 'CLI', 'task', '--new-category','CLI', 'Category'])
+        add_task = AddTask(args)
+
+        self.assertEqual(add_task.category_id, 2)
 
     def test_add_many_tasks(self):
         """ Test the storage of two tasks """
         args = parse_args(['add', 'task', 'New task #2;New task #3'])
         add_task = AddTask(args)
 
-        self.assertTrue(isinstance(add_task.task, List))
+        self.assertTrue(isinstance(add_task.task, list))
         self.assertListEqual(add_task.task, ['New task #2', 'New task #3'])
 
     def test_add_one_task(self):
@@ -48,7 +53,8 @@ class TestSearchTodo(unittest.TestCase):
             ('New task #1', 0, self.date, self.default_category_name),
             ('New task #2', 0, self.date, self.default_category_name),
             ('New task #3', 0, self.date, self.default_category_name),
-            ('Different task', 0, self.date, self.default_category_name)
+            ('Different task', 0, self.date, self.default_category_name),
+            ('CLI task', 0, self.date, 'CLI Category')
         ]
 
         args = parse_args(['search', 'task', '--month'])
@@ -85,7 +91,8 @@ class TestSearchTodo(unittest.TestCase):
             ('New task #1', 0, self.date, self.default_category_name),
             ('New task #2', 0, self.date, self.default_category_name),
             ('New task #3', 0, self.date, self.default_category_name),
-            ('Different task', 0, self.date, self.default_category_name)
+            ('Different task', 0, self.date, self.default_category_name),
+            ('CLI task', 0, self.date, 'CLI Category')
         ]
 
         args = parse_args(['search', 'task', '--today'])

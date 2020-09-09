@@ -2,7 +2,7 @@ import unittest
 import calendar
 from datetime import datetime, timedelta, date
 
-from codenotes.cli import args_needed_empty, dates_to_search
+from codenotes.cli import date_args_empty, dates_to_search
 from codenotes import parse_args
 
 
@@ -11,22 +11,22 @@ class TestArgsNeededEmpty(unittest.TestCase):
     def test_no_args(self):
         args = parse_args(['search', 'task'])
 
-        self.assertTrue(args_needed_empty(args))
+        self.assertTrue(date_args_empty(args))
 
     def test_only_date(self):
         args = parse_args(['search', 'task', '--today'])
 
-        self.assertFalse(args_needed_empty(args))
+        self.assertFalse(date_args_empty(args))
 
     def test_only_text(self):
         args = parse_args(['search', 'task', 'New', 'task', 'added'])
 
-        self.assertFalse(args_needed_empty(args))
+        self.assertFalse(date_args_empty(args))
 
     def test_text_and_date(self):
         args = parse_args(['search', 'task', 'New', 'task', 'added', '--today'])
 
-        self.assertFalse(args_needed_empty(args))
+        self.assertFalse(date_args_empty(args))
 
 
 class TestDateToSearch(unittest.TestCase):

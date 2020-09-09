@@ -21,7 +21,6 @@ class TestDefaultCategory(TestAddTaskTUI):
 
         self.add_task_tui.task_text_block.set_text('TODO Task #1')
         self.add_task_tui.add_task()
-        print(self.add_task_tui.tasks_list_menu.get_item_list())
 
         self.assertCountEqual(self.add_task_tui.tasks_list_menu.get_item_list(), expected_categories)
         self.assertEqual(self.add_task_tui.task_text_block.get(), '')
@@ -33,13 +32,15 @@ class TestDefaultCategory(TestAddTaskTUI):
         self.assertEqual(self.add_task_tui.selected_category, None)
 
         expected_categories = [
-            (1, 'TODO Tasks')
+            (1, 'TODO Tasks'),
+            (2, 'CLI Category')
         ]
         categories_list = self.add_task_tui.get_categories()
         self.assertCountEqual(categories_list, expected_categories)
 
         expected_categories_menu = [
-            Category(1, 'TODO Tasks')
+            Category(1, 'TODO Tasks'),
+            Category(2, 'CLI Category')
         ]
         self.add_task_tui._load_menu_categories()
         self.assertCountEqual(self.add_task_tui.categories_list, expected_categories_menu)
@@ -66,14 +67,16 @@ class TestNewCategory(TestAddTaskTUI):
 
         expected_categories = [
             (1, 'TODO Tasks'),
-            (2, 'Custom Category')
+            (2, 'CLI Category'),
+            (3, 'Custom Category')
         ]
         categories_list = self.add_task_tui.get_categories()
         self.assertCountEqual(categories_list, expected_categories)
 
         expected_categories_menu = [
             Category(1, 'TODO Tasks'),
-            Category(2, 'Custom Category')
+            Category(2, 'CLI Category'),
+            Category(3, 'Custom Category')
         ]
         self.add_task_tui._load_menu_categories()
         self.assertCountEqual(self.add_task_tui.categories_list, expected_categories_menu)
@@ -89,7 +92,7 @@ class TestNewCategory(TestAddTaskTUI):
         self.assertCountEqual(self.add_task_tui.tasks_list_menu.get_item_list(), expected_categories)
         self.assertEqual(self.add_task_tui.task_text_block.get(), '')
 
-        self.add_task_tui.selected_category = Category(2, 'Custom Category')
+        self.add_task_tui.selected_category = Category(3, 'Custom Category')
         self.add_task_tui.save_tasks()
 
     def test_initial_categories(self):
@@ -97,14 +100,16 @@ class TestNewCategory(TestAddTaskTUI):
 
         expected_categories = [
             (1, 'TODO Tasks'),
-            (2, 'Custom Category')
+            (2, 'CLI Category'),
+            (3, 'Custom Category')
         ]
         categories_list = self.add_task_tui.get_categories()
         self.assertCountEqual(categories_list, expected_categories)
 
         expected_categories_menu = [
             Category(1, 'TODO Tasks'),
-            Category(2, 'Custom Category')
+            Category(2, 'CLI Category'),
+            Category(3, 'Custom Category')
         ]
         self.add_task_tui._load_menu_categories()
         self.assertCountEqual(self.add_task_tui.categories_list, expected_categories_menu)
@@ -120,7 +125,7 @@ class TestNewCategory(TestAddTaskTUI):
 
         self.assertCountEqual(self.add_task_tui.tasks_list_menu.get_item_list(), expected_tasks_added)
 
-        self.add_task_tui.selected_category = Category(2, 'Custom Category')
+        self.add_task_tui.selected_category = Category(3, 'Custom Category')
         self.add_task_tui.save_tasks()
 
 
@@ -141,7 +146,8 @@ class TestSearchTaskTUI(unittest.TestCase):
         expected_categories = [
             'All',
             Category(1, 'TODO Tasks'),
-            Category(2, 'Custom Category')
+            Category(2, 'CLI Category'),
+            Category(3, 'Custom Category')
         ]
         self.assertCountEqual(self.search_task_tui.categories_list, expected_categories)
 
@@ -150,6 +156,8 @@ class TestSearchTaskTUI(unittest.TestCase):
             f'New task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Different task[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
+
+            f'CLI task[Incomplete][CLI Category]-{self.current_date.strftime("%Y-%m-%d")}',
 
             f'TODO Task #1[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'TODO Task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
@@ -201,7 +209,7 @@ class TestSearchTaskTUI(unittest.TestCase):
         # Custom Category
         self.search_task_tui.task_categories_menu.set_selected_item_index(2)
         self.search_task_tui._set_category_option()
-        self.assertEqual(self.search_task_tui.selected_category, Category(2, 'Custom Category'))
+        self.assertEqual(self.search_task_tui.selected_category, Category(2, 'CLI Category'))
 
     def test_status_widget(self):
         # All
@@ -231,6 +239,8 @@ class TestSearchTaskTUI(unittest.TestCase):
             f'New task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Different task[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
 
+            f'CLI task[Incomplete][CLI Category]-{self.current_date.strftime("%Y-%m-%d")}',
+
             f'TODO Task #1[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'TODO Task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'TODO Task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
@@ -250,6 +260,8 @@ class TestSearchTaskTUI(unittest.TestCase):
             f'New task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Different task[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
+
+            f'CLI task[Incomplete][CLI Category]-{self.current_date.strftime("%Y-%m-%d")}',
 
             f'TODO Task #1[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'TODO Task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
@@ -279,13 +291,20 @@ class TestSearchTaskTUI(unittest.TestCase):
         self.search_task_tui._set_category_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
+        expected_tasks = [
+            f'CLI task[Incomplete][CLI Category]-{self.current_date.strftime("%Y-%m-%d")}',
+        ]
+        self.search_task_tui.task_categories_menu.set_selected_item_index(2)
+        self.search_task_tui._set_category_option()
+        self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
+
         # Custom Category
         expected_tasks = [
             f'Custom Task #1[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Custom Task #2[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Custom Task #3[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}'
         ]
-        self.search_task_tui.task_categories_menu.set_selected_item_index(2)
+        self.search_task_tui.task_categories_menu.set_selected_item_index(3)
         self.search_task_tui._set_category_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
@@ -295,6 +314,8 @@ class TestSearchTaskTUI(unittest.TestCase):
             f'New task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Different task[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
+
+            f'CLI task[Incomplete][CLI Category]-{self.current_date.strftime("%Y-%m-%d")}',
 
             f'TODO Task #1[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'TODO Task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
@@ -338,6 +359,8 @@ class TestSearchTaskTUI(unittest.TestCase):
             f'New task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'New task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Different task[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
+
+            f'CLI task[Incomplete][CLI Category]-{self.current_date.strftime("%Y-%m-%d")}',
 
             f'TODO Task #1[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',
             f'TODO Task #2[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}',

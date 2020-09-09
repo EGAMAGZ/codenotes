@@ -6,14 +6,20 @@ import prompt_toolkit.output.win32 as prompt_toolkit
 from prompt_toolkit import HTML, print_formatted_text
 
 
-def args_needed_empty(args) -> bool:
+def date_args_empty(args) -> bool:
     """ Check if arguments required to search are empty
     Returns
     -------
     empty : bool
         Return boolean value if all related args to search are empty
     """
-    args_needed = [args.month, args.text, args.today, args.week, args.yesterday]
+    args_needed = [
+        args.month,
+        args.text,
+        args.today,
+        args.week,
+        args.yesterday
+    ]
 
     if any(args_needed):
         return False

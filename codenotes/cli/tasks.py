@@ -5,13 +5,13 @@ from datetime import datetime, date
 from rich.console import Console
 from typing import List, Union, overload, Tuple
 
+from codenotes.util import status_text
 from codenotes.db import add_conditions_sql
 import codenotes.db.utilities.tasks as tasks
-import codenotes.db.utilities.tasks_categories as categories
 from codenotes.db.connection import SQLiteConnection
+import codenotes.db.utilities.tasks_categories as categories
 from codenotes.tui import AddTaskTUI, ImpPyCUI, SearchTaskTUI
-from codenotes.cli import PrintFormatted, args_needed_empty, dates_to_search
-from codenotes.util import status_text
+from codenotes.cli import PrintFormatted, date_args_empty, dates_to_search
 
 
 @overload
@@ -50,9 +50,20 @@ def format_task_text(text: str) -> Union[List[str], str]:
         return task_text
 
 
+def add_task_args_empty(args) -> bool:
+    args_needed = [
+        args.text,
+        args.new_category
+    ]
+
+    if any(args_needed):
+        return False
+    return True
+
+
 class AddTask:
 
-    DEFAULT_CATEGORY_ID: int = 1
+    category_id: int = 1
 
     def __init__(self, args):
         """ Constructor fro AddTask class 
@@ -67,13 +78,20 @@ class AddTask:
         self.cursor = self.db.get_cursor()
         self.creation_date = datetime.now().date()
 
-        if args.text:
-            self.task = format_task_text(args.text)
+        if not add_task_args_empty(args):
 
-            if args.preview:
-                self.show_preview()
-            else:
-                self.save_task()
+            if args.new_category:
+                category = ' '.join(args.new_category)
+                self.save_category(category)
+
+            if args.text:
+                self.task = format_task_text(args.text)
+
+                if args.preview:
+                    self.show_preview()
+                else:
+                    self.save_task()
+
         else:
             root = ImpPyCUI(5, 4)
             AddTaskTUI.set_root(root)
@@ -90,6 +108,17 @@ class AddTask:
         """
         return cls(args)
 
+    def save_category(self, category: str):
+        if len(category) <= 30:
+            sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
+            self.cursor.execute(sql, (category.strip(),))
+
+            self.category_id = self.cursor.lastrowid
+
+            self.db.conn.commit()
+        else:
+            self._ask_category()
+
     def save_task(self):
         """ Function in charge to store the tasks in the database"""
 
@@ -99,14 +128,14 @@ class AddTask:
         with yaspin(text='Saving Tasks', color='yellow') as spinner:
             if isinstance(self.task, List):
                 for task in self.task:
-                    values = (task, self.creation_date, self.DEFAULT_CATEGORY_ID)
+                    values = (task, self.creation_date, self.category_id)
                     self.cursor.execute(sql, values)
                     spinner.hide()
                     PrintFormatted.print_tasks_storage(task)
                     spinner.show()
 
             elif isinstance(self.task, str):
-                values = (self.task, self.creation_date, self.DEFAULT_CATEGORY_ID)
+                values = (self.task, self.creation_date, self.category_id)
                 self.cursor.execute(sql, values)
                 spinner.hide()
                 PrintFormatted.print_tasks_storage(self.task)
@@ -136,6 +165,14 @@ class AddTask:
             if answer.lower() == 'y':
                 return True
             return False
+
+    def _ask_category(self):
+        category = self.console.input('Category name is too long(Max. 30). Write another name:')
+
+        while len(category) == 0 or len(category) > 30:
+            category = self.console.input('Category name too long(Max. 30). Write another name:')
+        else:
+            self.save_category(category)
 
     def show_preview(self):
         """ Function that displays a table with the tasks written"""
@@ -175,7 +212,7 @@ class SearchTask:
         self.search_date = dates_to_search(args)
         self.search_text = ' '.join(args.text)
 
-        if args_needed_empty(args):
+        if date_args_empty(args):
             root = ImpPyCUI(6, 6)
             SearchTaskTUI.set_root(root)
             root.start()
