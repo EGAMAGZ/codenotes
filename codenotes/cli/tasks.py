@@ -126,7 +126,7 @@ class AddTask:
               f'{tasks.COLUMN_TASK_CATEGORY}) VALUES (?,?,?);'
 
         with yaspin(text='Saving Tasks', color='yellow') as spinner:
-            if isinstance(self.task, List):
+            if isinstance(self.task, list):
                 for task in self.task:
                     values = (task, self.creation_date, self.category_id)
                     self.cursor.execute(sql, values)
