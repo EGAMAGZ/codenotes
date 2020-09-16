@@ -15,18 +15,18 @@ from codenotes.cli import PrintFormatted, date_args_empty, dates_to_search
 
 
 @overload
-def format_task_text(text: str) -> List[str]: ...
+def format_task_text(text: List[str]) -> List[str]: ...
 
 
 @overload
-def format_task_text(text: str) -> str: ...
+def format_task_text(text: List[str]) -> str: ...
 
 
-def format_task_text(text: str) -> Union[List[str], str]:
+def format_task_text(text: List[str]) -> Union[List[str], str]:
     """ Function that formats text passed through arguments
     Parameters
     ----------
-    text : str
+    text : List[str]
         Text written in the arguments of argparse
     Returns
     -------

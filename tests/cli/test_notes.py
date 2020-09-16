@@ -23,3 +23,7 @@ class TestAddNoteArgsEmpty(unittest.TestCase):
     def test_args_none(self):
         args = parse_args(['add', 'note'])
         self.assertTrue(add_note_args_empty(args))
+
+
+class AddNote(unittest.TestCase):
+    pass

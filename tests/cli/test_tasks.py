@@ -1,12 +1,30 @@
 import unittest
 from datetime import datetime
 
-from codenotes.cli.tasks import AddTask, SearchTask
 from codenotes import parse_args
+from codenotes.cli.tasks import AddTask, SearchTask, add_task_args_empty, format_task_text
+
+
+class TestAddTaskArgsEmpty(unittest.TestCase):
+    
+    def test_args_both(self):
+        args = parse_args(['add', 'task', 'New task', '--new-category', 'Sample', 'Category'])
+        self.assertFalse(add_task_args_empty(args))
+
+    def test_args_one(self):
+        args = parse_args(['add', 'task', 'New task'])
+        self.assertFalse(add_task_args_empty(args))
+
+        args = parse_args(['add', 'task', '--new-category', 'Sample', 'Category'])
+        self.assertFalse(add_task_args_empty(args))
+
+    def test_args_none(self):
+        args = parse_args(['add', 'task'])
+        self.assertTrue(add_task_args_empty(args))
 
 
 class TestAddTodo(unittest.TestCase):
-
+    # ! format_task_text function is indirectly tested
     def test_add_bad_input_task(self):
         """ Test bad task input, when is only typed ; """
         args = parse_args(['add', 'task', ';'])

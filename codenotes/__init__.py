@@ -44,7 +44,7 @@ def parse_args(args):
 
 
 def main():
-
+    # TODO: IMprove the management of arguments
     args = parse_args(sys.argv[1:])
     print(args)
     if len(sys.argv) > 1:
