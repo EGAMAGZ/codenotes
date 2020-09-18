@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime
 
 from codenotes import parse_args
-from codenotes.cli.tasks import AddTask, SearchTask, add_task_args_empty, format_task_text
+from codenotes.cli.tasks import AddTask, SearchTask, add_task_args_empty
 
 
 class TestAddTaskArgsEmpty(unittest.TestCase):
@@ -23,7 +23,7 @@ class TestAddTaskArgsEmpty(unittest.TestCase):
         self.assertTrue(add_task_args_empty(args))
 
 
-class TestAddTodo(unittest.TestCase):
+class TestAddTask(unittest.TestCase):
     # ! format_task_text function is indirectly tested
     def test_add_bad_input_task(self):
         """ Test bad task input, when is only typed ; """
@@ -56,7 +56,7 @@ class TestAddTodo(unittest.TestCase):
         self.assertEqual(add_task.task, 'New task #1')
 
 
-class TestSearchTodo(unittest.TestCase):
+class TestSearchTask(unittest.TestCase):
 
     def setUp(self) -> None:
         self.date = datetime.now().date().strftime('%Y-%m-%d')

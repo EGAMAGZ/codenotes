@@ -25,5 +25,13 @@ class TestAddNoteArgsEmpty(unittest.TestCase):
         self.assertTrue(add_note_args_empty(args))
 
 
-class AddNote(unittest.TestCase):
-    pass
+class TestAddNote(unittest.TestCase):
+
+    def test_add_category_and_complete_note(self):
+        pass
+    
+    def test_add_note(self):
+        pass
+
+    def test_add_title(self):
+        pass

@@ -5,7 +5,8 @@ from sqlite3.dbapi2 import Cursor
 
 import codenotes.db.utilities.notes as notes
 import codenotes.db.utilities.tasks as tasks
-import codenotes.db.utilities.tasks_categories as categories
+import codenotes.db.utilities.tasks_categories as tasks_categories
+import codenotes.db.utilities.notes_categories as notes_categories
 
 
 class SQLiteConnection:
@@ -19,9 +20,12 @@ class SQLiteConnection:
         self.conn = sqlite3.connect(self.DATABASE_PATH)
         self.cursor = self.conn.cursor()
 
+        self.exec_sql(notes_categories.CREATE_NOTES_CATEGORY_TABLE)  # Notes Category Table
+        self.cursor.execute(notes_categories.INSERT_DEFAULT_CATEGORY)  # Insert Default Category
         self.exec_sql(notes.CREATE_NOTES_TABLE)  # Notes Table
-        self.exec_sql(categories.CREATE_TODOS_CATEGORY_TABLE)  # Task Category Table
-        self.cursor.execute(categories.INSERT_DEFAULT_CATEGORY)  # Insert Default Category
+
+        self.exec_sql(tasks_categories.CREATE_TASKS_CATEGORY_TABLE)  # Task Category Table
+        self.cursor.execute(tasks_categories.INSERT_DEFAULT_CATEGORY)  # Insert Default Category
         self.exec_sql(tasks.CREATE_TASKS_TABLE)  # Tasks Table
 
         self.conn.commit()
