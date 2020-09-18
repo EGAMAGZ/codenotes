@@ -65,5 +65,6 @@ class TestDateToSearch(unittest.TestCase):
 
         self.assertListEqual(dates_to_search(args), days)
 
+
 if __name__ == "__main__":
     unittest.main()

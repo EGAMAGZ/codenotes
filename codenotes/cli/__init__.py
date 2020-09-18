@@ -1,7 +1,8 @@
 import calendar
-from prompt_toolkit.styles import Style
 from typing import overload, List, Union
 from datetime import datetime, date, timedelta
+
+from prompt_toolkit.styles import Style
 import prompt_toolkit.output.win32 as prompt_toolkit
 from prompt_toolkit import HTML, print_formatted_text
 
@@ -64,6 +65,12 @@ def dates_to_search(args) -> Union[List[date], date]:
         ]
 
         return days
+
+
+def format_argument_text(arg_text: List[str]) -> str:
+    text = ' '.join(arg_text)
+
+    return text.strip()
 
 
 class PrintFormatted:

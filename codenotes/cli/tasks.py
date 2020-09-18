@@ -1,9 +1,10 @@
+from typing import List, Union, overload, Tuple
+
 from rich import box
 from yaspin import yaspin
 from rich.table import Table
 from datetime import datetime, date
 from rich.console import Console
-from typing import List, Union, overload, Tuple
 
 from codenotes.util import status_text
 from codenotes.db import add_conditions_sql
@@ -11,7 +12,7 @@ import codenotes.db.utilities.tasks as tasks
 from codenotes.db.connection import SQLiteConnection
 import codenotes.db.utilities.tasks_categories as categories
 from codenotes.tui import AddTaskTUI, ImpPyCUI, SearchTaskTUI
-from codenotes.cli import PrintFormatted, date_args_empty, dates_to_search
+from codenotes.cli import PrintFormatted, date_args_empty, dates_to_search, format_argument_text
 
 
 @overload
@@ -35,7 +36,7 @@ def format_task_text(text: List[str]) -> Union[List[str], str]:
     tasks_list : List[str]
         List of texts of task joined and stripped
     """
-    task_text = ' '.join(text)
+    task_text = format_argument_text(text)
 
     if ';' in task_text:
         tasks_list = []
@@ -64,6 +65,7 @@ def add_task_args_empty(args) -> bool:
 class AddTask:
 
     category_id: int = 1
+    category_text: str
 
     def __init__(self, args):
         """ Constructor fro AddTask class 
@@ -86,8 +88,8 @@ class AddTask:
         else:
 
             if args.new_category:
-                category = ' '.join(args.new_category)
-                self.save_category(category)
+                self.category_text = format_argument_text(args.new_category)
+                self.save_category()
 
             if args.text:
                 self.task = format_task_text(args.text)
@@ -108,10 +110,15 @@ class AddTask:
         """
         return cls(args)
 
-    def save_category(self, category: str):
-        if len(category) <= 30:
+    def save_category(self):
+        """ Creates and saves a new category
+
+        When the task(s) is going to be saved and is created a new category,
+        it will set the id of this new one and store the task(s) in this created category
+        """
+        if len(self.category_text) <= 30:
             sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
-            self.cursor.execute(sql, (category.strip(),))
+            self.cursor.execute(sql, (self.category_text,))
 
             self.category_id = self.cursor.lastrowid
 
@@ -171,12 +178,12 @@ class AddTask:
         """ Function that asks to the user to introduce different category name """
 
         text = 'Category name is too long(Max. 30). Write another name:'
-        category = self.console.input(text)
+        self.category_text = self.console.input(text).strip()
 
-        while len(category) == 0 or len(category) > 30:
-            category = self.console.input(text)
+        while len(self.category_text) == 0 or len(self.category_text) > 30:
+            self.category_text = self.console.input(text).strip()
         else:
-            self.save_category(category)
+            self.save_category()
 
     def show_preview(self):
         """ Function that displays a table with the tasks written"""
@@ -214,7 +221,7 @@ class SearchTask:
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
         self.search_date = dates_to_search(args)
-        self.search_text = ' '.join(args.text)
+        self.search_text = format_argument_text(args.text)
 
         if date_args_empty(args):
             root = ImpPyCUI(6, 6)
