@@ -95,7 +95,7 @@ class AddTask:
                 self.task = format_task_text(args.text)
 
                 if args.preview:
-                    self.show_preview()
+                    self._show_preview()
                 else:
                     self.save_task()
 
@@ -185,7 +185,7 @@ class AddTask:
         else:
             self.save_category()
 
-    def show_preview(self):
+    def _show_preview(self):
         """ Function that displays a table with the tasks written"""
         formatted_date = self.creation_date.strftime('%Y-%m-%d')
         

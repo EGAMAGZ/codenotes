@@ -22,7 +22,7 @@ def parse_args(args):
     task.add_argument('--new-category', type=str, nargs='*', action='store')
     task.add_argument('--preview', '-p', action='store_true')
 
-    note = add_type_file.add_parser('note')
+    note = add_type_file.add_parser('note')  # TODO: ADD ARGUMENT TO ADD FROM CLIPBOARD
     note.add_argument('text', type=str, nargs='*', action='store')
     note.add_argument('--title', '-t', type=str, nargs='*', action='store')
     note.add_argument('--new-category', type=str, nargs='*', action='store')
