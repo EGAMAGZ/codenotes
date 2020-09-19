@@ -143,7 +143,7 @@ class AddTaskTUI:
 
                         self.cursor.execute(sql, values)
                         spinner.hide()
-                        PrintFormatted.print_tasks_storage(task, self.selected_category.category_name)
+                        PrintFormatted.print_content_storage(task, self.selected_category.category_name)
                         spinner.show()
                     spinner.ok("✔")
 

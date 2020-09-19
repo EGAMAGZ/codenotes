@@ -3,10 +3,10 @@ from datetime import datetime
 from rich.console import Console
 from yaspin import yaspin
 
-from codenotes.cli import format_argument_text, PrintFormatted
-from codenotes.db.connection import SQLiteConnection
-import codenotes.db.utilities.tasks_categories as categories
 import codenotes.db.utilities.notes as notes
+from codenotes.db.connection import SQLiteConnection
+from codenotes.cli import format_argument_text, PrintFormatted
+import codenotes.db.utilities.notes_categories as categories
 
 
 def add_note_args_empty(args) -> bool:
@@ -21,12 +21,12 @@ def add_note_args_empty(args) -> bool:
     return True
 
 
-class AddNotes:
+class AddNote:
 
     category_id: int = 1
     category_name: str
-    note_title: str
-    note_text: str
+    note_title: str = None
+    note_text: str = None
 
     def __init__(self, args):
         """ Constructor fro AddTask class 
@@ -49,15 +49,12 @@ class AddNotes:
                 self.save_category()
 
             if args.text or args.title:
-
                 self._set_note_content(args)
 
                 if args.preview:
                     pass
                 else:
                     self.save_note()
-
-            self.save_note()
 
     @classmethod
     def set_args(cls, args):
@@ -70,14 +67,6 @@ class AddNotes:
         """
         return cls(args)
 
-    def _check_note_title(self):
-        if len(self.note_text) > 30:
-            text = ''
-            self.note_title = self.console.input(text).strip()
-
-            while len(self.note_title) == 0 or len(self.note_title) > 30:
-                self.note_text = self.console.input(text).strip()
-
     def save_category(self):
         """ Creates and saves a new category"""
         if len(self.category_name) <= 30:
@@ -87,7 +76,7 @@ class AddNotes:
             self.category_id = self.cursor.lastrowid
 
             self.db.commit()
-
+            PrintFormatted.print_category_creation(self.category_name)
         else:
             self._ask_category()
 
@@ -98,20 +87,30 @@ class AddNotes:
         with yaspin(text='Saving Note', color='yellow') as spinner:
             values = (self.note_title, self.note_text, self.category_id, self.creation_date)
             self.cursor.execute(sql, values)
+
             spinner.hide()
-            PrintFormatted.print_note_storage(self.note_title)  # TODO: ADD PRINT FOR EMPTY NOTE TEXT
+            PrintFormatted.print_content_storage(self.note_title)  # TODO: ADD PRINT FOR EMPTY NOTE TEXT
             spinner.show()
 
-        pass
+            spinner.ok("✔")
+
+        self.db.commit()
+        self.db.close()
 
     def _set_note_content(self, args):
+
         if args.text:
             self.note_text = format_argument_text(args.text)
 
-            if not args.text:
+            if not args.title:
                 self.note_title = self.note_text[:30]
+            else:
+                self.note_title = format_argument_text(args.title)
+                self._check_note_title()
         else:
-            self._check_note_title()
+            if args.title:
+                self.note_title = format_argument_text(args.title)
+                self._check_note_title()
 
     def _ask_category(self):
         """ Function that asks to the user to introduce different category name """
@@ -123,3 +122,11 @@ class AddNotes:
             self.category_name = self.console.input(text).strip()
         else:
             self.save_category()
+
+    def _check_note_title(self):
+        if len(self.note_title) > 30:
+            text = 'LONG'
+            self.note_title = self.console.input(text).strip()
+
+            while len(self.note_title) == 0 or len(self.note_title) > 30:
+                self.note_text = self.console.input(text).strip()

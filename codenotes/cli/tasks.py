@@ -123,6 +123,7 @@ class AddTask:
             self.category_id = self.cursor.lastrowid
 
             self.db.commit()
+            PrintFormatted.print_category_creation(self.category_text)
         else:
             self._ask_category()
 
@@ -138,14 +139,14 @@ class AddTask:
                     values = (task, self.creation_date, self.category_id)
                     self.cursor.execute(sql, values)
                     spinner.hide()
-                    PrintFormatted.print_tasks_storage(task)
+                    PrintFormatted.print_content_storage(task)  # TODO: PRINT CATEGORY WHEN IS NOT NONE (DEFAULT)
                     spinner.show()
 
             elif isinstance(self.task, str):
                 values = (self.task, self.creation_date, self.category_id)
                 self.cursor.execute(sql, values)
                 spinner.hide()
-                PrintFormatted.print_tasks_storage(self.task)
+                PrintFormatted.print_content_storage(self.task)
                 spinner.show()
 
             if self.task:

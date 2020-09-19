@@ -98,44 +98,33 @@ class PrintFormatted:
     @classmethod
     def print_category_creation(cls, category: str):
         custom_html = HTML(
-
+            u'<msg>Created category:</msg><category-name>{}</category-name>'.format(category)
         )
 
-        custom_style = Style(
-
-        )
-
-        return cls(custom_html, custom_style)
-
-    @classmethod
-    def print_tasks_storage(cls, task_txt: str, task_category: str = 'TODO Tasks'):
-        """ Class method used to print the process of tasks storage
-        Parameters
-        ----------
-        task_txt : str
-            Content of the task that is stored
-        task_category : str
-            Category where the task is stored
-        """
-        custom_html = HTML(
-            u'<b>></b><msg>Task saved[{}]: </msg><task-txt>{}</task-txt>'.format(task_category, task_txt)
-        )
-
-        custom_style = Style.from_dict({  # Style use for prints related with saving process
-            'msg': '#d898ed bold',
-            'task-txt': '#616161 italic'
+        custom_style = Style.from_dict({
+            'msg': '#31f55f bold',
+            'category-name': '#616161 italic'
         })
 
         return cls(custom_html, custom_style)
 
     @classmethod
-    def print_note_storage(cls, note_title: str):
+    def print_content_storage(cls, content: str, category: str = 'TODO Tasks'):
+        """ Class method used to print the process of storage of tasks and notes
+        Parameters
+        ----------
+        content : str
+            A glance of the content that is stored
+        category : str
+            Category where is stored
+        """
         custom_html = HTML(
-
+            u'<msg>> Task saved[{}]: </msg><task-txt>{}</task-txt>'.format(category, content)
         )
 
-        custom_style = Style.from_dict({
-
+        custom_style = Style.from_dict({  # Style use for prints related with saving process
+            'msg': '#d898ed bold',
+            'task-txt': '#616161 italic'
         })
 
         return cls(custom_html, custom_style)
