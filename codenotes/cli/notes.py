@@ -24,7 +24,7 @@ def add_note_args_empty(args) -> bool:
 class AddNote:
 
     category_id: int = 1
-    category_name: str
+    category_name: str = None
     note_title: str = None
     note_text: str = None
 
