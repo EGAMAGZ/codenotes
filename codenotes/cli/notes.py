@@ -44,17 +44,20 @@ class AddNote:
         if add_note_args_empty(args):
             pass
         else:
-            if args.new_category:
-                self.category_name = format_argument_text(args.new_category)
-                self.save_category()
+            try:
+                if args.new_category:
+                    self.category_name = format_argument_text(args.new_category)
+                    self.save_category()
 
-            if args.text or args.title:
-                self._set_note_content(args)
+                if args.text or args.title:
+                    self._set_note_content(args)
 
-                if args.preview:
-                    pass
-                else:
-                    self.save_note()
+                    if args.preview:
+                        pass
+                    else:
+                        self.save_note()
+            except KeyboardInterrupt:
+                self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
 
     @classmethod
     def set_args(cls, args):
@@ -115,7 +118,7 @@ class AddNote:
     def _ask_category(self):
         """ Function that asks to the user to introduce different category name """
 
-        text = 'Category name is too long(Max. 30). Write another name:'
+        text = '⚠️[yellow]Category name is too long (Max. 30).[/yellow] Write another name:'
         self.category_name = self.console.input(text).strip()
 
         while len(self.category_name) == 0 or len(self.category_name) > 30:
@@ -125,7 +128,7 @@ class AddNote:
 
     def _check_note_title(self):
         if len(self.note_title) > 30:
-            text = 'LONG'
+            text = '⚠️[yellow]Note title is too long(Max. 30).[/yellow] Write another title:'
             self.note_title = self.console.input(text).strip()
 
             while len(self.note_title) == 0 or len(self.note_title) > 30:

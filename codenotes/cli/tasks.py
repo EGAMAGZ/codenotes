@@ -86,18 +86,21 @@ class AddTask:
             root.start()
 
         else:
+            try:
+                if args.new_category:
+                    self.category_text = format_argument_text(args.new_category)
+                    self.save_category()
 
-            if args.new_category:
-                self.category_text = format_argument_text(args.new_category)
-                self.save_category()
+                if args.text:
+                    self.task = format_task_text(args.text)
 
-            if args.text:
-                self.task = format_task_text(args.text)
+                    if args.preview:
+                        self._show_preview()
+                    else:
+                        self.save_task()
 
-                if args.preview:
-                    self._show_preview()
-                else:
-                    self.save_task()
+            except KeyboardInterrupt:
+                self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
 
     @classmethod
     def set_args(cls, args):
@@ -150,7 +153,7 @@ class AddTask:
                 spinner.show()
 
             if self.task:
-                spinner.ok("✔")
+                spinner.ok("✔️")
             else:
                 spinner.text = 'No Task Saved'
                 spinner.fail("💥")
@@ -166,7 +169,7 @@ class AddTask:
         confirmed : bool
             Boolean value that indicates the storage of the tasks written
         """
-        text = 'Do you want to save them?(y/n):'
+        text = '[yellow]Do you want to save them?(y/n):[/yellow]'
         answer = self.console.input(text)
         while len(answer) > 0 and answer.lower() != 'n' and answer.lower() != 'y':
             answer = self.console.input(text)
@@ -178,7 +181,7 @@ class AddTask:
     def _ask_category(self):
         """ Function that asks to the user to introduce different category name """
 
-        text = 'Category name is too long(Max. 30). Write another name:'
+        text = '⚠️[yellow]Category name is too long (Max. 30 characters).[/yellow]Write another name:'
         self.category_text = self.console.input(text).strip()
 
         while len(self.category_text) == 0 or len(self.category_text) > 30:
@@ -193,7 +196,7 @@ class AddTask:
         self.console.rule('Preview', style='purple')
         
         table = Table(box=box.SIMPLE_HEAD)
-        table.add_column('Task')
+        table.add_column('Task', overflow='fold')
         table.add_column('Creation Date', justify='center', style='yellow')
         
         if isinstance(self.task, List):
