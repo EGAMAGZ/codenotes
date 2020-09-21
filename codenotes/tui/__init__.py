@@ -1,4 +1,3 @@
-import curses
 import calendar
 from datetime import date, datetime, timedelta
 from typing import List, Tuple, Optional, Any, Union
@@ -12,7 +11,8 @@ from codenotes.db import add_conditions_sql
 import codenotes.db.utilities.tasks as tasks
 from codenotes.db.utilities import Category, Task
 from codenotes.db.connection import SQLiteConnection
-import codenotes.db.utilities.tasks_categories as categories
+import codenotes.db.utilities.tasks_categories as tasks_categories
+import codenotes.db.utilities.notes_categories as notes_categories
 
 WHITE_ON_MAGENTA = 11
 
@@ -64,7 +64,8 @@ class AddTaskTUI:
 
     def get_categories(self) -> List[Tuple[str]]:
         """ Gets all categories stored in database """
-        sql = f'SELECT {categories.COLUMN_CATEGORY_ID},{categories.COLUMN_CATEGORY_NAME} FROM {categories.TABLE_NAME};'
+        sql = f'SELECT {tasks_categories.COLUMN_CATEGORY_ID},{tasks_categories.COLUMN_CATEGORY_NAME} FROM ' \
+              f'{tasks_categories.TABLE_NAME};'
 
         query = self.cursor.execute(sql)
 
@@ -99,14 +100,14 @@ class AddTaskTUI:
     def add_category(self, category: str):
         """ Adds new category to categories menu and saves it in database """
         if category and len(category) <= 30:
-            sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
+            sql = f'INSERT INTO {tasks_categories.TABLE_NAME} ({tasks_categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
 
             self.cursor.execute(sql, (category.strip(),))
 
             category_id = self.cursor.lastrowid
             self.categories_menu.add_item(Category(category_id, category))
 
-            self.db.conn.commit()
+            self.db.commit()
         else:
             self._ask_new_category()
 
@@ -181,10 +182,10 @@ class SearchTaskTUI:
     STATUS_OPTION: List[str] = ['All', 'Incomplete', 'In Process', 'Finished']
     BASE_SQL: str = f'SELECT {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_ID},' \
                     f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CONTENT},{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_STATUS},' \
-                    f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_NAME},' \
+                    f'{tasks_categories.TABLE_NAME}.{tasks_categories.COLUMN_CATEGORY_NAME},' \
                     f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CREATION} FROM {tasks.TABLE_NAME} INNER JOIN ' \
-                    f'{categories.TABLE_NAME} ON {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CATEGORY} = ' \
-                    f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_ID}'
+                    f'{tasks_categories.TABLE_NAME} ON {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CATEGORY} = ' \
+                    f'{tasks_categories.TABLE_NAME}.{tasks_categories.COLUMN_CATEGORY_ID}'
 
     search_text_box: py_cui.widgets.TextBox
     tasks_list_menu: py_cui.widgets.ScrollMenu
@@ -232,7 +233,8 @@ class SearchTaskTUI:
 
     def get_categories(self) -> List[Tuple[str]]:
         """ Gets all categories stored in database """
-        sql = f'SELECT {categories.COLUMN_CATEGORY_ID},{categories.COLUMN_CATEGORY_NAME} FROM {categories.TABLE_NAME};'
+        sql = f'SELECT {tasks_categories.COLUMN_CATEGORY_ID},{tasks_categories.COLUMN_CATEGORY_NAME} FROM ' \
+              f'{tasks_categories.TABLE_NAME};'
 
         query = self.cursor.execute(sql)
 
@@ -408,15 +410,55 @@ class AddNoteTUI:
 
         self.categories_menu.add_item_list(self.categories_list)
 
+    def _ask_new_category(self):
+        """ Shows text box popup """
+        self.root.show_text_box_popup('Enter new category name (Max. 30):', command=self.add_category)
+
+    def _show_category_name(self):
+        """ Shows message popup to display complete the whole category name """
+        category = self.categories_menu.get()
+
+        self.root.show_message_popup('Category Name:', category.category_name)
+
+    def _set_category_option(self):
+        """ Function that is executed when a category is selected """
+        self.selected_category = self.categories_menu.get()
+
+        self.categories_menu.set_title(f'{self.selected_category}')
+
     def get_categories(self) -> List[Tuple[str]]:
         """ Gets all categories stored in database """
-        sql = f'SELECT {categories.COLUMN_CATEGORY_ID},{categories.COLUMN_CATEGORY_NAME} FROM {categories.TABLE_NAME};'
+        sql = f'SELECT {notes_categories.COLUMN_CATEGORY_ID},{notes_categories.COLUMN_CATEGORY_NAME} FROM ' \
+              f'{notes_categories.TABLE_NAME};'
 
         query = self.cursor.execute(sql)
 
         return query.fetchall()
 
+    def add_category(self, category: str):
+        """ Adds new category to categories menu and saves it in database """
+        if category and len(category) <= 30:
+            sql = f'INSERT INTO {notes_categories.TABLE_NAME} ({notes_categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
+
+            self.cursor.execute(sql, (category.strip(),))
+
+            category_id = self.cursor.lastrowid
+            self.categories_menu.add_item(Category(category_id, category))
+
+            self.db.commit()
+        else:
+            self._ask_new_category()
+
     def __config(self):
+        """ Function that configures the widgets of the root """
+        self._load_categories_menu()
+
+        self.categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_category_option)
+        self.categories_menu.add_key_command(py_cui.keys.KEY_N_LOWER, self._ask_new_category)
+        self.categories_menu.add_key_command(py_cui.keys.KEY_SPACE, self._show_category_name)
+        self.categories_menu.set_focus_text(
+            '|n - New Category|Enter - Select Category|Space - Show category|Up/Down - Move|Esc - Exit|'
+        )
 
         self.root.set_title('Codenotes - Add Note')
         pass
