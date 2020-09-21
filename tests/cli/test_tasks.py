@@ -38,6 +38,8 @@ class TestAddTask(unittest.TestCase):
         add_task = AddTask(args)
 
         self.assertEqual(add_task.category_id, 2)
+        self.assertEqual(add_task.category_name, 'CLI Category')
+        self.assertEqual(add_task.task, 'CLI task')
 
     def test_add_many_tasks(self):
         """ Test the storage of two tasks """

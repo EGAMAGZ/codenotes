@@ -65,7 +65,8 @@ def add_task_args_empty(args) -> bool:
 class AddTask:
 
     category_id: int = 1
-    category_text: str
+    category_name: str
+    task: Union[List[str], str]
 
     def __init__(self, args):
         """ Constructor fro AddTask class 
@@ -81,14 +82,14 @@ class AddTask:
         self.creation_date = datetime.now().date()
 
         if add_task_args_empty(args):
-            root = ImpPyCUI(5, 4)
+            root = ImpPyCUI(5,4)
             AddTaskTUI.set_root(root)
             root.start()
 
         else:
             try:
                 if args.new_category:
-                    self.category_text = format_argument_text(args.new_category)
+                    self.category_name = format_argument_text(args.new_category)
                     self.save_category()
 
                 if args.text:
@@ -119,14 +120,14 @@ class AddTask:
         When the task(s) is going to be saved and is created a new category,
         it will set the id of this new one and store the task(s) in this created category
         """
-        if len(self.category_text) <= 30:
+        if len(self.category_name) <= 30:
             sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
-            self.cursor.execute(sql, (self.category_text,))
+            self.cursor.execute(sql, (self.category_name,))
 
             self.category_id = self.cursor.lastrowid
 
             self.db.commit()
-            PrintFormatted.print_category_creation(self.category_text)
+            PrintFormatted.print_category_creation(self.category_name)
         else:
             self._ask_category()
 
@@ -182,10 +183,10 @@ class AddTask:
         """ Function that asks to the user to introduce different category name """
 
         text = '⚠️[yellow]Category name is too long (Max. 30 characters).[/yellow]Write another name:'
-        self.category_text = self.console.input(text).strip()
+        self.category_name = self.console.input(text).strip()
 
-        while len(self.category_text) == 0 or len(self.category_text) > 30:
-            self.category_text = self.console.input(text).strip()
+        while len(self.category_name) == 0 or len(self.category_name) > 30:
+            self.category_name = self.console.input(text).strip()
         else:
             self.save_category()
 

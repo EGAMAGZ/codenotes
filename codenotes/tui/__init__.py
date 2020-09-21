@@ -371,3 +371,20 @@ class SearchTaskTUI:
 
         self.root.add_key_command(py_cui.keys.KEY_S_LOWER, self._load_all_tasks)
         self.root.set_title('Codenotes - Search Tasks')
+
+
+class AddNoteTUI:
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def set_root(cls, root: ImpPyCUI):
+        """ Sets root and initialize class
+        
+        Parameters
+        ----------
+        root : ImpPyCUI
+            Root for TUI
+        """
+        return cls(root)

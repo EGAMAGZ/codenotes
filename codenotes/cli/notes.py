@@ -3,11 +3,11 @@ from datetime import datetime
 from rich.console import Console
 from yaspin import yaspin
 
+from codenotes.tui import AddNoteTUI, ImpPyCUI
 import codenotes.db.utilities.notes as notes
 from codenotes.db.connection import SQLiteConnection
 from codenotes.cli import format_argument_text, PrintFormatted
 import codenotes.db.utilities.notes_categories as categories
-
 
 def add_note_args_empty(args) -> bool:
     args_needed = [
@@ -24,7 +24,7 @@ def add_note_args_empty(args) -> bool:
 class AddNote:
 
     category_id: int = 1
-    category_name: str = None
+    category_name: str = 'General'
     note_title: str = None
     note_text: str = None
 
@@ -42,7 +42,10 @@ class AddNote:
         self.creation_date = datetime.now().date()
 
         if add_note_args_empty(args):
-            pass
+            root = ImpPyCUI(5,4)
+            AddNoteTUI.set_root(root)
+            root.start()
+
         else:
             try:
                 if args.new_category:
@@ -53,7 +56,8 @@ class AddNote:
                     self._set_note_content(args)
 
                     if args.preview:
-                        pass
+                        self._show_preview()
+
                     else:
                         self.save_note()
             except KeyboardInterrupt:
@@ -133,3 +137,6 @@ class AddNote:
 
             while len(self.note_title) == 0 or len(self.note_title) > 30:
                 self.note_text = self.console.input(text).strip()
+
+    def _show_preview(self):
+        pass

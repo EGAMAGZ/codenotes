@@ -52,8 +52,6 @@ class TestAddNote(unittest.TestCase):
         ])
         add_note = AddNote(args)
 
-        self.assertEqual(add_note.category_id, 1)
-        self.assertEqual(add_note.category_name, None)
         self.assertEqual(add_note.note_text, self.expected_note_text)
         self.assertEqual(add_note.note_title, 'Lorem ipsum dolor sit amet, co')
 
@@ -63,8 +61,6 @@ class TestAddNote(unittest.TestCase):
         ])
         add_note = AddNote(args)
 
-        self.assertEqual(add_note.category_id, 1)
-        self.assertEqual(add_note.category_name, None)
         self.assertEqual(add_note.note_text, None)
         self.assertEqual(add_note.note_title, 'Empty Note')
 
