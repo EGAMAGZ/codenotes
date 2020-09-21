@@ -1,14 +1,15 @@
-import py_cui
 import curses
 import calendar
-from yaspin import yaspin
-from typing import List, Tuple, Optional, Any, Union
 from datetime import date, datetime, timedelta
+from typing import List, Tuple, Optional, Any, Union
+
+import py_cui
+from yaspin import yaspin
 
 from codenotes.util import status_text
+from codenotes.cli import PrintFormatted
 from codenotes.db import add_conditions_sql
 import codenotes.db.utilities.tasks as tasks
-from codenotes.cli import PrintFormatted
 from codenotes.db.utilities import Category, Task
 from codenotes.db.connection import SQLiteConnection
 import codenotes.db.utilities.tasks_categories as categories
@@ -24,16 +25,12 @@ class ImpPyCUI(py_cui.PyCUI):
         super().__init__(num_rows, num_cols, auto_focus_buttons, exit_key, simulated_terminal)
         self.toggle_unicode_borders()
 
-    def _initialize_colors(self):
-        """ Override of base class function"""
-        super()._initialize_colors()
-        curses.init_pair(WHITE_ON_MAGENTA, curses.COLOR_WHITE, curses.COLOR_MAGENTA)
-
 
 class AddTaskTUI:
 
     tasks_list_menu: py_cui.widgets.ScrollMenu
     task_text_block: py_cui.widgets.TextBox
+    # TODO: CREATE ALL ATTRIBUTES
 
     categories_list: List[Category] = []
     selected_category: Category = None
@@ -47,7 +44,7 @@ class AddTaskTUI:
         # -| Text Blocks |-
         self.task_text_block = self.root.add_text_box('New Task', 0, 0, column_span=4)
         # -| Scroll Menus |-
-        self.task_categories_menu = self.root.add_scroll_menu('Categories', 1, 0, row_span=4)
+        self.categories_menu = self.root.add_scroll_menu('Categories', 1, 0, row_span=4)
         self.tasks_list_menu = self.root.add_scroll_menu('Tasks to add', 1, 1, column_span=3, row_span=3)
         # -| Buttons |-
         self.save_button = self.root.add_button('Save Tasks', 4, 1, column_span=3, command=self.save_tasks)
@@ -75,8 +72,7 @@ class AddTaskTUI:
 
     def _show_category_name(self):
         """ Shows message popup to display complete the whole category name """
-        category = self.task_categories_menu.get()
-        print(type(category))
+        category = self.categories_menu.get()
 
         self.root.show_message_popup('Category Name:', category.category_name)
 
@@ -88,13 +84,13 @@ class AddTaskTUI:
         """ Functions that creates a list of tasks and added it to the categories menu """
         self.categories_list = [Category(category[0], category[1]) for category in self.get_categories()]
 
-        self.task_categories_menu.add_item_list(self.categories_list)
+        self.categories_menu.add_item_list(self.categories_list)
 
     def _set_category_option(self):
         """ Function that is executed when a category is selected """
-        self.selected_category = self.task_categories_menu.get()
+        self.selected_category = self.categories_menu.get()
 
-        self.task_categories_menu.set_title(f'{self.selected_category}')
+        self.categories_menu.set_title(f'{self.selected_category}')
 
     def _ask_new_category(self):
         """ Shows text box popup """
@@ -108,7 +104,7 @@ class AddTaskTUI:
             self.cursor.execute(sql, (category.strip(),))
 
             category_id = self.cursor.lastrowid
-            self.task_categories_menu.add_item(Category(category_id, category))
+            self.categories_menu.add_item(Category(category_id, category))
 
             self.db.conn.commit()
         else:
@@ -168,10 +164,10 @@ class AddTaskTUI:
         self.tasks_list_menu.add_key_command(py_cui.keys.KEY_BACKSPACE, self.remove_task)
         self.tasks_list_menu.set_focus_text('|Backspace - Remove Task|Esc - Exit |')
 
-        self.task_categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_category_option)
-        self.task_categories_menu.add_key_command(py_cui.keys.KEY_N_LOWER, self._ask_new_category)
-        self.task_categories_menu.add_key_command(py_cui.keys.KEY_SPACE, self._show_category_name)
-        self.task_categories_menu.set_focus_text(
+        self.categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_category_option)
+        self.categories_menu.add_key_command(py_cui.keys.KEY_N_LOWER, self._ask_new_category)
+        self.categories_menu.add_key_command(py_cui.keys.KEY_SPACE, self._show_category_name)
+        self.categories_menu.set_focus_text(
             '|n - New Category|Enter - Select Category|Space - Show category|Up/Down - Move|Esc - Exit|'
         )
 
@@ -190,11 +186,11 @@ class SearchTaskTUI:
                     f'{categories.TABLE_NAME} ON {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CATEGORY} = ' \
                     f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_ID}'
 
-    task_search_text_box: py_cui.widgets.TextBox
+    search_text_box: py_cui.widgets.TextBox
     tasks_list_menu: py_cui.widgets.ScrollMenu
-    task_categories_menu: py_cui.widgets.ScrollMenu
-    task_date_menu: py_cui.widgets.ScrollMenu
-    task_status_menu: py_cui.widgets.ScrollMenu
+    categories_menu: py_cui.widgets.ScrollMenu
+    date_menu: py_cui.widgets.ScrollMenu
+    status_menu: py_cui.widgets.ScrollMenu
 
     selected_date: Union[Optional[date], Optional[List[date]]] = None
     selected_category: Optional[Category] = None
@@ -214,12 +210,12 @@ class SearchTaskTUI:
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
         # -| Text Boxes |-
-        self.task_search_text_box = self.root.add_text_box('Search task:', 0, 1, column_span=5)
+        self.search_text_box = self.root.add_text_box('Search task:', 0, 1, column_span=5)
         # -| Scroll Menu |-
         self.tasks_list_menu = self.root.add_scroll_menu('Task', 1, 1, row_span=5, column_span=5)
-        self.task_categories_menu = self.root.add_scroll_menu('Category', 0, 0, row_span=2)
-        self.task_date_menu = self.root.add_scroll_menu('Date', 2, 0, row_span=2)
-        self.task_status_menu = self.root.add_scroll_menu('Status', 4, 0, row_span=2)
+        self.categories_menu = self.root.add_scroll_menu('Category', 0, 0, row_span=2)
+        self.date_menu = self.root.add_scroll_menu('Date', 2, 0, row_span=2)
+        self.status_menu = self.root.add_scroll_menu('Status', 4, 0, row_span=2)
 
         self.__config()
 
@@ -244,7 +240,7 @@ class SearchTaskTUI:
 
     def _set_status_option(self):
         """ Sets the selected status from status menu """
-        index = self.task_status_menu.get_selected_item_index()
+        index = self.status_menu.get_selected_item_index()
         if index == 0:  # All
             self.selected_status = None
         else:
@@ -254,7 +250,7 @@ class SearchTaskTUI:
 
     def _set_date_option(self):
         """ Sets the selected date from date menu """
-        index = self.task_date_menu.get_selected_item_index()
+        index = self.date_menu.get_selected_item_index()
         now = datetime.now().date()
 
         if index == 0:  # Any Date
@@ -283,21 +279,21 @@ class SearchTaskTUI:
 
     def _set_category_option(self):
         """ Sets the selected category from category menu """
-        if self.task_categories_menu.get_selected_item_index() != 0:  # All Categories
-            category = self.task_categories_menu.get()
+        if self.categories_menu.get_selected_item_index() != 0:  # All Categories
+            category = self.categories_menu.get()
 
             self.selected_category = category
-            self.task_categories_menu.set_title(category.category_name)  # TODO: ADD ABBREVIATION
+            self.categories_menu.set_title(category.category_name)  # TODO: ADD ABBREVIATION
 
         else:
             self.selected_category = None
-            self.task_categories_menu.set_title('Category')
+            self.categories_menu.set_title('Category')
 
         self._load_all_tasks()
 
     def _show_category_popup(self):
         """ Shows message popup to display the complete category name """
-        category = self.task_categories_menu.get()
+        category = self.categories_menu.get()
         self.root.show_message_popup('Category Name:', category.category_name)
 
     def _load_all_tasks(self):
@@ -324,8 +320,8 @@ class SearchTaskTUI:
         if self.selected_status is not None:
             sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_STATUS} = {self.selected_status}', 'AND')
 
-        if self.task_search_text_box.get():
-            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.task_search_text_box.get()}%"',
+        if self.search_text_box.get():
+            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.search_text_box.get()}%"',
                                      'AND')
 
         query = self.cursor.execute(sql)
@@ -343,24 +339,24 @@ class SearchTaskTUI:
         self.categories_list = [Category(category[0], category[1]) for category in self.get_categories()]
         self.categories_list.insert(0, 'All')
 
-        self.task_categories_menu.add_item_list(self.categories_list)
+        self.categories_menu.add_item_list(self.categories_list)
 
     def __config(self):
         """ Function that configures the widgets of the root """
         self._load_all_tasks()
         self._load_menu_categories()
 
-        self.task_categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_category_option)
-        self.task_categories_menu.add_key_command(py_cui.keys.KEY_SPACE, self._show_category_popup)
-        self.task_categories_menu.set_focus_text('|Enter - Select Category|Up/Down - Move|Esc - Exit|')
+        self.categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_category_option)
+        self.categories_menu.add_key_command(py_cui.keys.KEY_SPACE, self._show_category_popup)
+        self.categories_menu.set_focus_text('|Enter - Select Category|Up/Down - Move|Esc - Exit|')
 
-        self.task_status_menu.add_item_list(self.STATUS_OPTION)
-        self.task_status_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_status_option)
-        self.task_status_menu.set_focus_text('|Enter - Select Status|Up/Down - Move|Esc - Exit|')
+        self.status_menu.add_item_list(self.STATUS_OPTION)
+        self.status_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_status_option)
+        self.status_menu.set_focus_text('|Enter - Select Status|Up/Down - Move|Esc - Exit|')
 
-        self.task_date_menu.add_item_list(self.DATE_OPTIONS)
-        self.task_date_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_date_option)
-        self.task_date_menu.set_focus_text('|Enter - Select Date|Up/Down - Move|Esc - Exit|')
+        self.date_menu.add_item_list(self.DATE_OPTIONS)
+        self.date_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_date_option)
+        self.date_menu.set_focus_text('|Enter - Select Date|Up/Down - Move|Esc - Exit|')
 
         self.tasks_list_menu.add_text_color_rule('Incomplete', py_cui.RED_ON_BLACK, rule_type='contains',
                                                  match_type='regex')
@@ -375,8 +371,25 @@ class SearchTaskTUI:
 
 class AddNoteTUI:
 
-    def __init__(self):
-        pass
+    note_title_text_box: py_cui.widgets.TextBox
+    categories_menu: py_cui.widgets.ScrollMenu
+    settings_menu: py_cui.widgets.ScrollMenu
+
+    categories_list: List[Category] = []
+    selected_category: Category = None
+
+    def __init__(self, root: ImpPyCUI):
+        self.root = root
+        self.db = SQLiteConnection()
+        self.cursor = self.db.get_cursor()
+
+        # -| Text Block |-
+        self.note_title_text_box = root.add_text_box('Title', 0, 0, column_span=4)
+        # -| Scroll Menu |-
+        self.categories_menu = root.add_scroll_menu('Categories', 1, 0, row_span=2)
+        self.settings_menu = root.add_scroll_menu('Settings', 3, 0, row_span=2)
+
+        self.__config()
 
     @classmethod
     def set_root(cls, root: ImpPyCUI):
@@ -388,3 +401,22 @@ class AddNoteTUI:
             Root for TUI
         """
         return cls(root)
+
+    def _load_categories_menu(self):
+        """ Functions that creates a list of tasks and added it to the categories menu """
+        self.categories_list = [Category(category[0], category[1]) for category in self.get_categories()]
+
+        self.categories_menu.add_item_list(self.categories_list)
+
+    def get_categories(self) -> List[Tuple[str]]:
+        """ Gets all categories stored in database """
+        sql = f'SELECT {categories.COLUMN_CATEGORY_ID},{categories.COLUMN_CATEGORY_NAME} FROM {categories.TABLE_NAME};'
+
+        query = self.cursor.execute(sql)
+
+        return query.fetchall()
+
+    def __config(self):
+
+        self.root.set_title('Codenotes - Add Note')
+        pass

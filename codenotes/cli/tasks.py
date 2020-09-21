@@ -82,7 +82,7 @@ class AddTask:
         self.creation_date = datetime.now().date()
 
         if add_task_args_empty(args):
-            root = ImpPyCUI(5,4)
+            root = ImpPyCUI(5, 4)
             AddTaskTUI.set_root(root)
             root.start()
 
@@ -143,7 +143,7 @@ class AddTask:
                     values = (task, self.creation_date, self.category_id)
                     self.cursor.execute(sql, values)
                     spinner.hide()
-                    PrintFormatted.print_content_storage(task, self.category_name)  # TODO: PRINT CATEGORY WHEN IS NOT NONE (DEFAULT)
+                    PrintFormatted.print_content_storage(task, self.category_name)
                     spinner.show()
 
             elif isinstance(self.task, str):

@@ -9,6 +9,7 @@ from codenotes.db.connection import SQLiteConnection
 from codenotes.cli import format_argument_text, PrintFormatted
 import codenotes.db.utilities.notes_categories as categories
 
+
 def add_note_args_empty(args) -> bool:
     args_needed = [
         args.title,
@@ -42,7 +43,7 @@ class AddNote:
         self.creation_date = datetime.now().date()
 
         if add_note_args_empty(args):
-            root = ImpPyCUI(5,4)
+            root = ImpPyCUI(5, 4)
             AddNoteTUI.set_root(root)
             root.start()
 
@@ -96,7 +97,7 @@ class AddNote:
             self.cursor.execute(sql, values)
 
             spinner.hide()
-            PrintFormatted.print_content_storage(self.note_title, self.category_name)  # TODO: ADD PRINT FOR EMPTY NOTE TEXT
+            PrintFormatted.print_content_storage(self.note_title, self.category_name)
             spinner.show()
 
             spinner.ok("✔")

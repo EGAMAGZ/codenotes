@@ -141,7 +141,7 @@ class TestSearchTaskTUI(unittest.TestCase):
         self.assertEqual(self.search_task_tui.selected_category, None)
         self.assertEqual(self.search_task_tui.selected_date, None)
         self.assertEqual(self.search_task_tui.selected_status, None)
-        self.assertEqual(self.search_task_tui.task_search_text_box.get(), '')
+        self.assertEqual(self.search_task_tui.search_text_box.get(), '')
 
         expected_categories = [
             'All',
@@ -171,64 +171,64 @@ class TestSearchTaskTUI(unittest.TestCase):
 
     def test_date_widget(self):
         # Any date
-        self.search_task_tui.task_date_menu.set_selected_item_index(0)
+        self.search_task_tui.date_menu.set_selected_item_index(0)
         self.search_task_tui._set_date_option()
         self.assertEqual(self.search_task_tui.selected_date, None)
 
         # Today
-        self.search_task_tui.task_date_menu.set_selected_item_index(1)
+        self.search_task_tui.date_menu.set_selected_item_index(1)
         self.search_task_tui._set_date_option()
         self.assertIsInstance(self.search_task_tui.selected_date, date)
 
         # Yesterday
-        self.search_task_tui.task_date_menu.set_selected_item_index(2)
+        self.search_task_tui.date_menu.set_selected_item_index(2)
         self.search_task_tui._set_date_option()
         self.assertIsInstance(self.search_task_tui.selected_date, date)
 
         # Week
-        self.search_task_tui.task_date_menu.set_selected_item_index(3)
+        self.search_task_tui.date_menu.set_selected_item_index(3)
         self.search_task_tui._set_date_option()
         self.assertIsInstance(self.search_task_tui.selected_date, list)
 
         # Month
-        self.search_task_tui.task_date_menu.set_selected_item_index(4)
+        self.search_task_tui.date_menu.set_selected_item_index(4)
         self.search_task_tui._set_date_option()
         self.assertIsInstance(self.search_task_tui.selected_date, list)
 
     def test_category_widget(self):
         # All
-        self.search_task_tui.task_categories_menu.set_selected_item_index(0)
+        self.search_task_tui.categories_menu.set_selected_item_index(0)
         self.search_task_tui._set_category_option()
         self.assertEqual(self.search_task_tui.selected_category, None)
 
         # Todo Tasks
-        self.search_task_tui.task_categories_menu.set_selected_item_index(1)
+        self.search_task_tui.categories_menu.set_selected_item_index(1)
         self.search_task_tui._set_category_option()
         self.assertEqual(self.search_task_tui.selected_category, Category(1, 'TODO Tasks'))
 
         # Custom Category
-        self.search_task_tui.task_categories_menu.set_selected_item_index(2)
+        self.search_task_tui.categories_menu.set_selected_item_index(2)
         self.search_task_tui._set_category_option()
         self.assertEqual(self.search_task_tui.selected_category, Category(2, 'CLI Category'))
 
     def test_status_widget(self):
         # All
-        self.search_task_tui.task_status_menu.set_selected_item_index(0)
+        self.search_task_tui.status_menu.set_selected_item_index(0)
         self.search_task_tui._set_status_option()
         self.assertEqual(self.search_task_tui.selected_status, None)
 
         # Incomplete
-        self.search_task_tui.task_status_menu.set_selected_item_index(1)
+        self.search_task_tui.status_menu.set_selected_item_index(1)
         self.search_task_tui._set_status_option()
         self.assertEqual(self.search_task_tui.selected_status, 0)
 
         # In Process
-        self.search_task_tui.task_status_menu.set_selected_item_index(2)
+        self.search_task_tui.status_menu.set_selected_item_index(2)
         self.search_task_tui._set_status_option()
         self.assertEqual(self.search_task_tui.selected_status, 1)
 
         # Finished
-        self.search_task_tui.task_status_menu.set_selected_item_index(3)
+        self.search_task_tui.status_menu.set_selected_item_index(3)
         self.search_task_tui._set_status_option()
         self.assertEqual(self.search_task_tui.selected_status, 2)
 
@@ -271,7 +271,7 @@ class TestSearchTaskTUI(unittest.TestCase):
             f'Custom Task #2[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Custom Task #3[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}'
         ]
-        self.search_task_tui.task_categories_menu.set_selected_item_index(0)
+        self.search_task_tui.categories_menu.set_selected_item_index(0)
         self.search_task_tui._set_category_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
         
@@ -287,14 +287,14 @@ class TestSearchTaskTUI(unittest.TestCase):
             f'TODO Task #3[Incomplete][TODO Tasks]-{self.current_date.strftime("%Y-%m-%d")}'
         ]
 
-        self.search_task_tui.task_categories_menu.set_selected_item_index(1)
+        self.search_task_tui.categories_menu.set_selected_item_index(1)
         self.search_task_tui._set_category_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
         expected_tasks = [
             f'CLI task[Incomplete][CLI Category]-{self.current_date.strftime("%Y-%m-%d")}',
         ]
-        self.search_task_tui.task_categories_menu.set_selected_item_index(2)
+        self.search_task_tui.categories_menu.set_selected_item_index(2)
         self.search_task_tui._set_category_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
@@ -304,7 +304,7 @@ class TestSearchTaskTUI(unittest.TestCase):
             f'Custom Task #2[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Custom Task #3[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}'
         ]
-        self.search_task_tui.task_categories_menu.set_selected_item_index(3)
+        self.search_task_tui.categories_menu.set_selected_item_index(3)
         self.search_task_tui._set_category_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
@@ -327,29 +327,29 @@ class TestSearchTaskTUI(unittest.TestCase):
         ]
         
         # Any Date
-        self.search_task_tui.task_date_menu.set_selected_item_index(0)
+        self.search_task_tui.date_menu.set_selected_item_index(0)
         self.search_task_tui._set_date_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
         
         # Today
-        self.search_task_tui.task_date_menu.set_selected_item_index(1)
+        self.search_task_tui.date_menu.set_selected_item_index(1)
         self.search_task_tui._set_date_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
         # Week
-        self.search_task_tui.task_date_menu.set_selected_item_index(3)
+        self.search_task_tui.date_menu.set_selected_item_index(3)
         self.search_task_tui._set_date_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
         # Month
-        self.search_task_tui.task_date_menu.set_selected_item_index(4)
+        self.search_task_tui.date_menu.set_selected_item_index(4)
         self.search_task_tui._set_date_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
         expected_tasks = []
 
         # Yesterday
-        self.search_task_tui.task_date_menu.set_selected_item_index(2)
+        self.search_task_tui.date_menu.set_selected_item_index(2)
         self.search_task_tui._set_date_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
@@ -370,21 +370,21 @@ class TestSearchTaskTUI(unittest.TestCase):
             f'Custom Task #2[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}',
             f'Custom Task #3[Incomplete][Custom Category]-{self.current_date.strftime("%Y-%m-%d")}'
         ]
-        self.search_task_tui.task_status_menu.set_selected_item_index(0)
+        self.search_task_tui.status_menu.set_selected_item_index(0)
         self.search_task_tui._set_status_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
-        self.search_task_tui.task_status_menu.set_selected_item_index(1)
+        self.search_task_tui.status_menu.set_selected_item_index(1)
         self.search_task_tui._set_status_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
         expected_tasks = []
 
-        self.search_task_tui.task_status_menu.set_selected_item_index(2)
+        self.search_task_tui.status_menu.set_selected_item_index(2)
         self.search_task_tui._set_status_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
-        self.search_task_tui.task_status_menu.set_selected_item_index(3)
+        self.search_task_tui.status_menu.set_selected_item_index(3)
         self.search_task_tui._set_status_option()
         self.assertCountEqual(self.search_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
 
