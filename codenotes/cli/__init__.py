@@ -109,7 +109,7 @@ class PrintFormatted:
         return cls(custom_html, custom_style)
 
     @classmethod
-    def print_content_storage(cls, content: str, category: str = 'TODO Tasks'):
+    def print_content_storage(cls, content: str, category: str):
         """ Class method used to print the process of storage of tasks and notes
         Parameters
         ----------

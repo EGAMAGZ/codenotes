@@ -96,7 +96,7 @@ class AddNote:
             self.cursor.execute(sql, values)
 
             spinner.hide()
-            PrintFormatted.print_content_storage(self.note_title)  # TODO: ADD PRINT FOR EMPTY NOTE TEXT
+            PrintFormatted.print_content_storage(self.note_title, self.category_name)  # TODO: ADD PRINT FOR EMPTY NOTE TEXT
             spinner.show()
 
             spinner.ok("✔")

@@ -65,7 +65,7 @@ def add_task_args_empty(args) -> bool:
 class AddTask:
 
     category_id: int = 1
-    category_name: str
+    category_name: str = 'TODO Task'
     task: Union[List[str], str]
 
     def __init__(self, args):
@@ -143,14 +143,14 @@ class AddTask:
                     values = (task, self.creation_date, self.category_id)
                     self.cursor.execute(sql, values)
                     spinner.hide()
-                    PrintFormatted.print_content_storage(task)  # TODO: PRINT CATEGORY WHEN IS NOT NONE (DEFAULT)
+                    PrintFormatted.print_content_storage(task, self.category_name)  # TODO: PRINT CATEGORY WHEN IS NOT NONE (DEFAULT)
                     spinner.show()
 
             elif isinstance(self.task, str):
                 values = (self.task, self.creation_date, self.category_id)
                 self.cursor.execute(sql, values)
                 spinner.hide()
-                PrintFormatted.print_content_storage(self.task)
+                PrintFormatted.print_content_storage(self.task, self.category_name)
                 spinner.show()
 
             if self.task:
