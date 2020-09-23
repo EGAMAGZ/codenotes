@@ -144,7 +144,7 @@ class AddTaskTUI:
                         spinner.show()
                     spinner.ok("✔")
 
-                    self.db.conn.commit()
+                    self.db.commit()
                     self.db.close()
                 else:
                     self._show_missing_category()
@@ -373,23 +373,30 @@ class SearchTaskTUI:
 
 class AddNoteTUI:
 
+    SETTINGS_OPTIONS: List[str] = ['Markdown']
+
     note_title_text_box: py_cui.widgets.TextBox
+    note_content_text_block: py_cui.widgets.ScrollTextBlock
     categories_menu: py_cui.widgets.ScrollMenu
-    settings_menu: py_cui.widgets.ScrollMenu
+    settings_menu: py_cui.widgets.CheckBoxMenu
 
     categories_list: List[Category] = []
     selected_category: Category = None
+    is_markdown: bool = False
 
     def __init__(self, root: ImpPyCUI):
         self.root = root
         self.db = SQLiteConnection()
         self.cursor = self.db.get_cursor()
 
-        # -| Text Block |-
+        # -| Text Box |-
         self.note_title_text_box = root.add_text_box('Title', 0, 0, column_span=4)
+        # -| Text Block |-
+        self.note_content_text_block = root.add_text_block('Note', 1, 1, row_span=4, column_span=3)
         # -| Scroll Menu |-
         self.categories_menu = root.add_scroll_menu('Categories', 1, 0, row_span=2)
-        self.settings_menu = root.add_scroll_menu('Settings', 3, 0, row_span=2)
+        # -| Check Box Menu |-
+        self.settings_menu = root.add_checkbox_menu('Settings', 3, 0, row_span=2)
 
         self.__config()
 
@@ -404,12 +411,6 @@ class AddNoteTUI:
         """
         return cls(root)
 
-    def _load_categories_menu(self):
-        """ Functions that creates a list of tasks and added it to the categories menu """
-        self.categories_list = [Category(category[0], category[1]) for category in self.get_categories()]
-
-        self.categories_menu.add_item_list(self.categories_list)
-
     def _ask_new_category(self):
         """ Shows text box popup """
         self.root.show_text_box_popup('Enter new category name (Max. 30):', command=self.add_category)
@@ -420,11 +421,21 @@ class AddNoteTUI:
 
         self.root.show_message_popup('Category Name:', category.category_name)
 
+    def _show_missing_category(self):
+        """ Shows warning popup to advice the user that he hasn't choose a category where to save the tasks """
+        self.root.show_warning_popup("You Haven't Choose a Category", 'Please Select Category Where to Save the Tasks')
+
     def _set_category_option(self):
         """ Function that is executed when a category is selected """
         self.selected_category = self.categories_menu.get()
 
         self.categories_menu.set_title(f'{self.selected_category}')
+
+    def _load_categories_menu(self):
+        """ Functions that creates a list of tasks and added it to the categories menu """
+        self.categories_list = [Category(category[0], category[1]) for category in self.get_categories()]
+
+        self.categories_menu.add_item_list(self.categories_list)
 
     def get_categories(self) -> List[Tuple[str]]:
         """ Gets all categories stored in database """
@@ -453,6 +464,9 @@ class AddNoteTUI:
         """ Function that configures the widgets of the root """
         self._load_categories_menu()
 
+        self.settings_menu.add_item_list(self.SETTINGS_OPTIONS)
+        self.settings_menu.add_text_color_rule('X', py_cui.GREEN_ON_BLACK, 'contains', match_type='regex')
+
         self.categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_category_option)
         self.categories_menu.add_key_command(py_cui.keys.KEY_N_LOWER, self._ask_new_category)
         self.categories_menu.add_key_command(py_cui.keys.KEY_SPACE, self._show_category_name)
@@ -461,4 +475,3 @@ class AddNoteTUI:
         )
 
         self.root.set_title('Codenotes - Add Note')
-        pass
