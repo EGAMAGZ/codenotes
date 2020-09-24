@@ -8,11 +8,9 @@ from yaspin import yaspin
 from codenotes.util import status_text
 from codenotes.cli import PrintFormatted
 from codenotes.db import add_conditions_sql
-import codenotes.db.utilities.tasks as tasks
 from codenotes.db.utilities import Category, Task
 from codenotes.db.connection import SQLiteConnection
-import codenotes.db.utilities.tasks_categories as tasks_categories
-import codenotes.db.utilities.notes_categories as notes_categories
+from codenotes.db.utilities import notes_categories, tasks_categories, tasks, notes
 
 WHITE_ON_MAGENTA = 11
 
@@ -27,6 +25,8 @@ class ImpPyCUI(py_cui.PyCUI):
 
 
 class AddTaskTUI:
+
+    CREATION_DATE: date = datetime.now().date()
 
     tasks_list_menu: py_cui.widgets.ScrollMenu
     task_text_block: py_cui.widgets.TextBox
@@ -125,7 +125,6 @@ class AddTaskTUI:
     def save_tasks(self):
         """ Function that stores the tasks added in tasks_list_menu widget """
         tasks_list = self.tasks_list_menu.get_item_list()
-        creation_date = datetime.now().date()
 
         sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, '\
               f'{tasks.COLUMN_TASK_CATEGORY}) VALUES (?,?,?); '
@@ -136,16 +135,15 @@ class AddTaskTUI:
                     # Selected a category
                     self.root.stop()
                     for task in tasks_list:
-                        values = (task, creation_date, self.selected_category.category_id)
+                        values = (task, self.CREATION_DATE, self.selected_category.category_id)
 
                         self.cursor.execute(sql, values)
                         spinner.hide()
                         PrintFormatted.print_content_storage(task, self.selected_category.category_name)
                         spinner.show()
-                    spinner.ok("✔")
 
                     self.db.commit()
-                    self.db.close()
+                    spinner.ok("✔")
                 else:
                     self._show_missing_category()
             else:
@@ -153,7 +151,8 @@ class AddTaskTUI:
                 self.root.stop()
                 spinner.text = 'No Task Saved'
                 spinner.fail("💥")
-                self.db.close()
+
+            self.db.close()
 
     def __config(self):
         """ Function that configures the widgets of the root """
@@ -374,15 +373,18 @@ class SearchTaskTUI:
 class AddNoteTUI:
 
     SETTINGS_OPTIONS: List[str] = ['Markdown']
+    CREATION_DATE: date = datetime.now().date()
 
     note_title_text_box: py_cui.widgets.TextBox
     note_content_text_block: py_cui.widgets.ScrollTextBlock
     categories_menu: py_cui.widgets.ScrollMenu
-    settings_menu: py_cui.widgets.CheckBoxMenu
+    save_note_button: py_cui.widgets.Button
 
     categories_list: List[Category] = []
     selected_category: Category = None
     is_markdown: bool = False
+    note_title: str
+    note_content: str
 
     def __init__(self, root: ImpPyCUI):
         self.root = root
@@ -390,13 +392,13 @@ class AddNoteTUI:
         self.cursor = self.db.get_cursor()
 
         # -| Text Box |-
-        self.note_title_text_box = root.add_text_box('Title', 0, 0, column_span=4)
+        self.note_title_text_box = self.root.add_text_box('Title', 0, 0, column_span=4)
         # -| Text Block |-
-        self.note_content_text_block = root.add_text_block('Note', 1, 1, row_span=4, column_span=3)
+        self.note_content_text_block = self.root.add_text_block('Note', 1, 1, row_span=3, column_span=3)
         # -| Scroll Menu |-
-        self.categories_menu = root.add_scroll_menu('Categories', 1, 0, row_span=2)
-        # -| Check Box Menu |-
-        self.settings_menu = root.add_checkbox_menu('Settings', 3, 0, row_span=2)
+        self.categories_menu = self.root.add_scroll_menu('Categories', 1, 0, row_span=2)
+        # -| Buttons |-
+        self.save_note_button = self.root.add_button('Save Note', 4, 1, column_span=3, command=self.save_note)
 
         self.__config()
 
@@ -460,12 +462,45 @@ class AddNoteTUI:
         else:
             self._ask_new_category()
 
+    def save_note(self):
+        self.note_title = self.note_title_text_box.get()
+        self.note_content = self.note_content_text_block.get()
+
+        sql = f'INSERT INTO {notes.TABLE_NAME}({notes.COLUMN_NOTE_TITLE}, {notes.COLUMN_NOTE_CONTENT},' \
+              f'{notes.COLUMN_NOTE_CATEGORY}, {notes.COLUMN_NOTE_CREATION}) VALUES (?,?,?,?);'
+
+        with yaspin(text='Saving Note') as spinner:
+            if self.note_content or self.note_title:
+                if self.selected_category is not None:
+
+                    if not self.note_title:
+                        self.note_title = self.note_content[:30]
+
+                    self.root.stop()
+                    values = (self.note_title, self.note_content, self.selected_category.category_id, self.CREATION_DATE)
+                    
+                    self.cursor.execute(sql, values)
+                    spinner.hide()
+                    PrintFormatted.print_content_storage(self.note_title, self.selected_category)
+                    spinner.show()
+
+                    self.db.commit()
+                    spinner.ok("✔")
+
+                else:
+                    self._show_missing_category()
+
+            else:
+                # Completely Empty Note
+                self.root.stop()
+                spinner.text = 'No Note Saved'
+                spinner.fail("💥")
+
+        self.db.close()
+
     def __config(self):
         """ Function that configures the widgets of the root """
         self._load_categories_menu()
-
-        self.settings_menu.add_item_list(self.SETTINGS_OPTIONS)
-        self.settings_menu.add_text_color_rule('X', py_cui.GREEN_ON_BLACK, 'contains', match_type='regex')
 
         self.categories_menu.add_key_command(py_cui.keys.KEY_ENTER, self._set_category_option)
         self.categories_menu.add_key_command(py_cui.keys.KEY_N_LOWER, self._ask_new_category)

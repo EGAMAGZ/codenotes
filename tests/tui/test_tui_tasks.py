@@ -15,14 +15,14 @@ class TestAddTaskTUI(unittest.TestCase):
 class TestDefaultCategory(TestAddTaskTUI):
 
     def test_add_task(self):
-        expected_categories = [
+        expected_tasks = [
             'TODO Task #1'
         ]
 
         self.add_task_tui.task_text_block.set_text('TODO Task #1')
         self.add_task_tui.add_task()
 
-        self.assertCountEqual(self.add_task_tui.tasks_list_menu.get_item_list(), expected_categories)
+        self.assertCountEqual(self.add_task_tui.tasks_list_menu.get_item_list(), expected_tasks)
         self.assertEqual(self.add_task_tui.task_text_block.get(), '')
 
         self.add_task_tui.selected_category = Category(1, 'TODO Tasks')
