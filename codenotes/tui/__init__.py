@@ -470,6 +470,7 @@ class AddNoteTUI:
               f'{notes.COLUMN_NOTE_CATEGORY}, {notes.COLUMN_NOTE_CREATION}) VALUES (?,?,?,?);'
 
         with yaspin(text='Saving Note') as spinner:
+            # TODO: THIS STILLS SAVING COMPLETELY EMPTY NOTES
             if self.note_content or self.note_title:
                 if self.selected_category is not None:
 
