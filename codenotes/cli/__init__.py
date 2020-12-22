@@ -1,11 +1,9 @@
 import calendar
-from typing import overload, List, Union
+from typing import overload, List, Union, final
 from datetime import datetime, date, timedelta
 
-from prompt_toolkit.styles import Style
-import prompt_toolkit.output.win32 as prompt_toolkit
-from prompt_toolkit import HTML, print_formatted_text
-
+from rich.console import Console
+from rich.theme import Theme
 
 def date_args_empty(args) -> bool:
     """ Check if arguments required to search are empty
@@ -73,40 +71,38 @@ def format_argument_text(arg_text: List[str]) -> str:
     return text.strip()
 
 
+@final
 class PrintFormatted:
 
-    def __init__(self, html_text: HTML, styles: Style):
+    console: Console
+
+    def __init__(self, custom_text: str, custom_theme: Theme):
         """ PrintFormatted Constructor """
-        self.print = print_formatted_text
-        try:
-            self.print(html_text, style=styles)
-        except prompt_toolkit.NoConsoleScreenBufferError:
-            print(html_text.value)
+        self.console = Console(theme=custom_theme)
+        self.console.print(custom_text)
 
     @classmethod
-    def print_html(cls, html_text: HTML, styles: Style):
+    def print_html(cls, text: str, theme: Theme):
         """ Class method used to print custom formatted text
         Parameters
         ----------
-        html_text : HTML
-            HTML text that will be print 
-        styles: Style
-            Styles that will be use in the HTML text
+        text : HTML
+            Text that will be print with format similar to html
+        theme: Theme
+            Theme used for the text to be displayed
         """
-        return cls(html_text, styles)
+        return cls(text, theme)
 
     @classmethod
     def print_category_creation(cls, category: str):
-        custom_html = HTML(
-            u'<msg>Created category:</msg><category-name>{}</category-name>'.format(category)
-        )
+        custom_txt = '[msg]Created category:[/msg][name]{}[/name]'.format(category)
 
-        custom_style = Style.from_dict({
+        custom_theme = Theme({
             'msg': '#31f55f bold',
-            'category-name': '#616161 italic'
+            'name': '#616161 italic'
         })
 
-        return cls(custom_html, custom_style)
+        return cls(custom_txt, custom_theme)
 
     @classmethod
     def print_content_storage(cls, content: str, category: str):
@@ -118,13 +114,11 @@ class PrintFormatted:
         category : str
             Category where is stored
         """
-        custom_html = HTML(
-            u'<msg>> Task saved[{}]: </msg><task-txt>{}</task-txt>'.format(category, content)
-        )
+        custom_txt = '[msg]> Task saved[{}]: [/msg][task]{}[/task]'.format(category, content)
 
-        custom_style = Style.from_dict({  # Style use for prints related with saving process
+        custom_theme = Theme({
             'msg': '#d898ed bold',
-            'task-txt': '#616161 italic'
+            'task': '#616161 italic'
         })
 
-        return cls(custom_html, custom_style)
+        return cls(custom_txt, custom_theme)
