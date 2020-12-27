@@ -162,23 +162,6 @@ class AddTask:
         self.db.commit()
         self.db.close()
 
-    def _ask_confirmation(self) -> bool:
-        """ Function that asks to the user to store or not
-
-        Returns
-        -------
-        confirmed : bool
-            Boolean value that indicates the storage of the tasks written
-        """
-        text = '[yellow]Do you want to save them?(y/n):[/yellow]'
-        answer = self.console.input(text)
-        while len(answer) > 0 and answer.lower() != 'n' and answer.lower() != 'y':
-            answer = self.console.input(text)
-        else:
-            if answer.lower() == 'y':
-                return True
-            return False
-
     def _ask_category(self):
         """ Function that asks to the user to introduce different category name """
 
@@ -196,7 +179,7 @@ class AddTask:
         
         self.console.rule('Preview', style='purple')
         
-        table = Table(box=box.SIMPLE_HEAD)
+        table = Table(box=box.ROUNDED)
         table.add_column('Task', overflow='fold')
         table.add_column('Creation Date', justify='center', style='yellow')
         
@@ -208,7 +191,9 @@ class AddTask:
 
         self.console.print(table, justify='center')
 
-        if self._ask_confirmation():
+        if PrintFormatted.ask_confirmation(
+            '[yellow]Do you want to save them?(y/n):[/yellow]'
+            ):
             self.save_task()
 
 

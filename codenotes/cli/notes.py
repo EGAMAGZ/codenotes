@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from rich.console import Console
+from rich.panel import Panel
 from yaspin import yaspin
 
 from codenotes.tui import AddNoteTUI, ImpPyCUI
@@ -140,4 +141,8 @@ class AddNote:
                 self.note_text = self.console.input(text).strip()
 
     def _show_preview(self):
-        pass
+        # TODO: FINISH
+        formatted_date = self.creation_date.strftime('%Y-%m-%d')
+
+        self.console.rule('Preview', style='purple')
+        self.console.print(Panel)

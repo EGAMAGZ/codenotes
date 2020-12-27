@@ -76,13 +76,15 @@ class PrintFormatted:
 
     console: Console
 
-    def __init__(self, custom_text: str, custom_theme: Theme):
+    def __init__(self, custom_theme: Theme = None):
         """ PrintFormatted Constructor """
-        self.console = Console(theme=custom_theme)
-        self.console.print(custom_text)
+        if custom_theme:
+            self.console = Console(theme=custom_theme)
+        else:
+            self.console = Console()
 
     @classmethod
-    def print_html(cls, text: str, theme: Theme):
+    def print(cls, text: str, theme: Theme = None) -> None:
         """ Class method used to print custom formatted text
         Parameters
         ----------
@@ -91,21 +93,22 @@ class PrintFormatted:
         theme: Theme
             Theme used for the text to be displayed
         """
-        return cls(text, theme)
+        print_formatted = cls(theme)
+        print_formatted.console.print(text)
 
     @classmethod
-    def print_category_creation(cls, category: str):
+    def print_category_creation(cls, category: str) -> None:
         custom_txt = '[msg]Created category:[/msg][name]{}[/name]'.format(category)
 
         custom_theme = Theme({
             'msg': '#31f55f bold',
             'name': '#616161 italic'
         })
-
-        return cls(custom_txt, custom_theme)
+        print_formatted = cls(custom_theme)
+        print_formatted.console.print(custom_txt)
 
     @classmethod
-    def print_content_storage(cls, content: str, category: str):
+    def print_content_storage(cls, content: str, category: str) -> None:
         """ Class method used to print the process of storage of tasks and notes
         Parameters
         ----------
@@ -121,4 +124,19 @@ class PrintFormatted:
             'task': '#616161 italic'
         })
 
-        return cls(custom_txt, custom_theme)
+        print_formatted = cls(custom_theme)
+        print_formatted.console.print(custom_txt)
+
+    @classmethod
+    def ask_confirmation(cls, text: str) -> bool:
+        print_formatted = cls()
+
+        custom_text = text
+        answer = print_formatted.console.input(custom_text).strip()
+
+        while len(answer) > 0 and answer.lower() != 'n' and answer.lower() != 'y':
+            answer = print_formatted.console.input(custom_text)
+
+        if answer.lower() == 'y':
+            return True
+        return False

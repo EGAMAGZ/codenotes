@@ -40,6 +40,8 @@ def parse_args(args):
     search_group.add_argument('--week', '-w', action='store_true')
     search_group.add_argument('--month', '-m', action='store_true')
 
+    tui = subparsers.add_parser('tui')
+
     return parser.parse_args(args)
 
 
