@@ -1,7 +1,6 @@
 from typing import List, Union, overload, Tuple
 
 from rich import box
-from yaspin import yaspin
 from rich.table import Table
 from datetime import datetime, date
 from rich.console import Console
@@ -67,6 +66,7 @@ class AddTask:
     category_id: int = 1
     category_name: str = 'TODO Task'
     task: Union[List[str], str]
+    console: Console
 
     def __init__(self, args):
         """ Constructor fro AddTask class 
@@ -89,6 +89,7 @@ class AddTask:
         else:
             try:
                 if args.new_category:
+                    # Will create a new category
                     self.category_name = format_argument_text(args.new_category)
                     self.save_category()
 
@@ -137,27 +138,24 @@ class AddTask:
         sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, '\
               f'{tasks.COLUMN_TASK_CATEGORY}) VALUES (?,?,?);'
 
-        with yaspin(text='Saving Tasks', color='yellow') as spinner:
+        with self.console.status('[bold yellow]Saving Tasks...',) as status:
             if isinstance(self.task, list):
                 for task in self.task:
                     values = (task, self.creation_date, self.category_id)
                     self.cursor.execute(sql, values)
-                    spinner.hide()
                     PrintFormatted.print_content_storage(task, self.category_name)
-                    spinner.show()
 
             elif isinstance(self.task, str):
                 values = (self.task, self.creation_date, self.category_id)
                 self.cursor.execute(sql, values)
-                spinner.hide()
                 PrintFormatted.print_content_storage(self.task, self.category_name)
-                spinner.show()
 
             if self.task:
-                spinner.ok("✔️")
+                self.console.print('[bold green]✔️Task Saved')
             else:
-                spinner.text = 'No Task Saved'
-                spinner.fail("💥")
+                self.console.print('[bold red] 💥 No Task Saved')
+
+            status.stop()
 
         self.db.commit()
         self.db.close()

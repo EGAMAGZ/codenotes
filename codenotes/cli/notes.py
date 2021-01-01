@@ -2,7 +2,6 @@ from datetime import datetime
 
 from rich.console import Console
 from rich.panel import Panel
-from yaspin import yaspin
 
 from codenotes.tui import AddNoteTUI, ImpPyCUI
 import codenotes.db.utilities.notes as notes
@@ -93,15 +92,14 @@ class AddNote:
         sql = f'INSERT INTO {notes.TABLE_NAME} ({notes.COLUMN_NOTE_TITLE}, {notes.COLUMN_NOTE_CONTENT}, ' \
               f'{notes.COLUMN_NOTE_CATEGORY}, {notes.COLUMN_NOTE_CREATION}) VALUES (?,?,?,?);'
 
-        with yaspin(text='Saving Note', color='yellow') as spinner:
+        with self.console.status('[bold yellow]Saving Note') as status:
             values = (self.note_title, self.note_text, self.category_id, self.creation_date)
             self.cursor.execute(sql, values)
 
-            spinner.hide()
             PrintFormatted.print_content_storage(self.note_title, self.category_name)
-            spinner.show()
 
-            spinner.ok("✔")
+            self.console.print('[bold green]✔️ Note Correctly Saved')
+            status.stop()
 
         self.db.commit()
         self.db.close()
