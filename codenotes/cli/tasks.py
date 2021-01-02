@@ -6,12 +6,13 @@ from datetime import datetime, date
 from rich.console import Console
 
 from codenotes.util import status_text
+from codenotes.cli import PrintFormatted
 from codenotes.db import add_conditions_sql
 import codenotes.db.utilities.tasks as tasks
 from codenotes.db.connection import SQLiteConnection
 import codenotes.db.utilities.tasks_categories as categories
 from codenotes.tui import AddTaskTUI, ImpPyCUI, SearchTaskTUI
-from codenotes.cli import PrintFormatted, date_args_empty, dates_to_search, format_argument_text
+from codenotes.util.args import format_argument_text, date_args_empty, dates_to_search
 
 
 @overload

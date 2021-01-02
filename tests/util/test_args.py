@@ -2,8 +2,8 @@ import unittest
 import calendar
 from datetime import datetime, timedelta, date
 
-from codenotes.cli import date_args_empty, dates_to_search
 from codenotes import parse_args
+from codenotes.util.args import date_args_empty, dates_to_search
 
 
 class TestArgsNeededEmpty(unittest.TestCase):

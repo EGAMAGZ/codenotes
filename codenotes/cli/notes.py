@@ -3,10 +3,11 @@ from datetime import datetime
 from rich.console import Console
 from rich.panel import Panel
 
+from codenotes.cli import PrintFormatted
 from codenotes.tui import AddNoteTUI, ImpPyCUI
 import codenotes.db.utilities.notes as notes
 from codenotes.db.connection import SQLiteConnection
-from codenotes.cli import format_argument_text, PrintFormatted
+from codenotes.util.args import format_argument_text
 import codenotes.db.utilities.notes_categories as categories
 
 
