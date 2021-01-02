@@ -4,6 +4,12 @@ from datetime import datetime, date, timedelta
 
 def date_args_empty(args) -> bool:
     """ Check if arguments required to search are empty
+
+    Parameters
+    ----------
+    args: Namespace
+        Arguments capture
+
     Returns
     -------
     empty : bool
@@ -32,6 +38,12 @@ def dates_to_search(args) -> date: ...
 
 def dates_to_search(args) -> Union[List[date], date]:
     """ Returns date to search depending of the user selection
+
+    Parameters
+    ----------
+    args: Namespace
+        Arguments capture
+
     Returns
     -------
     search_date : date
@@ -63,6 +75,18 @@ def dates_to_search(args) -> Union[List[date], date]:
 
 
 def add_note_args_empty(args) -> bool:
+    """ Functions that checks if the arguments required to create a new note are empty
+
+    Parameters
+    ----------
+    args: Namespace
+        Arguments capture with argparse
+    
+    Returns
+    -------
+    empty: bool
+        Boolean value that indicates if the arguments required for a note are empty
+    """
     args_needed = [
         args.title,
         args.new_category,
@@ -75,6 +99,18 @@ def add_note_args_empty(args) -> bool:
 
 
 def add_task_args_empty(args) -> bool:
+    """ Functions that checks if the arguments required to create a new task are empty
+
+    Parameters
+    ----------
+    args: Namespace
+        Arguments capture with argparse
+    
+    Returns
+    -------
+    empty: bool
+        Boolean value that indicates if the arguments required for a task are empty
+    """
     args_needed = [
         args.text,
         args.new_category
@@ -86,7 +122,18 @@ def add_task_args_empty(args) -> bool:
 
 
 def format_argument_text(arg_text: List[str]) -> str:
-    """ Function use to join the list of strings passed in the arguments"""
+    """ Function use to join the list of strings passed in the arguments
+    
+    Parameters
+    ----------
+    arg_text: List[str]
+        List of strings capture by argparse
+
+    Returns
+    -------
+    text_joined: str
+        Returns text that was joined
+    """
     text = ' '.join(arg_text)
 
     return text.strip()
