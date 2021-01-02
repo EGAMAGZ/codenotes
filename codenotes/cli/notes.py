@@ -7,20 +7,8 @@ from codenotes.cli import PrintFormatted
 from codenotes.tui import AddNoteTUI, ImpPyCUI
 import codenotes.db.utilities.notes as notes
 from codenotes.db.connection import SQLiteConnection
-from codenotes.util.args import format_argument_text
+from codenotes.util.args import format_argument_text, add_note_args_empty
 import codenotes.db.utilities.notes_categories as categories
-
-
-def add_note_args_empty(args) -> bool:
-    args_needed = [
-        args.title,
-        args.new_category,
-        args.text
-    ]
-
-    if any(args_needed):
-        return False
-    return True
 
 
 class AddNote:

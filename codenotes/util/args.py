@@ -1,5 +1,5 @@
 import calendar
-from typing import overload, List, Union, final
+from typing import overload, List, Union
 from datetime import datetime, date, timedelta
 
 def date_args_empty(args) -> bool:
@@ -60,6 +60,29 @@ def dates_to_search(args) -> Union[List[date], date]:
         ]
 
         return days
+
+
+def add_note_args_empty(args) -> bool:
+    args_needed = [
+        args.title,
+        args.new_category,
+        args.text
+    ]
+
+    if any(args_needed):
+        return False
+    return True
+
+
+def add_task_args_empty(args) -> bool:
+    args_needed = [
+        args.text,
+        args.new_category
+    ]
+
+    if any(args_needed):
+        return False
+    return True
 
 
 def format_argument_text(arg_text: List[str]) -> str:

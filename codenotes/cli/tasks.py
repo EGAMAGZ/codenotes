@@ -12,7 +12,7 @@ import codenotes.db.utilities.tasks as tasks
 from codenotes.db.connection import SQLiteConnection
 import codenotes.db.utilities.tasks_categories as categories
 from codenotes.tui import AddTaskTUI, ImpPyCUI, SearchTaskTUI
-from codenotes.util.args import format_argument_text, date_args_empty, dates_to_search
+from codenotes.util.args import format_argument_text, date_args_empty, dates_to_search, add_task_args_empty
 
 
 @overload
@@ -49,17 +49,6 @@ def format_task_text(text: List[str]) -> Union[List[str], str]:
         return tasks_list
     else:
         return task_text
-
-
-def add_task_args_empty(args) -> bool:
-    args_needed = [
-        args.text,
-        args.new_category
-    ]
-
-    if any(args_needed):
-        return False
-    return True
 
 
 class AddTask:
