@@ -66,6 +66,7 @@ def dates_to_search(args) -> Union[List[date], date]:
 
 
 def format_argument_text(arg_text: List[str]) -> str:
+    """ Function use to join the list of strings passed in the arguments"""
     text = ' '.join(arg_text)
 
     return text.strip()
@@ -77,7 +78,14 @@ class PrintFormatted:
     console: Console
 
     def __init__(self, custom_theme: Theme = None):
-        """ PrintFormatted Constructor """
+        """ PrintFormatted Constructor 
+        
+        Parameters
+        ----------
+        custom_theme: Theme
+            Theme use for Console class
+        """
+        # If a theme is passed, while pass it through Console class
         if custom_theme:
             self.console = Console(theme=custom_theme)
         else:
@@ -98,12 +106,20 @@ class PrintFormatted:
 
     @classmethod
     def print_category_creation(cls, category: str) -> None:
-        custom_txt = '[msg]Created category:[/msg][name]{}[/name]'.format(category)
+        """ Class method used to print the creation of a new category
+
+        Parameters
+        ----------
+        category: str
+            Name of the category created
+        """
+        custom_txt = '[msg]Created new category:[/msg][name]{}[/name]'.format(category)
 
         custom_theme = Theme({
             'msg': '#31f55f bold',
             'name': '#616161 italic'
         })
+
         print_formatted = cls(custom_theme)
         print_formatted.console.print(custom_txt)
 
@@ -117,11 +133,11 @@ class PrintFormatted:
         category : str
             Category where is stored
         """
-        custom_txt = '[msg]> Task saved[{}]: [/msg][task]{}[/task]'.format(category, content)
+        custom_txt = '[msg]> Saved[{}]: [/msg][content]{}[/content]'.format(category, content)
 
         custom_theme = Theme({
             'msg': '#d898ed bold',
-            'task': '#616161 italic'
+            'content': '#616161 italic'
         })
 
         print_formatted = cls(custom_theme)
@@ -129,9 +145,21 @@ class PrintFormatted:
 
     @classmethod
     def ask_confirmation(cls, text: str) -> bool:
+        """ Class method used to ask for confirmation
+
+        Parameters
+        ----------
+        text: str
+            Text that will be displayed to ask confirmation
+        
+        Returns
+        -------
+        confirmation: bool
+            Return boolean value that indicates the confirmation
+        """
         print_formatted = cls()
 
-        custom_text = text
+        custom_text = text  # Text with rich format
         answer = print_formatted.console.input(custom_text).strip()
 
         while len(answer) > 0 and answer.lower() != 'n' and answer.lower() != 'y':

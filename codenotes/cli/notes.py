@@ -139,8 +139,12 @@ class AddNote:
                 self.note_text = self.console.input(text).strip()
 
     def _show_preview(self):
-        # TODO: FINISH
-        formatted_date = self.creation_date.strftime('%Y-%m-%d')
+        """ Method that displays a panel with the title and text of the note """
 
         self.console.rule('Preview', style='purple')
-        self.console.print(Panel)
+        self.console.print(Panel(self.note_text if self.note_text else '[red bold]Empty note[/red bold]', title=self.note_title))
+
+        if PrintFormatted.ask_confirmation(
+                '[yellow]Do you want to save it?(y/n):[/yellow]'
+            ):
+            self.save_note()

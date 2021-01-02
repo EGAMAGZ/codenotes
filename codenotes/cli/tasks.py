@@ -172,7 +172,7 @@ class AddTask:
             self.save_category()
 
     def _show_preview(self):
-        """ Function that displays a table with the tasks written"""
+        """ Method that displays a table with the tasks written"""
         formatted_date = self.creation_date.strftime('%Y-%m-%d')
         
         self.console.rule('Preview', style='purple')
@@ -190,7 +190,7 @@ class AddTask:
         self.console.print(table, justify='center')
 
         if PrintFormatted.ask_confirmation(
-            '[yellow]Do you want to save them?(y/n):[/yellow]'
+                '[yellow]Do you want to save them?(y/n):[/yellow]'
             ):
             self.save_task()
 
