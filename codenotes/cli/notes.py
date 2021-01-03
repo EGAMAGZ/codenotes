@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import final
 
 from rich.console import Console
 from rich.panel import Panel
@@ -11,6 +12,7 @@ from codenotes.util.args import format_argument_text, add_note_args_empty
 import codenotes.db.utilities.notes_categories as categories
 
 
+@final
 class AddNote:
 
     category_id: int = 1

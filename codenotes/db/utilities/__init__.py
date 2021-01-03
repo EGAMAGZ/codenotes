@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import date
 
-from codenotes.util.menu import abbreviate_menu_text
+from codenotes.util.text import text_break
 
 
 @dataclass
@@ -11,7 +11,7 @@ class Category:
     category_name: str
 
     def __str__(self) -> str:
-        return abbreviate_menu_text(self.category_name)
+        return text_break(self.category_name)
 
 
 @dataclass

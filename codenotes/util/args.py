@@ -1,8 +1,9 @@
 import calendar
+from argparse import Namespace
 from typing import overload, List, Union
 from datetime import datetime, date, timedelta
 
-def date_args_empty(args) -> bool:
+def date_args_empty(args: Namespace) -> bool:
     """ Check if arguments required to search are empty
 
     Parameters
@@ -29,14 +30,14 @@ def date_args_empty(args) -> bool:
 
 
 @overload
-def dates_to_search(args) -> List[date]: ...
+def dates_to_search(args: Namespace) -> List[date]: ...
 
 
 @overload
-def dates_to_search(args) -> date: ...
+def dates_to_search(args: Namespace) -> date: ...
 
 
-def dates_to_search(args) -> Union[List[date], date]:
+def dates_to_search(args: Namespace) -> Union[List[date], date]:
     """ Returns date to search depending of the user selection
 
     Parameters
@@ -46,7 +47,7 @@ def dates_to_search(args) -> Union[List[date], date]:
 
     Returns
     -------
-    search_date : date
+    search_date : Union[List[date], date]
         Returns date to search
     """
     now = datetime.now().date()
@@ -74,7 +75,7 @@ def dates_to_search(args) -> Union[List[date], date]:
         return days
 
 
-def add_note_args_empty(args) -> bool:
+def add_note_args_empty(args: Namespace) -> bool:
     """ Functions that checks if the arguments required to create a new note are empty
 
     Parameters
@@ -98,7 +99,7 @@ def add_note_args_empty(args) -> bool:
     return True
 
 
-def add_task_args_empty(args) -> bool:
+def add_task_args_empty(args: Namespace) -> bool:
     """ Functions that checks if the arguments required to create a new task are empty
 
     Parameters

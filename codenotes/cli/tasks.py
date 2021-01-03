@@ -1,56 +1,22 @@
-from typing import List, Union, overload, Tuple
+from typing import List, Union, overload, Tuple, final
 
 from rich import box
 from rich.table import Table
 from datetime import datetime, date
 from rich.console import Console
 
+import codenotes.db.utilities.tasks as tasks
+import codenotes.db.utilities.tasks_categories as categories
 from codenotes.util import status_text
 from codenotes.cli import PrintFormatted
 from codenotes.db import add_conditions_sql
-import codenotes.db.utilities.tasks as tasks
 from codenotes.db.connection import SQLiteConnection
-import codenotes.db.utilities.tasks_categories as categories
 from codenotes.tui import AddTaskTUI, ImpPyCUI, SearchTaskTUI
 from codenotes.util.args import format_argument_text, date_args_empty, dates_to_search, add_task_args_empty
+from codenotes.util.text import format_task_text
 
 
-@overload
-def format_task_text(text: List[str]) -> List[str]: ...
-
-
-@overload
-def format_task_text(text: List[str]) -> str: ...
-
-
-def format_task_text(text: List[str]) -> Union[List[str], str]:
-    """ Function that formats text passed through arguments
-    Parameters
-    ----------
-    text : List[str]
-        Text written in the arguments of argparse
-    Returns
-    -------
-    task_text : str
-        Task of text passed in arguments and joined
-    tasks_list : List[str]
-        List of texts of task joined and stripped
-    """
-    task_text = format_argument_text(text)
-
-    if ';' in task_text:
-        tasks_list = []
-
-        for task in task_text.split(';'):
-            if task and not task.isspace():
-                # Checks if is '' or ' ', and doesn't append it if so
-                tasks_list.append(task.strip())  # "Trim"
-
-        return tasks_list
-    else:
-        return task_text
-
-
+@final
 class AddTask:
 
     category_id: int = 1
@@ -128,7 +94,7 @@ class AddTask:
         sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, '\
               f'{tasks.COLUMN_TASK_CATEGORY}) VALUES (?,?,?);'
 
-        with self.console.status('[bold yellow]Saving Tasks...',) as status:
+        with self.console.status('[bold yellow]Saving Tasks...') as status:
             if isinstance(self.task, list):
                 for task in self.task:
                     values = (task, self.creation_date, self.category_id)
@@ -185,6 +151,7 @@ class AddTask:
             self.save_task()
 
 
+@final
 class SearchTask:
 
     def __init__(self, args):
