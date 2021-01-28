@@ -1,6 +1,6 @@
 import calendar
 from argparse import Namespace
-from typing import overload, List, Union
+from typing import overload, Union
 from datetime import datetime, date, timedelta
 
 def date_args_empty(args: Namespace) -> bool:
@@ -30,14 +30,14 @@ def date_args_empty(args: Namespace) -> bool:
 
 
 @overload
-def dates_to_search(args: Namespace) -> List[date]: ...
+def dates_to_search(args: Namespace) -> list[date]: ...
 
 
 @overload
 def dates_to_search(args: Namespace) -> date: ...
 
 
-def dates_to_search(args: Namespace) -> Union[List[date], date]:
+def dates_to_search(args: Namespace) -> Union[list[date], date]:
     """ Returns date to search depending of the user selection
 
     Parameters
@@ -47,7 +47,7 @@ def dates_to_search(args: Namespace) -> Union[List[date], date]:
 
     Returns
     -------
-    search_date : Union[List[date], date]
+    search_date : Union[list[date], date]
         Returns date to search
     """
     now = datetime.now().date()
@@ -122,13 +122,13 @@ def add_task_args_empty(args: Namespace) -> bool:
     return True
 
 
-def format_argument_text(arg_text: List[str]) -> str:
+def format_argument_text(arg_text: list[str]) -> str:
     """ Function use to join the list of strings passed in the arguments
     
     Parameters
     ----------
-    arg_text: List[str]
-        List of strings capture by argparse
+    arg_text: list[str]
+        list of strings capture by argparse
 
     Returns
     -------

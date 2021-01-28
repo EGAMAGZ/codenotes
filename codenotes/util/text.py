@@ -1,4 +1,4 @@
-from typing import overload, List, Union
+from typing import overload, Union
 
 from codenotes.util.args import format_argument_text
 
@@ -26,25 +26,25 @@ def text_break(complete_text: str, max_length: int = 15) -> str:
         return complete_text
 
 @overload
-def format_task_text(text: List[str]) -> List[str]: ...
+def format_task_text(text: list[str]) -> list[str]: ...
 
 
 @overload
-def format_task_text(text: List[str]) -> str: ...
+def format_task_text(text: list[str]) -> str: ...
 
 
-def format_task_text(task_text: List[str]) -> Union[List[str], str]:
+def format_task_text(task_text: list[str]) -> Union[list[str], str]:
     """ Function that formats text passed through arguments
 
     Parameters
     ----------
-    text : List[str]
+    text : list[str]
         Text written in the arguments of argparse
     
     Returns
     -------
-    tasks_list : Union[List[str], str]
-        List of texts of task joined and stripped or, task of text passed in arguments and joined
+    tasks_list : Union[list[str], str]
+        list of texts of task joined and stripped or, task of text passed in arguments and joined
     """
     task_text = format_argument_text(task_text)
 

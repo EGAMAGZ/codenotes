@@ -1,6 +1,6 @@
 import calendar
 from datetime import date, datetime, timedelta
-from typing import List, Tuple, Optional, Any, Union
+from typing import Tuple, Optional, Any, Union
 
 import py_cui
 from yaspin import yaspin
@@ -32,7 +32,7 @@ class AddTaskTUI:
     task_text_block: py_cui.widgets.TextBox
     # TODO: CREATE ALL ATTRIBUTES
 
-    categories_list: List[Category] = []
+    categories_list: list[Category] = []
     selected_category: Category = None
 
     def __init__(self, root: ImpPyCUI):
@@ -62,7 +62,7 @@ class AddTaskTUI:
         """
         return cls(root)
 
-    def get_categories(self) -> List[Tuple[str]]:
+    def get_categories(self) -> list[Tuple[str]]:
         """ Gets all categories stored in database """
         sql = f'SELECT {tasks_categories.COLUMN_CATEGORY_ID},{tasks_categories.COLUMN_CATEGORY_NAME} FROM ' \
               f'{tasks_categories.TABLE_NAME};'
@@ -177,8 +177,8 @@ class AddTaskTUI:
 
 class SearchTaskTUI:
 
-    DATE_OPTIONS: List[str] = ['Any Date', 'Today', 'Yesterday', 'Week', 'Month']
-    STATUS_OPTION: List[str] = ['All', 'Incomplete', 'In Process', 'Finished']
+    DATE_OPTIONS: list[str] = ['Any Date', 'Today', 'Yesterday', 'Week', 'Month']
+    STATUS_OPTION: list[str] = ['All', 'Incomplete', 'In Process', 'Finished']
     BASE_SQL: str = f'SELECT {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_ID},' \
                     f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CONTENT},{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_STATUS},' \
                     f'{tasks_categories.TABLE_NAME}.{tasks_categories.COLUMN_CATEGORY_NAME},' \
@@ -192,11 +192,11 @@ class SearchTaskTUI:
     date_menu: py_cui.widgets.ScrollMenu
     status_menu: py_cui.widgets.ScrollMenu
 
-    selected_date: Union[Optional[date], Optional[List[date]]] = None
+    selected_date: Union[Optional[date], Optional[list[date]]] = None
     selected_category: Optional[Category] = None
     selected_status: Optional[int] = None
-    tasks_list: List[Task]
-    categories_list: List[Any]
+    tasks_list: list[Task]
+    categories_list: list[Any]
 
     def __init__(self, root: ImpPyCUI):
         """ Constructor of SearchTaskTUI class 
@@ -230,7 +230,7 @@ class SearchTaskTUI:
         """
         return cls(root)
 
-    def get_categories(self) -> List[Tuple[str]]:
+    def get_categories(self) -> list[Tuple[str]]:
         """ Gets all categories stored in database """
         sql = f'SELECT {tasks_categories.COLUMN_CATEGORY_ID},{tasks_categories.COLUMN_CATEGORY_NAME} FROM ' \
               f'{tasks_categories.TABLE_NAME};'
@@ -372,7 +372,7 @@ class SearchTaskTUI:
 
 class AddNoteTUI:
 
-    SETTINGS_OPTIONS: List[str] = ['Markdown']
+    SETTINGS_OPTIONS: list[str] = ['Markdown']
     CREATION_DATE: date = datetime.now().date()
 
     note_title_text_box: py_cui.widgets.TextBox
@@ -380,7 +380,7 @@ class AddNoteTUI:
     categories_menu: py_cui.widgets.ScrollMenu
     save_note_button: py_cui.widgets.Button
 
-    categories_list: List[Category] = []
+    categories_list: list[Category] = []
     selected_category: Category = None
     is_markdown: bool = False
     note_title: str
@@ -439,7 +439,7 @@ class AddNoteTUI:
 
         self.categories_menu.add_item_list(self.categories_list)
 
-    def get_categories(self) -> List[Tuple[str]]:
+    def get_categories(self) -> list[Tuple[str]]:
         """ Gets all categories stored in database """
         sql = f'SELECT {notes_categories.COLUMN_CATEGORY_ID},{notes_categories.COLUMN_CATEGORY_NAME} FROM ' \
               f'{notes_categories.TABLE_NAME};'

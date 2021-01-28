@@ -1,4 +1,4 @@
-from typing import List, Union, overload, Tuple, final
+from typing import Union, overload, Tuple, final
 
 from rich import box
 from rich.table import Table
@@ -21,7 +21,7 @@ class AddTask:
 
     category_id: int = 1
     category_name: str = 'TODO Task'
-    task: Union[List[str], str]
+    task: Union[list[str], str]
     console: Console
 
     def __init__(self, args):
@@ -137,7 +137,7 @@ class AddTask:
         table.add_column('Task', overflow='fold')
         table.add_column('Creation Date', justify='center', style='yellow')
         
-        if isinstance(self.task, List):
+        if isinstance(self.task, list):
             for task in self.task:
                 table.add_row(task, formatted_date)
         elif isinstance(self.task, str):
@@ -186,7 +186,7 @@ class SearchTask:
         """
         return cls(args)
 
-    def sql_query(self) -> List[Tuple[str]]:
+    def sql_query(self) -> list[Tuple[str]]:
         """ Function that makes a query of related information of tasks"""
         sql = f'SELECT {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CONTENT},{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_STATUS}, ' \
               f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CREATION}, ' \
