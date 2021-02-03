@@ -5,9 +5,9 @@ from typing import Tuple, Optional, Any, Union
 import py_cui
 from yaspin import yaspin
 
-from codenotes.util import status_text
 from codenotes.cli import PrintFormatted
-from codenotes.db import add_conditions_sql
+from codenotes.util.text import status_text
+from codenotes.util.sql import add_conditions_sql
 from codenotes.db.utilities import Category, Task
 from codenotes.db.connection import SQLiteConnection
 from codenotes.db.utilities import notes_categories, tasks_categories, tasks, notes

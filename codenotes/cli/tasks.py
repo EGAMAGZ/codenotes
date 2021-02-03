@@ -7,13 +7,12 @@ from rich.console import Console
 
 import codenotes.db.utilities.tasks as tasks
 import codenotes.db.utilities.tasks_categories as categories
-from codenotes.util import status_text
 from codenotes.cli import PrintFormatted
-from codenotes.db import add_conditions_sql
+from codenotes.util.sql import add_conditions_sql
 from codenotes.db.connection import SQLiteConnection
 from codenotes.tui import AddTaskTUI, ImpPyCUI, SearchTaskTUI
 from codenotes.util.args import format_argument_text, date_args_empty, dates_to_search, add_task_args_empty
-from codenotes.util.text import format_task_text
+from codenotes.util.text import format_task_text, status_text
 
 
 @final

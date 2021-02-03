@@ -1,3 +1,4 @@
+""" Utility module with the statements and names related with tasks table """
 from typing import Final
 
 import codenotes.db.utilities.tasks_categories as categories

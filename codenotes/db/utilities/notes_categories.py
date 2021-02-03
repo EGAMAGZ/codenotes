@@ -1,3 +1,4 @@
+""" Utility module with the statements and names related with category notes table """
 from typing import Final
 
 TABLE_NAME: Final = 'cn_notes_categories'

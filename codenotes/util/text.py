@@ -60,3 +60,24 @@ def format_task_text(task_text: list[str]) -> Union[list[str], str]:
 
     else:
         return task_text
+
+
+def status_text(status_value: int) -> str:
+    """ Functions that returns the status in text
+
+    Parameters
+    ----------
+    status_value: int
+        Integer value of the task status
+
+    Returns
+    -------
+    status_txt: str
+        Status text based in the integer value
+    """
+    if status_value == 0:
+        return 'Incomplete'
+    elif status_value == 1:
+        return 'In Process'
+    elif status_value == 2:
+        return 'Finished'

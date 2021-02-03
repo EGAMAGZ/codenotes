@@ -1,3 +1,4 @@
+""" Utility module with the statements and names related with task notes table """
 from typing import Final
 
 TABLE_NAME: Final = 'cn_tasks_categories'

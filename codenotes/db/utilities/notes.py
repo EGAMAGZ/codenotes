@@ -1,3 +1,4 @@
+""" Utility module with the statements and names related with notes table """
 from typing import Final
 
 import codenotes.db.utilities.notes_categories as categories
