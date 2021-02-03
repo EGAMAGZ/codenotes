@@ -211,6 +211,3 @@ class SearchTask:
         for task in self.sql_query():
             table.add_row(task[0], status_text(task[1]), task[3], task[2])
         self.console.print(table, justify='center')
-        # self.cli.rule(self.search_date.strftime('%m-%d-%Y'), style='purple')
-
-# select * from cn_todos where cn_todo_creation like date('2020-08-17');

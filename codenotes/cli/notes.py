@@ -63,7 +63,7 @@ class AddNote:
 
     def save_category(self):
         """ Creates and saves a new category"""
-        if len(self.category_name) <= 30:
+        if len(self.category_name) <= 30: # Category name can't be longer than 30 characters
             sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
             self.cursor.execute(sql, (self.category_name,))
 
@@ -75,6 +75,7 @@ class AddNote:
             self._ask_category()
 
     def save_note(self):
+        """ Saves the note created in the database and setting category to store """
         sql = f'INSERT INTO {notes.TABLE_NAME} ({notes.COLUMN_NOTE_TITLE}, {notes.COLUMN_NOTE_CONTENT}, ' \
               f'{notes.COLUMN_NOTE_CATEGORY}, {notes.COLUMN_NOTE_CREATION}) VALUES (?,?,?,?);'
 
