@@ -1,3 +1,4 @@
+from argparse import Namespace
 from typing import Union, overload, Tuple, final
 
 from rich import box
@@ -10,7 +11,6 @@ import codenotes.db.utilities.tasks_categories as categories
 from codenotes.cli import PrintFormatted
 from codenotes.util.sql import add_conditions_sql
 from codenotes.db.connection import SQLiteConnection
-from codenotes.tui import AddTaskTUI, ImpPyCUI, SearchTaskTUI
 from codenotes.util.args import format_argument_text, date_args_empty, dates_to_search, add_task_args_empty
 from codenotes.util.text import format_task_text, status_text
 
@@ -23,7 +23,7 @@ class AddTask:
     task: Union[list[str], str]
     console: Console
 
-    def __init__(self, args):
+    def __init__(self, args: Namespace):
         """ Constructor fro AddTask class 
         
         Parameters
@@ -36,12 +36,7 @@ class AddTask:
         self.cursor = self.db.get_cursor()
         self.creation_date = datetime.now().date()
 
-        if add_task_args_empty(args):
-            root = ImpPyCUI(5, 4)
-            AddTaskTUI.set_root(root)
-            root.start()
-
-        else:
+        if not add_task_args_empty(args):
             try:
                 if args.new_category:
                     # Will create a new category
@@ -60,7 +55,7 @@ class AddTask:
                 self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
 
     @classmethod
-    def set_args(cls, args):
+    def set_args(cls, args: Namespace):
         """ Set args and initialize class
         
         Parameters
@@ -153,7 +148,7 @@ class AddTask:
 @final
 class SearchTask:
 
-    def __init__(self, args):
+    def __init__(self, args: Namespace):
         """ SearchTask Constructor 
         
         Parameters
@@ -167,15 +162,11 @@ class SearchTask:
         self.search_date = dates_to_search(args)
         self.search_text = format_argument_text(args.text)
 
-        if date_args_empty(args):
-            root = ImpPyCUI(6, 6)
-            SearchTaskTUI.set_root(root)
-            root.start()
-        else:
+        if not date_args_empty(args):
             self.search_task()
 
     @classmethod
-    def set_args(cls, args):
+    def set_args(cls, args: Namespace):
         """ Set args and initialize class
         
         Parameters

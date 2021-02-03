@@ -1,3 +1,4 @@
+from argparse import Namespace
 from datetime import datetime
 from typing import final
 
@@ -5,7 +6,6 @@ from rich.console import Console
 from rich.panel import Panel
 
 from codenotes.cli import PrintFormatted
-from codenotes.tui import AddNoteTUI, ImpPyCUI
 import codenotes.db.utilities.notes as notes
 from codenotes.db.connection import SQLiteConnection
 from codenotes.util.args import format_argument_text, add_note_args_empty
@@ -16,11 +16,11 @@ import codenotes.db.utilities.notes_categories as categories
 class AddNote:
 
     category_id: int = 1
-    category_name: str = 'General'
+    category_name: str = 'General' # Default category name
     note_title: str = None
     note_text: str = None
 
-    def __init__(self, args):
+    def __init__(self, args: Namespace):
         """ Constructor fro AddTask class 
         
         Parameters
@@ -33,12 +33,7 @@ class AddNote:
         self.cursor = self.db.get_cursor()
         self.creation_date = datetime.now().date()
 
-        if add_note_args_empty(args):
-            root = ImpPyCUI(5, 4)
-            AddNoteTUI.set_root(root)
-            root.start()
-
-        else:
+        if not add_note_args_empty(args):
             try:
                 if args.new_category:
                     self.category_name = format_argument_text(args.new_category)
@@ -56,7 +51,7 @@ class AddNote:
                 self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
 
     @classmethod
-    def set_args(cls, args):
+    def set_args(cls, args: Namespace):
         """ Set args and initialize class
         
         Parameters
