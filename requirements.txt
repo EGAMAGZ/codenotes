@@ -14,4 +14,3 @@ typing-extensions==3.7.4.3
 wcwidth==0.2.5
 windows-curses==2.2.0
 wrapt==1.12.1
-yaspin==1.2.0
