@@ -20,6 +20,7 @@ class AddTask:
 
     category_id: int = 1
     category_name: str = 'TODO Task'
+    creation_date: date
     task: Union[list[str], str]
     console: Console
 
@@ -33,7 +34,6 @@ class AddTask:
         """
         self.console = Console()
         self.db = SQLiteConnection()
-        self.cursor = self.db.get_cursor()
         self.creation_date = datetime.now().date()
 
         if not add_task_args_empty(args):
@@ -63,7 +63,7 @@ class AddTask:
         args : NameSpace
             Arguments of argparse
         """
-        return cls(args)
+        cls(args)
 
     def save_category(self):
         """ Creates and saves a new category
@@ -73,9 +73,9 @@ class AddTask:
         """
         if len(self.category_name) <= 30:
             sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
-            self.cursor.execute(sql, (self.category_name,))
+            cursor = self.db.exec_sql(sql, (self.category_name,))
 
-            self.category_id = self.cursor.lastrowid
+            self.category_id = cursor.lastrowid
 
             self.db.commit()
             PrintFormatted.print_category_creation(self.category_name)
@@ -92,12 +92,14 @@ class AddTask:
             if isinstance(self.task, list):
                 for task in self.task:
                     values = (task, self.creation_date, self.category_id)
-                    self.cursor.execute(sql, values)
+                    self.db.exec_sql(sql, values)
+
                     PrintFormatted.print_content_storage(task, self.category_name)
 
             elif isinstance(self.task, str):
                 values = (self.task, self.creation_date, self.category_id)
-                self.cursor.execute(sql, values)
+                self.db.exec_sql(sql, values)
+
                 PrintFormatted.print_content_storage(self.task, self.category_name)
 
             if self.task:
@@ -158,12 +160,13 @@ class SearchTask:
         """
         self.console = Console()
         self.db = SQLiteConnection()
-        self.cursor = self.db.get_cursor()
         self.search_date = dates_to_search(args)
         self.search_text = format_argument_text(args.text)
 
         if not date_args_empty(args):
             self.search_task()
+            
+        # self.db.close() FIXME: CAN'T PROPERLY CLOSE CONNECTION
 
     @classmethod
     def set_args(cls, args: Namespace):
@@ -174,7 +177,7 @@ class SearchTask:
         args : NameSpace
             Arguments of argparse
         """
-        return cls(args)
+        cls(args)
 
     def sql_query(self) -> list[Tuple[str]]:
         """ Function that makes a query of related information of tasks"""
@@ -195,7 +198,7 @@ class SearchTask:
         if self.search_text:
             sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.search_text}%"', 'AND')
 
-        query = self.cursor.execute(sql)
+        query = self.db.exec_sql(sql)
 
         return query.fetchall()
 

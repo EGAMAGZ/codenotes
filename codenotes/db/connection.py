@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from typing import Optional
+from typing import Final
 from sqlite3.dbapi2 import Cursor
 
 import codenotes.db.utilities.notes as notes
@@ -11,9 +11,9 @@ import codenotes.db.utilities.notes_categories as notes_categories
 
 class SQLiteConnection:
 
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    DATABASE_NAME = 'codenotes.db'
-    DATABASE_PATH = os.path.join(BASE_DIR, DATABASE_NAME)
+    BASE_DIR: Final = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    DATABASE_NAME: Final = 'codenotes.db'
+    DATABASE_PATH: Final = os.path.join(BASE_DIR, DATABASE_NAME)
 
     def __init__(self):
         """ SQLiteConnection Constructor """
@@ -30,7 +30,7 @@ class SQLiteConnection:
 
         self.conn.commit()
 
-    def exec_sql(self, sql: str) -> Optional[Cursor]:
+    def exec_sql(self, sql: str, values: tuple = None) -> Cursor:
         """ Function that executes sql command 
         
         Parameters
@@ -38,12 +38,17 @@ class SQLiteConnection:
         sql : str
             SQL statement to be executed
 
+        values: Optional[tuple]
+            Optional argument typo of tuple, which contains the values the sql statement requires
+
         Returns
         -------
         cursor : Union[Cursor, None]
             Method will return None or Cursor, depending of the statement executed
         """
-        self.cursor.execute(sql)
+        if values is not None:
+            return self.cursor.execute(sql, values)
+        return self.cursor.execute(sql)
 
     def get_cursor(self) -> Cursor:
         """ Return cursor created 

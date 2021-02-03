@@ -1,6 +1,6 @@
 from argparse import Namespace
-from datetime import datetime
-from typing import final
+from datetime import datetime, date
+from typing import final, Union
 
 from rich.console import Console
 from rich.panel import Panel
@@ -8,20 +8,21 @@ from rich.panel import Panel
 from codenotes.cli import PrintFormatted
 import codenotes.db.utilities.notes as notes
 from codenotes.db.connection import SQLiteConnection
-from codenotes.util.args import format_argument_text, add_note_args_empty
+from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text, add_note_args_empty
 import codenotes.db.utilities.notes_categories as categories
 
 
 @final
 class AddNote:
 
-    category_id: int = 1
+    category_id: int = 1 # Default Id of 'General' category
     category_name: str = 'General' # Default category name
     note_title: str = None
     note_text: str = None
+    creation_date: date # Today's date
 
     def __init__(self, args: Namespace):
-        """ Constructor fro AddTask class 
+        """ Constructor of AddTask class 
         
         Parameters
         ----------
@@ -30,7 +31,6 @@ class AddNote:
         """
         self.console = Console()
         self.db = SQLiteConnection()
-        self.cursor = self.db.get_cursor()
         self.creation_date = datetime.now().date()
 
         if not add_note_args_empty(args):
@@ -59,15 +59,15 @@ class AddNote:
         args : NameSpace
             Arguments of argparse
         """
-        return cls(args)
+        cls(args)
 
     def save_category(self):
         """ Creates and saves a new category"""
         if len(self.category_name) <= 30: # Category name can't be longer than 30 characters
             sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
-            self.cursor.execute(sql, (self.category_name,))
+            cursor = self.db.exec_sql(sql, (self.category_name,))
 
-            self.category_id = self.cursor.lastrowid
+            self.category_id = cursor.lastrowid
 
             self.db.commit()
             PrintFormatted.print_category_creation(self.category_name)
@@ -81,7 +81,7 @@ class AddNote:
 
         with self.console.status('[bold yellow]Saving Note') as status:
             values = (self.note_title, self.note_text, self.category_id, self.creation_date)
-            self.cursor.execute(sql, values)
+            self.db.exec_sql(sql, values)
 
             PrintFormatted.print_content_storage(self.note_title, self.category_name)
 
@@ -135,3 +135,39 @@ class AddNote:
                 '[yellow]Do you want to save it?(y/n):[/yellow]'
             ):
             self.save_note()
+
+
+@final
+class SearchNote:
+
+    search_date: Union[list[date], date]
+    console: Console
+
+    def __init__(self, args: Namespace) -> None:
+        """ SearchNote constructor
+
+        Parameters
+        ----------
+        args: Namespace
+            Arguments of argparse
+        """
+        self.console = Console() 
+        self.search_date = dates_to_search(args)
+
+        if not date_args_empty(args):
+            self.search_task()
+
+
+    @classmethod
+    def set_args(cls, args: Namespace):
+        """ Set args and initialize class
+
+        Parameters
+        ----------
+        args: Namespace
+            Arguments of argparse
+        """
+        cls(args)
+
+    def search_task(self):
+        pass
