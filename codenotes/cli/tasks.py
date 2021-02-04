@@ -1,5 +1,5 @@
 from argparse import Namespace
-from typing import Union, overload, Tuple, final
+from typing import Union, overload, final
 
 from rich import box
 from rich.table import Table
@@ -179,7 +179,7 @@ class SearchTask:
         """
         cls(args)
 
-    def sql_query(self) -> list[Tuple[str]]:
+    def sql_query(self) -> list[tuple]:
         """ Function that makes a query of related information of tasks"""
         sql = f'SELECT {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CONTENT},{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_STATUS}, ' \
               f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CREATION}, ' \

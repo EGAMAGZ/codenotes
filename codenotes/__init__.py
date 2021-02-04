@@ -2,7 +2,7 @@ import sys
 import argparse
 
 from codenotes.cli.tasks import AddTask, SearchTask
-from codenotes.cli.notes import AddNote
+from codenotes.cli.notes import AddNote, SearchNote
 
 __version__ = '0.0.1'
 
@@ -59,5 +59,7 @@ def main():
         elif args.subargs == 'search':
             if args.type == 'task':
                 SearchTask.set_args(args)
+            elif args.type == 'note':
+                SearchNote.set_args(args)
     else:
         pass

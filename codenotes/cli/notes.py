@@ -50,6 +50,7 @@ class AddNote:
             except KeyboardInterrupt:
                 self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
 
+
     @classmethod
     def set_args(cls, args: Namespace):
         """ Set args and initialize class
@@ -151,8 +152,10 @@ class SearchNote:
         args: Namespace
             Arguments of argparse
         """
-        self.console = Console() 
+        self.console = Console()
+        self.db  = SQLiteConnection()
         self.search_date = dates_to_search(args)
+        self.search_text = format_argument_text(args.text)
 
         if not date_args_empty(args):
             self.search_task()
@@ -168,6 +171,19 @@ class SearchNote:
             Arguments of argparse
         """
         cls(args)
+
+    def sql_query(self) -> list[tuple]:
+        """
+        
+        Returns
+        -------
+        query: list[tuple]
+        """
+        sql = ""
+
+        query = self.db.exec_sql(sql)
+
+        return query.fetchall()
 
     def search_task(self):
         pass

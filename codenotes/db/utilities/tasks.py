@@ -1,18 +1,18 @@
 """ Utility module with the statements and names related with tasks table """
-from typing import Final
+from typing import Final, Text
 
 import codenotes.db.utilities.tasks_categories as categories
 
 
-TABLE_NAME: Final = 'cn_tasks'
+TABLE_NAME: Final[str] = 'cn_tasks'
 
-COLUMN_TASK_ID: Final = 'cn_task_id'
-COLUMN_TASK_CONTENT: Final = 'cn_task_content'
-COLUMN_TASK_STATUS: Final = 'cn_task_status'
-COLUMN_TASK_CREATION: Final = 'cn_task_creation'
-COLUMN_TASK_CATEGORY: Final = 'cn_task_category'
+COLUMN_TASK_ID: Final[str] = 'cn_task_id'
+COLUMN_TASK_CONTENT: Final[str] = 'cn_task_content'
+COLUMN_TASK_STATUS: Final[str] = 'cn_task_status'
+COLUMN_TASK_CREATION: Final[str] = 'cn_task_creation'
+COLUMN_TASK_CATEGORY: Final[str] = 'cn_task_category'
 
-CREATE_TASKS_TABLE: Final = f'CREATE TABLE IF NOT EXISTS {TABLE_NAME} ({COLUMN_TASK_ID} INTEGER PRIMARY KEY ' \
+CREATE_TASKS_TABLE: Final[Text] = f'CREATE TABLE IF NOT EXISTS {TABLE_NAME} ({COLUMN_TASK_ID} INTEGER PRIMARY KEY ' \
                             f'AUTOINCREMENT NULL , {COLUMN_TASK_CONTENT} TEXT NOT NULL, {COLUMN_TASK_STATUS} ' \
                             f'INTEGER NULL DEFAULT 0, {COLUMN_TASK_CREATION} DATE NOT NULL, {COLUMN_TASK_CATEGORY} ' \
                             f'INTEGER, FOREIGN KEY({COLUMN_TASK_CATEGORY}) REFERENCES {categories.TABLE_NAME}' \

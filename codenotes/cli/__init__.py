@@ -1,7 +1,8 @@
-from typing import final
+from typing import Text, final
 
-from rich.console import Console
 from rich.theme import Theme
+from rich.console import Console
+from rich.markdown import Markdown
 
 
 @final
@@ -30,6 +31,7 @@ class PrintFormatted:
         ----------
         text : HTML
             Text that will be print with format similar to html
+
         theme: Theme
             Theme used for the text to be displayed
         """
@@ -62,6 +64,7 @@ class PrintFormatted:
         ----------
         content : str
             A glance of the content that is stored
+
         category : str
             Category where is stored
         """
