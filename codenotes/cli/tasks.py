@@ -1,5 +1,5 @@
 from argparse import Namespace
-from typing import Union, overload, final
+from typing import Union, final
 
 from rich import box
 from rich.table import Table
@@ -24,7 +24,7 @@ class AddTask:
     task: Union[list[str], str]
     console: Console
 
-    def __init__(self, args: Namespace):
+    def __init__(self, args: Namespace) -> None:
         """ Constructor fro AddTask class 
         
         Parameters
@@ -55,7 +55,7 @@ class AddTask:
                 self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
 
     @classmethod
-    def set_args(cls, args: Namespace):
+    def set_args(cls, args: Namespace) -> None:
         """ Set args and initialize class
         
         Parameters
@@ -65,7 +65,7 @@ class AddTask:
         """
         cls(args)
 
-    def save_category(self):
+    def save_category(self) -> None:
         """ Creates and saves a new category
 
         When the task(s) is going to be saved and is created a new category,
@@ -82,7 +82,7 @@ class AddTask:
         else:
             self._ask_category()
 
-    def save_task(self):
+    def save_task(self) -> None:
         """ Function in charge to store the tasks in the database"""
 
         sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, '\
@@ -112,7 +112,7 @@ class AddTask:
         self.db.commit()
         self.db.close()
 
-    def _ask_category(self):
+    def _ask_category(self) -> None:
         """ Function that asks to the user to introduce different category name """
 
         text = '⚠️[yellow]Category name is too long (Max. 30 characters).[/yellow]Write another name:'
@@ -123,7 +123,7 @@ class AddTask:
         else:
             self.save_category()
 
-    def _show_preview(self):
+    def _show_preview(self) -> None:
         """ Method that displays a table with the tasks written"""
         formatted_date = self.creation_date.strftime('%Y-%m-%d')
         
@@ -150,7 +150,7 @@ class AddTask:
 @final
 class SearchTask:
 
-    def __init__(self, args: Namespace):
+    def __init__(self, args: Namespace) -> None:
         """ SearchTask Constructor 
         
         Parameters
@@ -169,7 +169,7 @@ class SearchTask:
         # self.db.close() FIXME: CAN'T PROPERLY CLOSE CONNECTION
 
     @classmethod
-    def set_args(cls, args: Namespace):
+    def set_args(cls, args: Namespace) -> None:
         """ Set args and initialize class
         
         Parameters
@@ -202,7 +202,7 @@ class SearchTask:
 
         return query.fetchall()
 
-    def search_task(self):
+    def search_task(self) -> None:
         """ Function that displays a table with the tasks searched """
         table = Table()
 

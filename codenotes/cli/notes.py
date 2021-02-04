@@ -2,14 +2,16 @@ from argparse import Namespace
 from datetime import datetime, date
 from typing import final, Union
 
-from rich.console import Console
 from rich.panel import Panel
+from rich.table import Table
+from rich.console import Console
 
-from codenotes.cli import PrintFormatted
 import codenotes.db.utilities.notes as notes
-from codenotes.db.connection import SQLiteConnection
-from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text, add_note_args_empty
 import codenotes.db.utilities.notes_categories as categories
+from codenotes.cli import PrintFormatted
+from codenotes.db.connection import SQLiteConnection
+from codenotes.util.sql import add_conditions_sql
+from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text, add_note_args_empty
 
 
 @final
@@ -21,7 +23,7 @@ class AddNote:
     note_text: str = None
     creation_date: date # Today's date
 
-    def __init__(self, args: Namespace):
+    def __init__(self, args: Namespace) -> None:
         """ Constructor of AddTask class 
         
         Parameters
@@ -52,7 +54,7 @@ class AddNote:
 
 
     @classmethod
-    def set_args(cls, args: Namespace):
+    def set_args(cls, args: Namespace) -> None:
         """ Set args and initialize class
         
         Parameters
@@ -62,7 +64,7 @@ class AddNote:
         """
         cls(args)
 
-    def save_category(self):
+    def save_category(self) -> None:
         """ Creates and saves a new category"""
         if len(self.category_name) <= 30: # Category name can't be longer than 30 characters
             sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
@@ -75,7 +77,7 @@ class AddNote:
         else:
             self._ask_category()
 
-    def save_note(self):
+    def save_note(self) -> None:
         """ Saves the note created in the database and setting category to store """
         sql = f'INSERT INTO {notes.TABLE_NAME} ({notes.COLUMN_NOTE_TITLE}, {notes.COLUMN_NOTE_CONTENT}, ' \
               f'{notes.COLUMN_NOTE_CATEGORY}, {notes.COLUMN_NOTE_CREATION}) VALUES (?,?,?,?);'
@@ -92,7 +94,7 @@ class AddNote:
         self.db.commit()
         self.db.close()
 
-    def _set_note_content(self, args):
+    def _set_note_content(self, args) -> None:
 
         if args.text:
             self.note_text = format_argument_text(args.text)
@@ -107,7 +109,7 @@ class AddNote:
                 self.note_title = format_argument_text(args.title)
                 self._check_note_title()
 
-    def _ask_category(self):
+    def _ask_category(self) -> None:
         """ Function that asks to the user to introduce different category name """
 
         text = '⚠️[yellow]Category name is too long (Max. 30).[/yellow] Write another name:'
@@ -118,7 +120,7 @@ class AddNote:
         else:
             self.save_category()
 
-    def _check_note_title(self):
+    def _check_note_title(self) -> None:
         if len(self.note_title) > 30:
             text = '⚠️[yellow]Note title is too long(Max. 30).[/yellow] Write another title:'
             self.note_title = self.console.input(text).strip()
@@ -126,11 +128,13 @@ class AddNote:
             while len(self.note_title) == 0 or len(self.note_title) > 30:
                 self.note_text = self.console.input(text).strip()
 
-    def _show_preview(self):
+    def _show_preview(self) -> None:
         """ Method that displays a panel with the title and text of the note """
 
         self.console.rule('Preview', style='purple')
-        self.console.print(Panel(self.note_text if self.note_text else '[red bold]Empty note[/red bold]', title=self.note_title))
+        self.console.print(
+                Panel(self.note_text if self.note_text else '[red bold]Empty note[/red bold]', title=self.note_title)
+            )
 
         if PrintFormatted.ask_confirmation(
                 '[yellow]Do you want to save it?(y/n):[/yellow]'
@@ -162,7 +166,7 @@ class SearchNote:
 
 
     @classmethod
-    def set_args(cls, args: Namespace):
+    def set_args(cls, args: Namespace) -> None:
         """ Set args and initialize class
 
         Parameters
@@ -179,11 +183,35 @@ class SearchNote:
         -------
         query: list[tuple]
         """
-        sql = ""
+        sql = f"SELECT {notes.TABLE_NAME}.{notes.COLUMN_NOTE_TITLE}, {notes.TABLE_NAME}.{notes.COLUMN_NOTE_CONTENT}, " \
+            f"{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_NAME}, " \
+            f"{notes.TABLE_NAME}.{notes.COLUMN_NOTE_README}, {notes.TABLE_NAME}.{notes.COLUMN_NOTE_CREATION} FROM " \
+            f"{notes.TABLE_NAME} INNER JOIN {categories.TABLE_NAME} ON " \
+            f"{notes.TABLE_NAME}.{notes.COLUMN_NOTE_CATEGORY} = {categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_ID}"
+
+        if self.search_date:
+            if isinstance(self.search_date, date):
+                sql = add_conditions_sql(sql, f'{notes.COLUMN_NOTE_CREATION} LIKE date("{self.search_date}")')
+
+            elif isinstance(self.search_date, list):
+                first_day, last_day = self.search_date
+                sql = add_conditions_sql(sql, f'{notes.COLUMN_NOTE_CREATION} BETWEEN date("{first_day}") '
+                                              f'AND date("{last_day}")')
+        if self.search_text:
+            sql = add_conditions_sql(sql, f'{notes.COLUMN_NOTE_CREATION} LIKE "%{self.search_text}%"', 'AND')
 
         query = self.db.exec_sql(sql)
 
         return query.fetchall()
 
-    def search_task(self):
-        pass
+    def search_task(self) -> None:
+        table = Table()
+        table.add_column('Title')
+        table.add_column('Content')
+        table.add_column('Category')
+        table.add_column('Creation Date')
+
+        for note in self.sql_query():
+            table.add_row(note[0], note[1], note[2], note[4])
+        
+        self.console.print(table, justify='center')
