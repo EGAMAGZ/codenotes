@@ -198,7 +198,7 @@ class SearchNote:
                 sql = add_conditions_sql(sql, f'{notes.COLUMN_NOTE_CREATION} BETWEEN date("{first_day}") '
                                               f'AND date("{last_day}")')
         if self.search_text:
-            sql = add_conditions_sql(sql, f'{notes.COLUMN_NOTE_CREATION} LIKE "%{self.search_text}%"', 'AND')
+            sql = add_conditions_sql(sql, f'{notes.COLUMN_NOTE_CONTENT} LIKE "%{self.search_text}%"', 'AND')
 
         query = self.db.exec_sql(sql)
 
