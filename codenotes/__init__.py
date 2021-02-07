@@ -30,7 +30,7 @@ def parse_args(args):
 
     search = subparsers.add_parser('search')
 
-    search.add_argument('type', choices=['note', 'task'])
+    search.add_argument('type', choices=['note', 'task']) 
     search.add_argument('text', action='store', nargs='*')
     
     search_group = search.add_mutually_exclusive_group()
@@ -40,6 +40,8 @@ def parse_args(args):
     search_group.add_argument('--week', '-w', action='store_true')
     search_group.add_argument('--month', '-m', action='store_true')
 
+    tui = subparsers.add_parser('tui')
+    tui.add_argument('type', choices=['note', 'task'])
 
     return parser.parse_args(args)
 

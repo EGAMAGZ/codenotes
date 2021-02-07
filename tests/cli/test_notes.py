@@ -115,3 +115,5 @@ class TestSearchNote(unittest.TestCase):
     def tearDown(self) -> None:
         del self.date
         del self.default_note_text
+        del self.default_note_title
+        del self.default_category

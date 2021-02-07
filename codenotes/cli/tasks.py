@@ -1,10 +1,11 @@
 from argparse import Namespace
 from typing import Union, final
+from datetime import datetime, date
 
 from rich import box
+from rich.tree import Tree
 from rich.table import Table
-from datetime import datetime, date
-from rich.console import Console
+from rich.console import Console, RenderGroup
 
 import codenotes.db.utilities.tasks as tasks
 import codenotes.db.utilities.tasks_categories as categories
@@ -164,7 +165,7 @@ class SearchTask:
         self.search_text = format_argument_text(args.text)
 
         if not date_args_empty(args):
-            self.search_task()
+            self.__search_task()
             
         # self.db.close() FIXME: CAN'T PROPERLY CLOSE CONNECTION
 
@@ -202,15 +203,46 @@ class SearchTask:
 
         return query.fetchall()
 
-    def search_task(self) -> None:
+    def __sorter(self, query):
+        return query[3]
+
+    def __search_task(self) -> None:
         """ Function that displays a table with the tasks searched """
-        table = Table()
+        root = Tree('✔️[bold green]List of Tasks  Found')
+        query = self.sql_query()
 
-        table.add_column('Tasks')
-        table.add_column('Status')
-        table.add_column('Category')
-        table.add_column('Creation Date', justify='center', style='yellow')
+        if query:  # query != []
+            table = Table()
+            table.add_column('Tasks')
+            table.add_column('Status')
+            table.add_column('Category')
+            table.add_column('Creation Date', justify='center', style='yellow')
 
-        for task in self.sql_query():
-            table.add_row(task[0], status_text(task[1]), task[3], task[2])
-        self.console.print(table, justify='center')
+            task_sorted = sorted(query, key=self.__sorter)
+            actual_task = task_sorted[0]
+            actual_category = actual_task[3]
+
+            child_node = root.add(f':file_folder:{actual_category}')
+
+            for actual_task in task_sorted:
+                if actual_task[3] != actual_category:
+                    child_node.add(table)
+
+                    table = Table()
+                    table.add_column('Tasks')
+                    table.add_column('Status')
+                    table.add_column('Category')
+                    table.add_column('Creation Date', justify='center', style='yellow')
+
+                    actual_category = actual_task[3]
+                    child_node = root.add(f':file_folder:{actual_category}')
+
+                table.add_row(
+                        actual_task[0], status_text(actual_task[1]), actual_task[3], actual_task[2]
+                    )
+            else:
+                child_node.add(table)
+
+        else:
+            root.add('[red] No Task Found')
+        self.console.print(root)
