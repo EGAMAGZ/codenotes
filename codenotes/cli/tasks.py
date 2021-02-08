@@ -251,7 +251,7 @@ class SearchTask:
 
     def __search_task(self) -> None:
         """ Function that displays a tree with tables as child nodes with the tasks searched """
-        root = Tree('✔️[bold green]List of Tasks  Found')
+        root = Tree('📒[bold blue] List of Tasks  Found')
         query = self.sql_query()
 
         if query:  # When the list is not empty
@@ -261,13 +261,13 @@ class SearchTask:
             table.add_column('Category')
             table.add_column('Creation Date', justify='center', style='yellow')
 
-            task_sorted = sorted(query, key=sorter)
-            actual_task = task_sorted[0]
+            tasks_sorted = sorted(query, key=sorter)
+            actual_task = tasks_sorted[0]
             actual_category = actual_task[3]
 
             child_node = root.add(f':file_folder:[#d898ed]{actual_category}')
 
-            for actual_task in task_sorted:
+            for actual_task in tasks_sorted:
                 if actual_task[3] != actual_category:
                     child_node.add(table)
 
@@ -287,6 +287,6 @@ class SearchTask:
                 child_node.add(table)
 
         else:
-            root.add('[red] No Task Found')
+            root.add('[red]❌ No Task Found')
         self.console.print(root)
         # self.db.close() # FIXME: DATABASE DONT CLOSE CORRECTLY

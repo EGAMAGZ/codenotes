@@ -1,9 +1,10 @@
 from argparse import Namespace
 from datetime import datetime, date
-from typing import final, Union
+from typing import final, Union, Any
 
+from rich.tree import Tree
 from rich.panel import Panel
-from rich.table import Table
+from rich.markdown import Markdown
 from rich.console import Console
 
 import codenotes.db.utilities.notes as notes
@@ -12,6 +13,22 @@ from codenotes.cli import PrintFormatted
 from codenotes.db.connection import SQLiteConnection
 from codenotes.util.sql import add_conditions_sql
 from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text, add_note_args_empty
+
+
+def sorter(query: tuple)-> Any:
+    """ Function used to get the key that will be used in the built-in function sorted()
+
+    Parameters
+    ----------
+    query: tuple
+        Row from the query done to the database, which contains the variables that will be used to sort the query
+
+    Returns
+    -------
+    key: Any
+        Returns the key that will be used
+    """
+    return query[2]
 
 
 @final
@@ -162,7 +179,7 @@ class SearchNote:
         self.search_text = format_argument_text(args.text)
 
         if not date_args_empty(args):
-            self.search_task()
+            self.search_note()
 
 
     @classmethod
@@ -177,7 +194,7 @@ class SearchNote:
         cls(args)
 
     def sql_query(self) -> list[tuple]:
-        """
+        """ Function that makes a query of related information of notes, and also adds more statements to the main sql
         
         Returns
         -------
@@ -198,20 +215,44 @@ class SearchNote:
                 sql = add_conditions_sql(sql, f'{notes.COLUMN_NOTE_CREATION} BETWEEN date("{first_day}") '
                                               f'AND date("{last_day}")')
         if self.search_text:
-            sql = add_conditions_sql(sql, f'{notes.COLUMN_NOTE_CONTENT} LIKE "%{self.search_text}%"', 'AND')
+            sql = add_conditions_sql(sql, f'{notes.COLUMN_NOTE_TITLE} LIKE "%{self.search_text}%"', 'AND')
 
         query = self.db.exec_sql(sql)
 
         return query.fetchall()
 
-    def search_task(self) -> None:
-        table = Table()
-        table.add_column('Title')
-        table.add_column('Content')
-        table.add_column('Category')
-        table.add_column('Creation Date')
+    def search_note(self) -> None:
+        root = Tree('📒[bold #964B00] List of Notes Found')
+        query = self.sql_query()
 
-        for note in self.sql_query():
-            table.add_row(note[0], note[1], note[2], note[4])
-        
-        self.console.print(table, justify='center')
+        if query:
+            notes_sorted = sorted(query, key=sorter)
+            actual_note = notes_sorted[0]
+            actual_category = actual_note[2]
+
+            child_node = root.add(f':file_folder:[#d898ed]{actual_category}')
+            for actual_note in notes_sorted:
+                if actual_note[2] != actual_category:
+
+                    actual_category = actual_note[2]
+                    child_node = root.add(f':file_folder: [#d898ed]{actual_category}')
+                
+                if actual_note[3] == 0:
+                    child_node.add(
+                            Panel(
+                                actual_note[1] if actual_note[1] else '[red bold]Empty note[/red bold]',
+                                title=f'{actual_note[0]} {actual_note[4]}'
+                                )
+                        )
+                else:  # actual_note[3] == 1
+                    markdown = Markdown( actual_note[1] if actual_note[1] else '# Note Empty')
+                    child_node.add(
+                            Panel(
+                                markdown,
+                                title=f'{actual_note[0]} {actual_note[4]}'
+                                )
+                        )
+            
+        else:
+            root.add('[red]❌ No Note Found')
+        self.console.print(root)
