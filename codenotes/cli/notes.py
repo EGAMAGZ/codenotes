@@ -161,9 +161,31 @@ class AddNote:
 
 @final
 class SearchNote:
+    """ Class to search and display notes in the database
 
-    search_date: Union[list[date], date]
+    This class only has the purpouse to search and display the notes. The arguments that will be used to filter the
+    search are text and date(s). The SQL statement for the query will be dinamycally generate depending on the captured
+    (and previously mentioned arguments).
+
+    Attributes
+    ----------
     console: Console
+        (Rich) Console for beatiful printting
+
+    db: SQLiteConnection
+        Connection with the dabatase
+
+    search_date: Union[date, list[date]]
+        Date or list of dates to search the notes
+
+    search_text: str
+        Text to search in the title of the notes
+    """
+
+    console: Console
+    db: SQLiteConnection
+    search_date: Union[list[date], date]
+    search_text: str
 
     def __init__(self, args: Namespace) -> None:
         """ SearchNote constructor
@@ -181,10 +203,9 @@ class SearchNote:
         if not date_args_empty(args):
             self.search_note()
 
-
     @classmethod
     def set_args(cls, args: Namespace) -> None:
-        """ Set args and initialize class
+        """ Class method that initializes the class and automatically will do the search
 
         Parameters
         ----------
@@ -199,6 +220,7 @@ class SearchNote:
         Returns
         -------
         query: list[tuple]
+            Query done to the database
         """
         sql = f"SELECT {notes.TABLE_NAME}.{notes.COLUMN_NOTE_TITLE}, {notes.TABLE_NAME}.{notes.COLUMN_NOTE_CONTENT}, " \
             f"{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_NAME}, " \
@@ -222,6 +244,7 @@ class SearchNote:
         return query.fetchall()
 
     def search_note(self) -> None:
+        """ Function that displays a tree with Panels as child nodes with the notes searched """
         root = Tree('📒[bold #964B00] List of Notes Found')
         query = self.sql_query()
 
@@ -256,3 +279,5 @@ class SearchNote:
         else:
             root.add('[red]❌ No Note Found')
         self.console.print(root)
+        
+        # self.db.close() # FIXME: DATABASE DONT CLOSE CORRECTLY

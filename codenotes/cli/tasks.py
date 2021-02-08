@@ -170,7 +170,7 @@ class SearchTask:
 
     This class only has the purpouse to search and display the tasks. The arguments that will be used to filter the
     search are text and date(s). The SQL statement for the query will be dinamycally generate depending on the captured
-    (and previously mentioned) arguments.
+    (and previously mentioned arguments).
 
     Attributes
     ----------
