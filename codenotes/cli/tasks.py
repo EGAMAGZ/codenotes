@@ -5,7 +5,7 @@ from datetime import datetime, date
 from rich import box
 from rich.tree import Tree
 from rich.table import Table
-from rich.console import Console, RenderGroup
+from rich.console import Console
 
 import codenotes.db.utilities.tasks as tasks
 import codenotes.db.utilities.tasks_categories as categories
@@ -168,14 +168,14 @@ class AddTask:
 class SearchTask:
     """ Class to search and display tasks in the database
 
-    This class only has the purpouse to search and display the tasks. The arguments that will be used to filter the
+    This class only has the purpose to search and display the tasks. The arguments that will be used to filter the
     search are text and date(s). The SQL statement for the query will be dinamycally generate depending on the captured
     (and previously mentioned arguments).
 
     Attributes
     ----------
     console: Console
-        (Rich) Console for beatiful printting
+        (Rich) Console for beautiful printting
 
     db: SQLiteConnection
         Connection with the dabatase

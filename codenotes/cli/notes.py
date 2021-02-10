@@ -170,7 +170,7 @@ class SearchNote:
     Attributes
     ----------
     console: Console
-        (Rich) Console for beatiful printting
+        (Rich) Console for beautiful printting
 
     db: SQLiteConnection
         Connection with the dabatase

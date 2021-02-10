@@ -1,13 +1,38 @@
 import sys
 import argparse
+from typing import Final
 
+from codenotes.cli import PrintFormatted
 from codenotes.cli.tasks import AddTask, SearchTask
 from codenotes.cli.notes import AddNote, SearchNote
 
-__version__ = '0.0.1'
+
+__version__ = '1.0'
 
 
-def parse_args(args):
+USAGE_TEXT: Final[str] = "Write any thought you have without quitting from the command line\n\n" \
+"[header]USAGE[/header]\ncodenotes <command> <subcommand>\n\n[header]CORE COMMANDS[/header]\n" \
+"add\tCreate new note or task with the content typed\n" \
+"search\tSearch for notes or tasks with the parameters specified\n\n[header]FLAGS[/header]\n" \
+"--version, -v\tShow codenotes version\n\n[header]EXAMPLES[/header]\n" \
+"$ codenotes add task Finish coding the tests --new-categoery Reminders\n" \
+"$ codenotes add task Create documentation for the codenotes proyect; Release the proyect -p\n" \
+"$ codenotes search note --today\n\n[header]FEEDBACK[/header]\nOpen an issue in [u]github.com/EGAMAGZ/codenotes[/u]"
+
+
+def parse_args(sys_args: list) -> argparse.Namespace:
+    """ Function incharge to declare the Argumen Parser and add arguments to it
+
+    Parameters
+    ----------
+    sys_args: list
+        String list of arguments capture by sys.argv
+
+    Returns
+    -------
+    args: Namespace
+        All the arguments that are in ArgumenParser
+    """
 
     parser = argparse.ArgumentParser(prog='codenotes')
     parser.add_argument('--version', '-v', action='version', version=__version__)
@@ -43,25 +68,41 @@ def parse_args(args):
     tui = subparsers.add_parser('tui')
     tui.add_argument('type', choices=['note', 'task'])
 
-    return parser.parse_args(args)
+    parser.error = print_usage
+
+    return parser.parse_args(sys_args)
+
+
+def print_usage(error_message: str = None) -> None:
+    """ Print usage text with rich console, and print error message passed when this function is called by argparse
+
+    Parameters
+    ----------
+    error_message: str
+        Error message through
+    """
+    if error_message is not None:
+        PrintFormatted.custom_print(f'[red]{error_message}[/red]')
+    
+    PrintFormatted.print_help(USAGE_TEXT)
 
 
 def main():
-    # TODO: IMprove the management of arguments
+    """ Main function """
     args = parse_args(sys.argv[1:])
-    print(args)
     if len(sys.argv) > 1:
+        #* ADD <type>
         if args.subargs == 'add':
             if args.type == 'task':
                 AddTask.set_args(args)
 
             elif args.type == 'note':
                 AddNote.set_args(args)
-
+        #*  SEARCH <type>
         elif args.subargs == 'search':
             if args.type == 'task':
                 SearchTask.set_args(args)
             elif args.type == 'note':
                 SearchNote.set_args(args)
     else:
-        pass
+        print_usage()
