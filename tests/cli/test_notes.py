@@ -15,7 +15,7 @@ class TestAddNote(unittest.TestCase):
         args = parse_args([
             'add', 'note', 'Lorem', 'ipsum', 'dolor', 'sit', 'amet,', 'consectetur', 'adipiscing',
             'elit,', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore',
-            'magna', 'aliqua.', '--title', 'Lorem', 'ipsum', 'Note', '--new-category', 'CLI', 'Category'
+            'magna', 'aliqua.', '--title', 'Lorem', 'ipsum', 'Note', '--category', 'CLI', 'Category'
         ])
         add_note = AddNote(args)
 
@@ -23,6 +23,16 @@ class TestAddNote(unittest.TestCase):
         self.assertEqual(add_note.category_name, 'CLI Category')
         self.assertEqual(add_note.note_text, self.expected_note_text)
         self.assertEqual(add_note.note_title, 'Lorem ipsum Note')
+
+        args = parse_args([
+            'add', 'note', 'New', 'Note', 'in', 'the', 'same', 'category', '--category', 'CLI', 'Category'
+        ])
+        add_note = AddNote(args)
+
+        self.assertEqual(add_note.category_id, 2)
+        self.assertEqual(add_note.category_name, 'CLI Category')
+        self.assertEqual(add_note.note_text, 'New Note in the same category')
+        self.assertEqual(add_note.note_title, 'New Note in the same category')
     
     def test_add_note(self):
         args = parse_args([
@@ -61,7 +71,8 @@ class TestSearchNote(unittest.TestCase):
         expected_notes = [
             (self.default_note_title, self.default_note_text, 'CLI Category', 0, self.date),
             ('Lorem ipsum dolor sit amet, co', self.default_note_text, self.default_category, 0, self.date),
-            ('Empty Note', None, self.default_category, 0, self.date)
+            ('Empty Note', None, self.default_category, 0, self.date),
+            ('New Note in the same category', 'New Note in the same category','CLI Category', 0, self.date)
         ]
 
         args = parse_args(['search', 'note', '--month'])
@@ -96,7 +107,8 @@ class TestSearchNote(unittest.TestCase):
         expected_notes = [
             (self.default_note_title, self.default_note_text, 'CLI Category', 0, self.date),
             ('Lorem ipsum dolor sit amet, co', self.default_note_text, self.default_category, 0, self.date),
-            ('Empty Note', None, self.default_category, 0, self.date)
+            ('Empty Note', None, self.default_category, 0, self.date),
+            ('New Note in the same category', 'New Note in the same category','CLI Category', 0, self.date)
         ]
 
         args = parse_args(['search', 'note', '--today'])

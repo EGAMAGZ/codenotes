@@ -88,6 +88,7 @@ class AddTask:
         When the task(s) is going to be saved and is created a new category,
         it will set the id of this new one and store the task(s) in this created category
         """
+        # TODO: CREATE CATEGORY IF NOT EXISTS, IF SO, SAVE THE CATEGORY IN IT
         if len(self.category_name) <= 30:
             sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
             cursor = self.db.exec_sql(sql, (self.category_name,))

@@ -2,7 +2,6 @@ from typing import final
 
 from rich.theme import Theme
 from rich.console import Console
-from rich.text import Text
 
 
 @final
@@ -127,7 +126,8 @@ class PrintFormatted:
         custom_text = help_txt
 
         custom_theme = Theme({
-            'header': 'white bold'
+            'header': 'white bold',
+            'quote': 'purple'
         })
         
         print_formatted = cls(custom_theme)

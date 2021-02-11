@@ -90,7 +90,7 @@ def add_note_args_empty(args: Namespace) -> bool:
     """
     args_needed = [
         args.title,
-        args.new_category,
+        args.category,
         args.text
     ]
 

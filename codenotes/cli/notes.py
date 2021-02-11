@@ -1,6 +1,7 @@
 from argparse import Namespace
 from datetime import datetime, date
-from typing import final, Union, Any
+from typing import Final, final, Union, Any, Text
+from rich.theme import Theme
 
 from rich.tree import Tree
 from rich.panel import Panel
@@ -13,6 +14,20 @@ from codenotes.cli import PrintFormatted
 from codenotes.db.connection import SQLiteConnection
 from codenotes.util.sql import add_conditions_sql
 from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text, add_note_args_empty
+
+
+USAGE_TEXT: Final[Text] = """[quote]Write any thought you have without quitting from the command line[/quote]
+    [header]USAGE[/header]
+    codenotes add <ANNOTATION> <TEXT> <flags>
+    [header]TYPES OF ANNOTATION[header]
+    note Create a new note
+    [header]FLAGS[/header]
+    --title,-t <title> Sets a title to the note with a limit of 30 characters. When a title is not specified, it takes
+    the first 30 characters from the note
+    --category,-c <category> Create a new category if it not exist and will store the note in it
+    --preview, -p Shows a preview of the note that will be save
+    [header]USAGE[/header]
+    $ codenotes add note I got an idea for UI --title UI Idea --category Codenotes"""
 
 
 def sorter(query: tuple)-> Any:
@@ -54,8 +69,8 @@ class AddNote:
 
         if not add_note_args_empty(args):
             try:
-                if args.new_category:
-                    self.category_name = format_argument_text(args.new_category)
+                if args.category:
+                    self.category_name = format_argument_text(args.category)
                     self.save_category()
 
                 if args.text or args.title:
@@ -68,6 +83,8 @@ class AddNote:
                         self.save_note()
             except KeyboardInterrupt:
                 self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
+        else:
+            PrintFormatted.print_help(USAGE_TEXT)
 
 
     @classmethod
@@ -81,16 +98,35 @@ class AddNote:
         """
         cls(args)
 
+    def category_exists(self):
+        sql = f"SELECT {categories.COLUMN_CATEGORY_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_CATEGORY_NAME} = '{self.category_name}'"
+        query = self.db.exec_sql(sql)
+        categories_list: list[tuple] = query.fetchall()
+
+        if categories_list: # categories_list == []
+            self.category_id = categories_list[0][0]
+            return True
+        return False
+
     def save_category(self) -> None:
         """ Creates and saves a new category"""
         if len(self.category_name) <= 30: # Category name can't be longer than 30 characters
-            sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
-            cursor = self.db.exec_sql(sql, (self.category_name,))
 
-            self.category_id = cursor.lastrowid
+            if not self.category_exists():
+                sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
+                cursor = self.db.exec_sql(sql, (self.category_name,))
 
-            self.db.commit()
-            PrintFormatted.print_category_creation(self.category_name)
+                self.category_id = cursor.lastrowid
+
+                self.db.commit()
+                PrintFormatted.print_category_creation(self.category_name)
+            else:
+                custom_theme = Theme({
+                    'msg': '#31f55f bold',
+                    'name': '#616161 italic'
+                })
+                PrintFormatted.custom_print(f'[msg]Category selected:[/msg][name]{self.category_name}[/name]',
+                                            custom_theme)
         else:
             self._ask_category()
 
@@ -270,10 +306,7 @@ class SearchNote:
                 else:  # actual_note[3] == 1
                     markdown = Markdown( actual_note[1] if actual_note[1] else '# Note Empty')
                     child_node.add(
-                            Panel(
-                                markdown,
-                                title=f'{actual_note[0]} {actual_note[4]}'
-                                )
+                            Panel(markdown, title=f'{actual_note[0]} {actual_note[4]}')
                         )
             
         else:

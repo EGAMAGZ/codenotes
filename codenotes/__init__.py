@@ -1,6 +1,6 @@
 import sys
 import argparse
-from typing import Final
+from typing import Final, Text
 
 from codenotes.cli import PrintFormatted
 from codenotes.cli.tasks import AddTask, SearchTask
@@ -10,10 +10,11 @@ from codenotes.cli.notes import AddNote, SearchNote
 __version__ = '1.0'
 
 
-USAGE_TEXT: Final[str] = "Write any thought you have without quitting from the command line\n\n" \
+USAGE_TEXT: Final[Text] = "[quote]Write any thought you have without quitting from the command line[/quote]\n\n" \
 "[header]USAGE[/header]\ncodenotes <command> <subcommand>\n\n[header]CORE COMMANDS[/header]\n" \
 "add\tCreate new note or task with the content typed\n" \
-"search\tSearch for notes or tasks with the parameters specified\n\n[header]FLAGS[/header]\n" \
+"search\tSearch for notes or tasks with the parameters specified\n[header]SUBCOMMANDS[/header]\n" \
+"note/task\tType of annotations\n\n[header]FLAGS[/header]\n" \
 "--version, -v\tShow codenotes version\n\n[header]EXAMPLES[/header]\n" \
 "$ codenotes add task Finish coding the tests --new-categoery Reminders\n" \
 "$ codenotes add task Create documentation for the codenotes proyect; Release the proyect -p\n" \
@@ -50,7 +51,7 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     note = add_type_file.add_parser('note')  # TODO: ADD ARGUMENT TO ADD FROM CLIPBOARD
     note.add_argument('text', type=str, nargs='*', action='store')
     note.add_argument('--title', '-t', type=str, nargs='*', action='store')
-    note.add_argument('--new-category', type=str, nargs='*', action='store')
+    note.add_argument('--category', '-c', type=str, nargs='*', action='store') #TODO: CHANGE TO CTAGEORY to CREATE IT IF NOT EXISTS
     note.add_argument('--preview', '-p', action='store_true')
 
     search = subparsers.add_parser('search')
