@@ -4,13 +4,13 @@ from typing import Text, Final
 CLI_USAGE_TEXT: Final[Text] = """[quote]Write any thought you have without quitting from the command line[/quote]
 
 [header]USAGE[/header]
-codenotes <command> <subcommand> <text> <flags>
+codenotes <command> <annotation> <text> <flags>
 
 [header]CORE COMMANDS[/header]
 add     Create new note or task with the content typed
 search  Search for notes or tasks with the parameters specified
 
-[header]SUBCOMMANDS[/header]
+[header]ANNOTATION[/header]
 note/task       Type of annotations
 
 [header]FLAGS[/header]
@@ -51,6 +51,27 @@ codenotes add task <text> <flags>
 
 [header]TEXT[/header]
 To save two or more task, use the symbol ; to indicate the ending of a task.
+
 [header]USAGE[/header]
 $ codenotes add task Finish coding the tests --new-categoery Reminders
 $ codenotes add task Create documentation for the codenotes proyect; Release the proyect -p"""
+
+SEARCH_USAGE_TEXT: Final[Text] = """[quote]Write any thought you have without quitting from the command line[/quote]
+
+[header]USAGE[/header]
+codenotes search <annotation> <text> <flags>
+
+[header]ANNOTATION[/header]
+note/task       Type of annotations
+
+[header]TEXT[/header]
+
+[header]FLAGS[/header]
+--today, -t Search annotations created today
+--yesterday, -y Search annotations created yesterday
+--week, -w Search annotations created in the week
+--month, -m Search annotations created in the month
+
+[header]USAGE[/header]
+$ codenotes search note --today
+$ codenotes search task Finish my project --month"""

@@ -8,27 +8,13 @@ from rich.panel import Panel
 from rich.markdown import Markdown
 from rich.console import Console
 
+import codenotes.util.help as help_text
 import codenotes.db.utilities.notes as notes
 import codenotes.db.utilities.notes_categories as categories
 from codenotes.cli import PrintFormatted
 from codenotes.db.connection import SQLiteConnection
 from codenotes.util.sql import add_conditions_sql
 from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text, add_note_args_empty
-
-
-ADD_USAGE_TEXT: Final[Text] = """[quote]Write any thought you have without quitting from the command line[/quote]
-
-[header]USAGE[/header]
-codenotes add note <text> <flags>
-
-[header]FLAGS[/header]
---title,-t <title> Sets a title to the note with a limit of 30 characters. When a title is not specified, it takes
-\t\tthe first 30 characters from the note
---category,-c <category> Create a new category if it not exist and will store the note in it
---preview, -p Shows a preview of the note that will be save
-
-[header]USAGE[/header]
-$ codenotes add note I got an idea for UI --title UI Idea --category Codenotes"""
 
 
 def sorter(query: tuple) -> Any:
@@ -112,7 +98,7 @@ class AddNote:
                 self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
         
         else:
-            PrintFormatted.print_help(ADD_USAGE_TEXT)
+            PrintFormatted.print_help(help_text.ADD_NOTE_USAGE_TEXT)
 
 
     @classmethod
@@ -281,7 +267,8 @@ class SearchNote:
 
         if not date_args_empty(args):
             self.search_note()
-            #TODO: ADD USAGE_TEXT
+        else:
+            PrintFormatted.print_help(help_text.SEARCH_USAGE_TEXT)
 
     @classmethod
     def set_args(cls, args: Namespace) -> None:

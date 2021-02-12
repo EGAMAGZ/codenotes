@@ -2,36 +2,13 @@ import sys
 import argparse
 from typing import Final, Text
 
+import codenotes.util.help as help_text
 from codenotes.cli import PrintFormatted
 from codenotes.cli.tasks import AddTask, SearchTask
 from codenotes.cli.notes import AddNote, SearchNote
 
 
 __version__ = '1.0'
-
-
-USAGE_TEXT: Final[Text] = """[quote]Write any thought you have without quitting from the command line[/quote]
-
-[header]USAGE[/header]
-codenotes <command> <subcommand> <text> <flags>
-
-[header]CORE COMMANDS[/header]
-add     Create new note or task with the content typed
-search  Search for notes or tasks with the parameters specified
-
-[header]SUBCOMMANDS[/header]
-note/task       Type of annotations
-
-[header]FLAGS[/header]
---version, -v   Show codenotes version
-
-[header]EXAMPLES[/header]
-$ codenotes add task Finish coding the tests --new-categoery Reminders
-$ codenotes add task Create documentation for the codenotes proyect; Release the proyect -p
-$ codenotes search note --today
-
-[header]FEEDBACK[/header]
-Open an issue in [u]github.com/EGAMAGZ/codenotes[/u]"""
 
 
 def parse_args(sys_args: list) -> argparse.Namespace:
@@ -98,7 +75,7 @@ def print_usage(error_message: str = None) -> None:
     if error_message is not None:
         PrintFormatted.custom_print(f'[red]{error_message}[/red]')
     
-    PrintFormatted.print_help(USAGE_TEXT)
+    PrintFormatted.print_help(help_text.CLI_USAGE_TEXT)
 
 
 def main():
