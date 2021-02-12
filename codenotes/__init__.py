@@ -51,7 +51,7 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     note = add_type_file.add_parser('note')  # TODO: ADD ARGUMENT TO ADD FROM CLIPBOARD
     note.add_argument('text', type=str, nargs='*', action='store')
     note.add_argument('--title', '-t', type=str, nargs='*', action='store')
-    note.add_argument('--category', '-c', type=str, nargs='*', action='store') #TODO: CHANGE TO CTAGEORY to CREATE IT IF NOT EXISTS
+    note.add_argument('--category', '-c', type=str, nargs='*', action='store')
     note.add_argument('--preview', '-p', action='store_true')
 
     search = subparsers.add_parser('search')

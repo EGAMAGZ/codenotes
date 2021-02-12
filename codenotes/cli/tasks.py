@@ -35,6 +35,28 @@ def sorter(query: tuple) -> Any:
 
 @final
 class AddTask:
+    """ Class to create new tasks and categories in the database
+
+    This class only has the purpose to create and display the preview of tasks, also create new categories and save 
+    tasks in it. The arguments that will be used to create it are the task content and optionally a category
+
+    Attributes
+    ----------
+    category_id: int
+        Category Id where the note will be stored (Default 1)
+
+    category_name: str
+        Category name where the note will be stored (Default 'TODO Task')
+
+    creation_date: date
+        Date of the creation of the note (Today date)
+
+    task: Union[list[str], str]
+        Task or list of task that will be store in database
+
+    console: Console
+        (Rich) Console for beatiful printting
+    """
 
     category_id: int = 1
     category_name: str = 'TODO Task'
@@ -83,7 +105,14 @@ class AddTask:
         """
         cls(args)
 
-    def category_exists(self):
+    def category_exists(self) -> bool:
+        """ Checks if the typed category exists
+
+        Returns
+        -------
+        exists: bool
+            Boolean value flag if the category already exists
+        """
         sql = f"SELECT {categories.COLUMN_CATEGORY_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_CATEGORY_NAME} = '{self.category_name}'"
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
@@ -94,12 +123,11 @@ class AddTask:
         return False
 
     def save_category(self) -> None:
-        """ Creates and saves a new category
+        """ Creates and saves a new category if not exists
 
-        When the task(s) is going to be saved and is created a new category,
-        it will set the id of this new one and store the task(s) in this created category
+        When the task(s) is going to be saved and is created a new category, it will set the id of this new one and 
+        store the task(s) in this created category
         """
-        # TODO: CREATE CATEGORY IF NOT EXISTS, IF SO, SAVE THE CATEGORY IN IT
         if len(self.category_name) <= 30:
             if not self.category_exists():
                 sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
