@@ -45,7 +45,7 @@ def parse_args(sys_args: list) -> argparse.Namespace:
 
     task = add_type_file.add_parser('task')
     task.add_argument('text', type=str, nargs='*', action='store')
-    task.add_argument('--new-category', type=str, nargs='*', action='store')
+    task.add_argument('--category', '-c', type=str, nargs='*', action='store')
     task.add_argument('--preview', '-p', action='store_true')
 
     note = add_type_file.add_parser('note')  # TODO: ADD ARGUMENT TO ADD FROM CLIPBOARD

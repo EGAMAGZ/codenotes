@@ -114,7 +114,7 @@ def add_task_args_empty(args: Namespace) -> bool:
     """
     args_needed = [
         args.text,
-        args.new_category
+        args.category
     ]
 
     if any(args_needed):

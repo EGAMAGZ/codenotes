@@ -3,6 +3,7 @@ from typing import Any, Union, final
 from datetime import datetime, date
 
 from rich import box
+from rich.theme import Theme
 from rich.tree import Tree
 from rich.table import Table
 from rich.console import Console
@@ -55,9 +56,9 @@ class AddTask:
 
         if not add_task_args_empty(args):
             try:
-                if args.new_category:
-                    # Will create a new category
-                    self.category_name = format_argument_text(args.new_category)
+                if args.category:
+                    # Will create a new category if not exists
+                    self.category_name = format_argument_text(args.category)
                     self.save_category()
 
                 if args.text:
@@ -77,10 +78,20 @@ class AddTask:
         
         Parameters
         ----------
-        args : NameSpace
+        args: NameSpace
             Arguments of argparse
         """
         cls(args)
+
+    def category_exists(self):
+        sql = f"SELECT {categories.COLUMN_CATEGORY_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_CATEGORY_NAME} = '{self.category_name}'"
+        query = self.db.exec_sql(sql)
+        categories_list: list[tuple] = query.fetchall()
+
+        if categories_list: # categories_list == []
+            self.category_id = categories_list[0][0]
+            return True
+        return False
 
     def save_category(self) -> None:
         """ Creates and saves a new category
@@ -90,13 +101,21 @@ class AddTask:
         """
         # TODO: CREATE CATEGORY IF NOT EXISTS, IF SO, SAVE THE CATEGORY IN IT
         if len(self.category_name) <= 30:
-            sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
-            cursor = self.db.exec_sql(sql, (self.category_name,))
+            if not self.category_exists():
+                sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
+                cursor = self.db.exec_sql(sql, (self.category_name,))
 
-            self.category_id = cursor.lastrowid
+                self.category_id = cursor.lastrowid
 
-            self.db.commit()
-            PrintFormatted.print_category_creation(self.category_name)
+                self.db.commit()
+                PrintFormatted.print_category_creation(self.category_name)
+            else:
+                custom_theme = Theme({
+                    'msg': '#31f55f bold',
+                    'name': '#616161 italic'
+                })
+                PrintFormatted.custom_print(f'[msg]Category selected:[/msg][name]{self.category_name}[/name]',
+                                            custom_theme)
         else:
             self._ask_category()
 

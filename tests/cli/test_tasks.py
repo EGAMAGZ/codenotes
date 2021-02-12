@@ -16,12 +16,21 @@ class TestAddTask(unittest.TestCase):
         self.assertListEqual(add_task.task, [])
 
     def test_add_task_and_category(self):
-        args = parse_args(['add', 'task', 'CLI', 'task', '--new-category','CLI', 'Category'])
+        args = parse_args(['add', 'task', 'CLI', 'task', '--category','CLI', 'Category'])
         add_task = AddTask(args)
 
         self.assertEqual(add_task.category_id, 2)
         self.assertEqual(add_task.category_name, 'CLI Category')
         self.assertEqual(add_task.task, 'CLI task')
+        
+        args = parse_args([
+            'add', 'task', 'Task', 'in','same', 'category', '--category','CLI', 'Category'
+            ])
+        add_task = AddTask(args)
+
+        self.assertEqual(add_task.category_id, 2)
+        self.assertEqual(add_task.category_name, 'CLI Category')
+        self.assertEqual(add_task.task, 'Task in same category')
 
     def test_add_many_tasks(self):
         """ Test the storage of two tasks """
@@ -56,7 +65,8 @@ class TestSearchTask(unittest.TestCase):
             ('New task #2', 0, self.date, self.default_category_name),
             ('New task #3', 0, self.date, self.default_category_name),
             ('Different task', 0, self.date, self.default_category_name),
-            ('CLI task', 0, self.date, 'CLI Category')
+            ('CLI task', 0, self.date, 'CLI Category'),
+            ('Task in same category', 0, self.date, 'CLI Category')
         ]
 
         args = parse_args(['search', 'task', '--month'])
@@ -94,7 +104,8 @@ class TestSearchTask(unittest.TestCase):
             ('New task #2', 0, self.date, self.default_category_name),
             ('New task #3', 0, self.date, self.default_category_name),
             ('Different task', 0, self.date, self.default_category_name),
-            ('CLI task', 0, self.date, 'CLI Category')
+            ('CLI task', 0, self.date, 'CLI Category'),
+            ('Task in same category', 0, self.date, 'CLI Category')
         ]
 
         args = parse_args(['search', 'task', '--today'])
