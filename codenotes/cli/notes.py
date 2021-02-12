@@ -134,7 +134,7 @@ class AddNote:
         exists: bool
             Boolean value flag if the category already exists
         """
-        sql = f"SELECT {categories.COLUMN_CATEGORY_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_CATEGORY_NAME} = '{self.category_name}'"
+        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.category_name}'"
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
 
@@ -152,7 +152,7 @@ class AddNote:
         if len(self.category_name) <= 30: # Category name can't be longer than 30 characters
 
             if not self.category_exists():
-                sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
+                sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_NAME}) VALUES (?)'
                 cursor = self.db.exec_sql(sql, (self.category_name,))
 
                 self.category_id = cursor.lastrowid
@@ -171,8 +171,8 @@ class AddNote:
 
     def save_note(self) -> None:
         """ Saves the note created in the database and setting category to store """
-        sql = f'INSERT INTO {notes.TABLE_NAME} ({notes.COLUMN_NOTE_TITLE}, {notes.COLUMN_NOTE_CONTENT}, ' \
-              f'{notes.COLUMN_NOTE_CATEGORY}, {notes.COLUMN_NOTE_CREATION}) VALUES (?,?,?,?);'
+        sql = f'INSERT INTO {notes.TABLE_NAME} ({notes.COLUMN_TITLE}, {notes.COLUMN_CONTENT}, ' \
+              f'{notes.COLUMN_CATEGORY}, {notes.COLUMN_CREATION}) VALUES (?,?,?,?);'
 
         with self.console.status('[bold yellow]Saving Note') as status:
             values = (self.note_title, self.note_text, self.category_id, self.creation_date)
@@ -302,22 +302,22 @@ class SearchNote:
         query: list[tuple]
             Query done to the database
         """
-        sql = f"SELECT {notes.TABLE_NAME}.{notes.COLUMN_NOTE_TITLE}, {notes.TABLE_NAME}.{notes.COLUMN_NOTE_CONTENT}, " \
-            f"{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_NAME}, " \
-            f"{notes.TABLE_NAME}.{notes.COLUMN_NOTE_README}, {notes.TABLE_NAME}.{notes.COLUMN_NOTE_CREATION} FROM " \
+        sql = f"SELECT {notes.TABLE_NAME}.{notes.COLUMN_TITLE}, {notes.TABLE_NAME}.{notes.COLUMN_CONTENT}, " \
+            f"{categories.TABLE_NAME}.{categories.COLUMN_NAME}, " \
+            f"{notes.TABLE_NAME}.{notes.COLUMN_README}, {notes.TABLE_NAME}.{notes.COLUMN_CREATION} FROM " \
             f"{notes.TABLE_NAME} INNER JOIN {categories.TABLE_NAME} ON " \
-            f"{notes.TABLE_NAME}.{notes.COLUMN_NOTE_CATEGORY} = {categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_ID}"
+            f"{notes.TABLE_NAME}.{notes.COLUMN_CATEGORY} = {categories.TABLE_NAME}.{categories.COLUMN_ID}"
 
         if self.search_date:
             if isinstance(self.search_date, date):
-                sql = add_conditions_sql(sql, f'{notes.COLUMN_NOTE_CREATION} LIKE date("{self.search_date}")')
+                sql = add_conditions_sql(sql, f'{notes.COLUMN_CREATION} LIKE date("{self.search_date}")')
 
             elif isinstance(self.search_date, list):
                 first_day, last_day = self.search_date
-                sql = add_conditions_sql(sql, f'{notes.COLUMN_NOTE_CREATION} BETWEEN date("{first_day}") '
+                sql = add_conditions_sql(sql, f'{notes.COLUMN_CREATION} BETWEEN date("{first_day}") '
                                               f'AND date("{last_day}")')
         if self.search_text:
-            sql = add_conditions_sql(sql, f'{notes.COLUMN_NOTE_TITLE} LIKE "%{self.search_text}%"', 'AND')
+            sql = add_conditions_sql(sql, f'{notes.COLUMN_TITLE} LIKE "%{self.search_text}%"', 'AND')
 
         query = self.db.exec_sql(sql)
 

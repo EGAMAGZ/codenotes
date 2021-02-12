@@ -132,7 +132,7 @@ class AddTask:
         exists: bool
             Boolean value flag if the category already exists
         """
-        sql = f"SELECT {categories.COLUMN_CATEGORY_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_CATEGORY_NAME} = '{self.category_name}'"
+        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.category_name}'"
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
 
@@ -149,7 +149,7 @@ class AddTask:
         """
         if len(self.category_name) <= 30:
             if not self.category_exists():
-                sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_CATEGORY_NAME}) VALUES (?)'
+                sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_NAME}) VALUES (?)'
                 cursor = self.db.exec_sql(sql, (self.category_name,))
 
                 self.category_id = cursor.lastrowid
@@ -169,8 +169,8 @@ class AddTask:
     def save_task(self) -> None:
         """ Function in charge to store the tasks in the database"""
 
-        sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_TASK_CONTENT},{tasks.COLUMN_TASK_CREATION}, '\
-              f'{tasks.COLUMN_TASK_CATEGORY}) VALUES (?,?,?);'
+        sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_CONTENT},{tasks.COLUMN_CREATION}, '\
+              f'{tasks.COLUMN_CATEGORY}) VALUES (?,?,?);'
 
         with self.console.status('[bold yellow]Saving Tasks...') as status:
             if isinstance(self.task, list):
@@ -296,22 +296,22 @@ class SearchTask:
         query: list[tuple]
             Query done to the database
         """
-        sql = f'SELECT {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CONTENT},{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_STATUS}, ' \
-              f'{tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CREATION}, ' \
-              f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_NAME} FROM {tasks.TABLE_NAME} INNER JOIN ' \
-              f'{categories.TABLE_NAME} ON {tasks.TABLE_NAME}.{tasks.COLUMN_TASK_CATEGORY} = ' \
-              f'{categories.TABLE_NAME}.{categories.COLUMN_CATEGORY_ID}'
+        sql = f'SELECT {tasks.TABLE_NAME}.{tasks.COLUMN_CONTENT},{tasks.TABLE_NAME}.{tasks.COLUMN_STATUS}, ' \
+              f'{tasks.TABLE_NAME}.{tasks.COLUMN_CREATION}, ' \
+              f'{categories.TABLE_NAME}.{categories.COLUMN_NAME} FROM {tasks.TABLE_NAME} INNER JOIN ' \
+              f'{categories.TABLE_NAME} ON {tasks.TABLE_NAME}.{tasks.COLUMN_CATEGORY} = ' \
+              f'{categories.TABLE_NAME}.{categories.COLUMN_ID}'
 
         if self.search_date:
             if isinstance(self.search_date, date):
-                sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} LIKE date("{self.search_date}")')
+                sql = add_conditions_sql(sql, f'{tasks.COLUMN_CREATION} LIKE date("{self.search_date}")')
 
             elif isinstance(self.search_date, list):
                 first_day, last_day = self.search_date
-                sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CREATION} BETWEEN date("{first_day}") '
+                sql = add_conditions_sql(sql, f'{tasks.COLUMN_CREATION} BETWEEN date("{first_day}") '
                                               f'AND date("{last_day}")')
         if self.search_text:
-            sql = add_conditions_sql(sql, f'{tasks.COLUMN_TASK_CONTENT} LIKE "%{self.search_text}%"', 'AND')
+            sql = add_conditions_sql(sql, f'{tasks.COLUMN_CONTENT} LIKE "%{self.search_text}%"', 'AND')
 
         query = self.db.exec_sql(sql)
 

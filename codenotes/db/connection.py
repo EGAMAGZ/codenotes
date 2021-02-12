@@ -49,13 +49,13 @@ class SQLiteConnection:
         self.connection = sqlite3.connect(self.DATABASE_PATH)
         self.cursor = self.connection.cursor()
 
-        self.exec_sql(notes_categories.CREATE_NOTES_CATEGORY_TABLE)  # Notes Category Table
+        self.exec_sql(notes_categories.CREATE_TABLE)  # Notes Category Table
         self.cursor.execute(notes_categories.INSERT_DEFAULT_CATEGORY)  # Insert Default Category
-        self.exec_sql(notes.CREATE_NOTES_TABLE)  # Notes Table
+        self.exec_sql(notes.CREATE_TABLE)  # Notes Table
 
-        self.exec_sql(tasks_categories.CREATE_TASKS_CATEGORY_TABLE)  # Task Category Table
+        self.exec_sql(tasks_categories.CREATE_TABLE)  # Task Category Table
         self.cursor.execute(tasks_categories.INSERT_DEFAULT_CATEGORY)  # Insert Default Category
-        self.exec_sql(tasks.CREATE_TASKS_TABLE)  # Tasks Table
+        self.exec_sql(tasks.CREATE_TABLE)  # Tasks Table
 
         self.connection.commit()
 
