@@ -10,15 +10,28 @@ from codenotes.cli.notes import AddNote, SearchNote
 __version__ = '1.0'
 
 
-USAGE_TEXT: Final[Text] = "[quote]Write any thought you have without quitting from the command line[/quote]\n\n" \
-"[header]USAGE[/header]\ncodenotes <command> <subcommand>\n\n[header]CORE COMMANDS[/header]\n" \
-"add\tCreate new note or task with the content typed\n" \
-"search\tSearch for notes or tasks with the parameters specified\n[header]SUBCOMMANDS[/header]\n" \
-"note/task\tType of annotations\n\n[header]FLAGS[/header]\n" \
-"--version, -v\tShow codenotes version\n\n[header]EXAMPLES[/header]\n" \
-"$ codenotes add task Finish coding the tests --new-categoery Reminders\n" \
-"$ codenotes add task Create documentation for the codenotes proyect; Release the proyect -p\n" \
-"$ codenotes search note --today\n\n[header]FEEDBACK[/header]\nOpen an issue in [u]github.com/EGAMAGZ/codenotes[/u]"
+USAGE_TEXT: Final[Text] = """[quote]Write any thought you have without quitting from the command line[/quote]
+
+[header]USAGE[/header]
+codenotes <command> <subcommand> <text> <flags>
+
+[header]CORE COMMANDS[/header]
+add     Create new note or task with the content typed
+search  Search for notes or tasks with the parameters specified
+
+[header]SUBCOMMANDS[/header]
+note/task       Type of annotations
+
+[header]FLAGS[/header]
+--version, -v   Show codenotes version
+
+[header]EXAMPLES[/header]
+$ codenotes add task Finish coding the tests --new-categoery Reminders
+$ codenotes add task Create documentation for the codenotes proyect; Release the proyect -p
+$ codenotes search note --today
+
+[header]FEEDBACK[/header]
+Open an issue in [u]github.com/EGAMAGZ/codenotes[/u]"""
 
 
 def parse_args(sys_args: list) -> argparse.Namespace:
@@ -99,11 +112,17 @@ def main():
 
             elif args.type == 'note':
                 AddNote.set_args(args)
+            else:
+                print_usage()
+
         #*  SEARCH <type>
         elif args.subargs == 'search':
             if args.type == 'task':
                 SearchTask.set_args(args)
             elif args.type == 'note':
                 SearchNote.set_args(args)
+            else:
+                print_usage()
+
     else:
         print_usage()

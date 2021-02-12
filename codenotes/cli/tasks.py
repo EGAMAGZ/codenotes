@@ -1,5 +1,5 @@
 from argparse import Namespace
-from typing import Any, Union, final
+from typing import Any, Text, Union, final, Final
 from datetime import datetime, date
 
 from rich import box
@@ -15,6 +15,22 @@ from codenotes.util.sql import add_conditions_sql
 from codenotes.db.connection import SQLiteConnection
 from codenotes.util.args import format_argument_text, date_args_empty, dates_to_search, add_task_args_empty
 from codenotes.util.text import format_task_text, status_text
+
+
+ADD_USAGE_TEXT: Final[Text] = """[quote]Write any thought you have without quitting from the command line[/quote]
+
+[header]USAGE[/header]
+codenotes add task <text> <flags>
+
+[header]FLAGS[/header]
+--category,-c <category> Create a new category if it not exist and will store the note in it
+--preview, -p Shows a preview of the note that will be save
+
+[header]TEXT[/header]
+To save two or more task, use the symbol ; to indicate the ending of a task.
+[header]USAGE[/header]
+$ codenotes add task Finish coding the tests --new-categoery Reminders
+$ codenotes add task Create documentation for the codenotes proyect; Release the proyect -p"""
 
 
 def sorter(query: tuple) -> Any:
@@ -93,6 +109,9 @@ class AddTask:
 
             except KeyboardInterrupt:
                 self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
+
+        else:
+            PrintFormatted.print_help(ADD_USAGE_TEXT)
 
     @classmethod
     def set_args(cls, args: Namespace) -> None:
@@ -255,6 +274,7 @@ class SearchTask:
 
         if not date_args_empty(args):
             self.__search_task()
+            #TODO: ADD USAGE_TEXT
 
     @classmethod
     def set_args(cls, args: Namespace) -> None:
