@@ -65,6 +65,7 @@ codenotes search <annotation> <text> <flags>
 note/task       Type of annotations
 
 [header]TEXT[/header]
+Text that will be search if any annotations contains it.
 
 [header]FLAGS[/header]
 --today, -t Search annotations created today
