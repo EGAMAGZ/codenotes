@@ -8,7 +8,7 @@ from codenotes.cli.tasks import AddTask, SearchTask
 from codenotes.cli.notes import AddNote, SearchNote
 
 
-__version__ = '1.0'
+__version__ = '1.0.0'
 
 
 def parse_args(sys_args: list) -> argparse.Namespace:
