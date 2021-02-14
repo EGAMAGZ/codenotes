@@ -1,7 +1,10 @@
 # Codenotes
+*All your annotations without quitting the terminal*
+
+A simple CLI where you can save and view all your created annotations
 
 ## Installation
-To install codenotes, it is recommended to use pip:
+To install `codenotes`, it is recommended to use pip:
 ```
 pip install codenotes
 ```
@@ -12,7 +15,7 @@ cd codenotes
 pip install .
 ```
 
-If codenotes is already installed and you would like to update it, use:
+If `codenotes` is already installed and you would like to update it, use:
 ```
 pip install --upgrade codenotes
 ```
@@ -23,7 +26,24 @@ git pull
 pip install --upgrade .
 ```
 ## Usage
+Run `codenotes` to display the usage text.
 
+```
+codenotes <action> <annotation> <flags>
+```
+<img src="images/CodenotesSample.gif">
+
+**Features**
+* Creates notes and tasks, and saves them in a category optionally specified
+* Shows a preview of the annotation creation
+* Creates categories where tasks or notes will be saved
+* Searches for annotations created today, yesterday, during the week or month
+
+## Unit Tests
+`codenotes` unit tests are written for `unittest`. To run the tests:
+```
+python -m unittest
+```
 
 ## License
 MIT License

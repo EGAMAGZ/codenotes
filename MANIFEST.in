@@ -1,0 +1,5 @@
+include *.md
+include *.txt
+include AUTHORS
+include LICENSE
+recursive-include tests *.py
