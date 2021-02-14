@@ -8,15 +8,17 @@ with open('README.md', 'r') as readme_file:
 
 setup(
     name="Codenotes",
-    version="1.0.0",
+    version="0.0.1",
     author="Gamaliel Garcia",
-    description='',
+    author_email="egamagz.dev@outlook.com",
+    description='A simple CLI where you can save and view all your created annotations',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/EGAMAGZ/codenotes",
     license="MIT",
-    keywords="cli cui curses command-line note task",
+    keywords="cli cui tui curses command-line note task codenotes",
     classifiers=[
+        'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'Environment :: Console :: Curses',
         'License :: OSI Approved :: MIT License',
