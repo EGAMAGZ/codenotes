@@ -1,6 +1,11 @@
 # Codenotes
 *All your annotations without quitting the terminal*
 
+[![PyPI version](https://badge.fury.io/py/Codenotes.svg)](https://badge.fury.io/py/Codenotes)
+![PyPI - License](https://img.shields.io/pypi/l/codenotes)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/codenotes)
+![PyPI - Status](https://img.shields.io/pypi/status/codenotes)
+
 A simple CLI where you can save and view all your created annotations
 
 ## Installation
