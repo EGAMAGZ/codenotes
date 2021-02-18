@@ -1,0 +1,4 @@
+pylint==2.6.0
+tox==3.21.4
+virtualenv==20.4.2
+twine==3.3.0
