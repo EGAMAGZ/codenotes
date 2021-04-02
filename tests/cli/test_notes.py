@@ -13,7 +13,7 @@ class TestAddNote(unittest.TestCase):
 
     def test_add_category_and_complete_note(self):
         args = parse_args([
-            'add', 'note', 'Lorem', 'ipsum', 'dolor', 'sit', 'amet,', 'consectetur', 'adipiscing',
+            'note', 'create', 'Lorem', 'ipsum', 'dolor', 'sit', 'amet,', 'consectetur', 'adipiscing',
             'elit,', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore',
             'magna', 'aliqua.', '--title', 'Lorem', 'ipsum', 'Note', '--category', 'CLI', 'Category'
         ])
@@ -25,7 +25,7 @@ class TestAddNote(unittest.TestCase):
         self.assertEqual(add_note.note_title, 'Lorem ipsum Note')
 
         args = parse_args([
-            'add', 'note', 'New', 'Note', 'in', 'the', 'same', 'category', '--category', 'CLI', 'Category'
+            'note', 'create', 'New', 'Note', 'in', 'the', 'same', 'category', '--category', 'CLI', 'Category'
         ])
         add_note = AddNote(args)
 
@@ -36,7 +36,7 @@ class TestAddNote(unittest.TestCase):
     
     def test_add_note(self):
         args = parse_args([
-            'add', 'note', 'Lorem', 'ipsum', 'dolor', 'sit', 'amet,', 'consectetur', 'adipiscing',
+            'note', 'create', 'Lorem', 'ipsum', 'dolor', 'sit', 'amet,', 'consectetur', 'adipiscing',
             'elit,', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore',
             'magna', 'aliqua.'
         ])
@@ -47,7 +47,7 @@ class TestAddNote(unittest.TestCase):
 
     def test_add_title(self):
         args = parse_args([
-            'add', 'note', '--title', 'Empty', 'Note'
+            'note', 'create', '--title', 'Empty', 'Note'
         ])
         add_note = AddNote(args) 
 
@@ -75,7 +75,7 @@ class TestSearchNote(unittest.TestCase):
             ('New Note in the same category', 'New Note in the same category','CLI Category', 0, self.date)
         ]
 
-        args = parse_args(['search', 'note', '--month'])
+        args = parse_args(['note', 'search', '--month'])
         query = SearchNote(args).sql_query()
 
         self.assertCountEqual(query, expected_notes)
@@ -86,7 +86,7 @@ class TestSearchNote(unittest.TestCase):
             ('Lorem ipsum dolor sit amet, co', self.default_note_text, self.default_category, 0, self.date)
         ]
 
-        args = parse_args(['search', 'note', 'Lorem', 'ipsum', '--today'])
+        args = parse_args(['note', 'search', 'Lorem', 'ipsum', '--today'])
         query = SearchNote(args).sql_query()
 
         self.assertCountEqual(query, expected_notes)
@@ -98,7 +98,7 @@ class TestSearchNote(unittest.TestCase):
             ('Lorem ipsum dolor sit amet, co', self.default_note_text, self.default_category, 0, self.date)
         ]
 
-        args = parse_args(['search', 'note', 'Lorem', 'ipsum'])
+        args = parse_args(['note', 'search', 'Lorem', 'ipsum'])
         query = SearchNote(args).sql_query()
 
         self.assertCountEqual(query, expected_notes)
@@ -111,7 +111,7 @@ class TestSearchNote(unittest.TestCase):
             ('New Note in the same category', 'New Note in the same category','CLI Category', 0, self.date)
         ]
 
-        args = parse_args(['search', 'note', '--today'])
+        args = parse_args(['note', 'search', '--today'])
         query = SearchNote(args).sql_query()
 
         self.assertCountEqual(query, expected_notes)
@@ -119,7 +119,7 @@ class TestSearchNote(unittest.TestCase):
     def test_search_yesterday_note(self):
         expected_notes = []
 
-        args = parse_args(['search', 'note', '--yesterday'])
+        args = parse_args(['note', 'search', '--yesterday'])
         query = SearchNote(args).sql_query()
 
         self.assertCountEqual(query, expected_notes)

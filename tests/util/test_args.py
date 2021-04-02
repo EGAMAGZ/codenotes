@@ -9,22 +9,22 @@ from codenotes.util.args import date_args_empty, dates_to_search, add_note_args_
 class TestDateArgsNeededEmpty(unittest.TestCase):
 
     def test_no_args(self):
-        args = parse_args(['search', 'task'])
+        args = parse_args(['task', 'search'])
 
         self.assertTrue(date_args_empty(args))
 
     def test_only_date(self):
-        args = parse_args(['search', 'task', '--today'])
+        args = parse_args(['task', 'search', '--today'])
 
         self.assertFalse(date_args_empty(args))
 
     def test_only_text(self):
-        args = parse_args(['search', 'task', 'New', 'task', 'added'])
+        args = parse_args(['task', 'search', 'New', 'task', 'added'])
 
         self.assertFalse(date_args_empty(args))
 
     def test_text_and_date(self):
-        args = parse_args(['search', 'task', 'New', 'task', 'added', '--today'])
+        args = parse_args(['task', 'search', 'New', 'task', 'added', '--today'])
 
         self.assertFalse(date_args_empty(args))
 
@@ -32,18 +32,18 @@ class TestDateArgsNeededEmpty(unittest.TestCase):
 class TestAddTaskArgsEmpty(unittest.TestCase):
     
     def test_args_both(self):
-        args = parse_args(['add', 'task', 'New task', '--new-category', 'Sample', 'Category'])
+        args = parse_args(['task','create', 'New task', '--new-category', 'Sample', 'Category'])
         self.assertFalse(add_task_args_empty(args))
 
     def test_args_one(self):
-        args = parse_args(['add', 'task', 'New task'])
+        args = parse_args(['task','create', 'New task'])
         self.assertFalse(add_task_args_empty(args))
 
-        args = parse_args(['add', 'task', '--new-category', 'Sample', 'Category'])
+        args = parse_args(['task','create', '--new-category', 'Sample', 'Category'])
         self.assertFalse(add_task_args_empty(args))
 
     def test_args_none(self):
-        args = parse_args(['add', 'task'])
+        args = parse_args(['task','create'])
         self.assertTrue(add_task_args_empty(args))
 
 
@@ -51,13 +51,13 @@ class TestDateToSearch(unittest.TestCase):
 
     def test_today(self):
         search_date = datetime.now().date()
-        args = parse_args(['search', 'task', '--today'])
+        args = parse_args(['task', 'search', '--today'])
 
         self.assertEqual(dates_to_search(args), search_date)
 
     def test_yesterday(self):
         search_date = datetime.now().date() - timedelta(days=1)
-        args = parse_args(['search', 'task', '--yesterday'])
+        args = parse_args(['task', 'search', '--yesterday'])
 
         self.assertEqual(dates_to_search(args), search_date)
 
@@ -69,7 +69,7 @@ class TestDateToSearch(unittest.TestCase):
             date(now.year, now.month, num_days)
         ]
 
-        args = parse_args(['search', 'task', '--month'])
+        args = parse_args(['task', 'search', '--month'])
 
         self.assertListEqual(dates_to_search(args), days)
 
@@ -79,7 +79,7 @@ class TestDateToSearch(unittest.TestCase):
         last_day = first_day + timedelta(days=6)
         days = [first_day, last_day]
 
-        args = parse_args(['search', 'task', '--week'])
+        args = parse_args(['task', 'search', '--week'])
 
         self.assertListEqual(dates_to_search(args), days)
 
@@ -87,21 +87,21 @@ class TestDateToSearch(unittest.TestCase):
 class TestAddNoteArgsEmpty(unittest.TestCase):
 
     def test_args_three(self):
-        args = parse_args(['add', 'note', 'New', 'note', '-t', 'Sample', 'title', '--new-category', 'Category'])
+        args = parse_args(['note','create', 'New', 'note', '-t', 'Sample', 'title', '--new-category', 'Category'])
         self.assertFalse(add_note_args_empty(args))
 
     def test_args_one(self):
-        args = parse_args(['add', 'note', 'New', 'note'])
+        args = parse_args(['note','create', 'New', 'note'])
         self.assertFalse(add_note_args_empty(args))
 
-        args = parse_args(['add', 'note', '--new-category', 'Category'])
+        args = parse_args(['note','create', '--new-category', 'Category'])
         self.assertFalse(add_note_args_empty(args))
 
-        args = parse_args(['add', 'note', '-t', 'Title'])
+        args = parse_args(['note','create', '-t', 'Title'])
         self.assertFalse(add_note_args_empty(args))
 
     def test_args_none(self):
-        args = parse_args(['add', 'note'])
+        args = parse_args(['note','create'])
         self.assertTrue(add_note_args_empty(args))
 
 

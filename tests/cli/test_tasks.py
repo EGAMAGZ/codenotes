@@ -9,14 +9,14 @@ class TestAddTask(unittest.TestCase):
     # ! format_task_text function is indirectly tested
     def test_add_bad_input_task(self):
         """ Test bad task input, when is only typed ; """
-        args = parse_args(['add', 'task', ';'])
+        args = parse_args(['task', 'create', ';'])
         add_task = AddTask(args)
 
         self.assertTrue(isinstance(add_task.task, list))
         self.assertListEqual(add_task.task, [])
 
     def test_add_task_and_category(self):
-        args = parse_args(['add', 'task', 'CLI', 'task', '--category','CLI', 'Category'])
+        args = parse_args(['task', 'create', 'CLI', 'task', '--category','CLI', 'Category'])
         add_task = AddTask(args)
 
         self.assertEqual(add_task.category_id, 2)
@@ -24,7 +24,7 @@ class TestAddTask(unittest.TestCase):
         self.assertEqual(add_task.task, 'CLI task')
         
         args = parse_args([
-            'add', 'task', 'Task', 'in','same', 'category', '--category','CLI', 'Category'
+            'task', 'create', 'Task', 'in','same', 'category', '--category','CLI', 'Category'
             ])
         add_task = AddTask(args)
 
@@ -34,7 +34,7 @@ class TestAddTask(unittest.TestCase):
 
     def test_add_many_tasks(self):
         """ Test the storage of two tasks """
-        args = parse_args(['add', 'task', 'New task #2;New task #3'])
+        args = parse_args(['task', 'create', 'New task #2;New task #3'])
         add_task = AddTask(args)
 
         self.assertTrue(isinstance(add_task.task, list))
@@ -42,7 +42,7 @@ class TestAddTask(unittest.TestCase):
 
     def test_add_one_task(self):
         """ Test the storage of one task """
-        args = parse_args(['add', 'task', 'New task #1'])
+        args = parse_args(['task', 'create', 'New task #1'])
         add_task = AddTask(args)
 
         self.assertTrue(isinstance(add_task.task, str))
@@ -57,7 +57,7 @@ class TestSearchTask(unittest.TestCase):
 
     def test_search_month_task(self):
         # Stores a fourth task
-        args = parse_args(['add', 'task', 'Different', 'task'])
+        args = parse_args(['task', 'create', 'Different', 'task'])
         AddTask.set_args(args)
 
         expected_tasks = [
@@ -69,7 +69,7 @@ class TestSearchTask(unittest.TestCase):
             ('Task in same category', 0, self.date, 'CLI Category')
         ]
 
-        args = parse_args(['search', 'task', '--month'])
+        args = parse_args(['task', 'search', '--month'])
         query = SearchTask(args).sql_query()
 
         self.assertCountEqual(query, expected_tasks)
@@ -80,7 +80,7 @@ class TestSearchTask(unittest.TestCase):
         expected_tasks=[
             ('Different task', 0, self.date, self.default_category_name)
         ]
-        args = parse_args(['search', 'task', 'Different', '--today'])
+        args = parse_args(['task', 'search', 'Different', '--today'])
         query = SearchTask(args).sql_query()
 
         self.assertCountEqual(query, expected_tasks)
@@ -92,7 +92,7 @@ class TestSearchTask(unittest.TestCase):
             ('New task #2', 0, self.date, self.default_category_name),
             ('New task #3', 0, self.date, self.default_category_name)
         ]
-        args = parse_args(['search', 'task', 'New', 'task'])
+        args = parse_args(['task', 'search', 'New', 'task'])
         query = SearchTask(args).sql_query()
 
         self.assertCountEqual(query, expected_tasks)
@@ -108,7 +108,7 @@ class TestSearchTask(unittest.TestCase):
             ('Task in same category', 0, self.date, 'CLI Category')
         ]
 
-        args = parse_args(['search', 'task', '--today'])
+        args = parse_args(['task', 'search', '--today'])
         query = SearchTask(args).sql_query()
 
         self.assertCountEqual(query, expected_tasks)
@@ -116,7 +116,7 @@ class TestSearchTask(unittest.TestCase):
     def test_search_yesterday_task(self):
         expected_tasks = []
 
-        args = parse_args(['search', 'task', '--yesterday'])
+        args = parse_args(['task', 'search', '--yesterday'])
         query = SearchTask(args).sql_query()
 
         self.assertCountEqual(query, expected_tasks)
