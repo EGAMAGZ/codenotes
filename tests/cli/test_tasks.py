@@ -5,7 +5,7 @@ from codenotes import parse_args
 from codenotes.cli.tasks import CreateTask, SearchTask
 
 
-class TestAddTask(unittest.TestCase):
+class TestCreateTask(unittest.TestCase):
     # ! format_task_text function is indirectly tested
     def test_add_bad_input_task(self):
         """ Test bad task input, when is only typed ; """
@@ -19,7 +19,7 @@ class TestAddTask(unittest.TestCase):
         args = parse_args(['task', 'create', 'CLI', 'task', '--category','CLI', 'Category'])
         add_task = CreateTask(args)
 
-        self.assertEqual(add_task.category_id, 2)
+        self.assertEqual(add_task.category_id, 5)
         self.assertEqual(add_task.category_name, 'CLI Category')
         self.assertEqual(add_task.task, 'CLI task')
         
@@ -28,7 +28,7 @@ class TestAddTask(unittest.TestCase):
             ])
         add_task = CreateTask(args)
 
-        self.assertEqual(add_task.category_id, 2)
+        self.assertEqual(add_task.category_id, 5)
         self.assertEqual(add_task.category_name, 'CLI Category')
         self.assertEqual(add_task.task, 'Task in same category')
 

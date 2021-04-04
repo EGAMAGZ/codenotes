@@ -156,6 +156,6 @@ def create_category_args_empty(args: Namespace) -> bool:
         args.note,
         args.task
     ]
-    if any(args_needed) and not args.text:
+    if any(args_needed):
         return False
     return True

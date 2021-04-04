@@ -5,7 +5,7 @@ from codenotes import parse_args
 from codenotes.cli.notes import CreateNote, SearchNote
 
 
-class TestAddNote(unittest.TestCase):
+class TestCreateNote(unittest.TestCase):
 
     def setUp(self) -> None:
         self.expected_note_text = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor ' \
@@ -129,3 +129,7 @@ class TestSearchNote(unittest.TestCase):
         del self.default_note_text
         del self.default_note_title
         del self.default_category
+
+
+if __name__ == '__main__':
+    unittest.main()

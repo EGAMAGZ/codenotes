@@ -27,7 +27,7 @@ class CreateCategory:
         self.console = Console()
         self.db = SQLiteConnection()
 
-        if create_category_args_empty(args):
+        if not create_category_args_empty(args):
             try:
                 self.category = format_list_text(args.text)
                 self.__get_category_table(args)
@@ -65,9 +65,10 @@ class CreateCategory:
 
     def save_category(self) -> None:
         sql = f'INSERT INTO {self.category_table_name} ({self.category_name_column}) VALUES(?)'
-
+        
         with self.console.status('[bold yellow]Saving Tasks...') as status:
             if isinstance(self.category, list):
+                # TODO: Validate if len of the category is 30
                 for category in self.category:
                     if not self.category_exists(category):
                         values = (category,)
