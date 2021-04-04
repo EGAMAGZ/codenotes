@@ -26,14 +26,14 @@ def text_break(complete_text: str, max_length: int = 15) -> str:
         return complete_text
 
 @overload
-def format_task_text(text: list[str]) -> list[str]: ...
+def format_list_text(text: list[str]) -> list[str]: ...
 
 
 @overload
-def format_task_text(text: list[str]) -> str: ...
+def format_list_text(text: list[str]) -> str: ...
 
 
-def format_task_text(task_text: list[str]) -> Union[list[str], str]:
+def format_list_text(task_text: list[str]) -> Union[list[str], str]:
     """ Function that formats text passed through arguments
 
     Parameters

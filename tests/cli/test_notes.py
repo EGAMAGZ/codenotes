@@ -2,7 +2,7 @@ from datetime import datetime
 import unittest
 
 from codenotes import parse_args
-from codenotes.cli.notes import AddNote, SearchNote
+from codenotes.cli.notes import CreateNote, SearchNote
 
 
 class TestAddNote(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestAddNote(unittest.TestCase):
             'elit,', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore',
             'magna', 'aliqua.', '--title', 'Lorem', 'ipsum', 'Note', '--category', 'CLI', 'Category'
         ])
-        add_note = AddNote(args)
+        add_note = CreateNote(args)
 
         self.assertEqual(add_note.category_id, 2)
         self.assertEqual(add_note.category_name, 'CLI Category')
@@ -27,7 +27,7 @@ class TestAddNote(unittest.TestCase):
         args = parse_args([
             'note', 'create', 'New', 'Note', 'in', 'the', 'same', 'category', '--category', 'CLI', 'Category'
         ])
-        add_note = AddNote(args)
+        add_note = CreateNote(args)
 
         self.assertEqual(add_note.category_id, 2)
         self.assertEqual(add_note.category_name, 'CLI Category')
@@ -40,7 +40,7 @@ class TestAddNote(unittest.TestCase):
             'elit,', 'sed', 'do', 'eiusmod', 'tempor', 'incididunt', 'ut', 'labore', 'et', 'dolore',
             'magna', 'aliqua.'
         ])
-        add_note = AddNote(args)
+        add_note = CreateNote(args)
 
         self.assertEqual(add_note.note_text, self.expected_note_text)
         self.assertEqual(add_note.note_title, 'Lorem ipsum dolor sit amet, co')
@@ -49,7 +49,7 @@ class TestAddNote(unittest.TestCase):
         args = parse_args([
             'note', 'create', '--title', 'Empty', 'Note'
         ])
-        add_note = AddNote(args) 
+        add_note = CreateNote(args) 
 
         self.assertEqual(add_note.note_text, None)
         self.assertEqual(add_note.note_title, 'Empty Note')

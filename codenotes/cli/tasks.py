@@ -1,5 +1,5 @@
 from argparse import Namespace
-from typing import Any, Text, Union, final, Final
+from typing import Any, Union, final
 from datetime import datetime, date
 
 from rich import box
@@ -14,8 +14,8 @@ import codenotes.db.utilities.tasks_categories as categories
 from codenotes.cli import PrintFormatted
 from codenotes.util.sql import add_conditions_sql
 from codenotes.db.connection import SQLiteConnection
-from codenotes.util.args import format_argument_text, date_args_empty, dates_to_search, add_task_args_empty
-from codenotes.util.text import format_task_text, status_text
+from codenotes.util.args import format_argument_text, date_args_empty, dates_to_search, create_task_args_empty
+from codenotes.util.text import format_list_text, status_text
 
 
 def sorter(query: tuple) -> Any:
@@ -35,7 +35,7 @@ def sorter(query: tuple) -> Any:
 
 
 @final
-class AddTask:
+class CreateTask:
     """ Class to create new tasks and categories in the database
 
     This class only has the purpose to create and display the preview of tasks, also create new categories and save 
@@ -57,6 +57,9 @@ class AddTask:
 
     console: Console
         (Rich) Console for beatiful printting
+    
+    db: SQLiteConnection
+        Connection with the dabatase
     """
 
     category_id: int = 1
@@ -64,6 +67,7 @@ class AddTask:
     creation_date: date
     task: Union[list[str], str]
     console: Console
+    db: SQLiteConnection
 
     def __init__(self, args: Namespace) -> None:
         """ Constructor fro AddTask class 
@@ -77,7 +81,7 @@ class AddTask:
         self.db = SQLiteConnection()
         self.creation_date = datetime.now().date()
 
-        if not add_task_args_empty(args):
+        if not create_task_args_empty(args):
             try:
                 if args.category:
                     # Will create a new category if not exists
@@ -85,7 +89,7 @@ class AddTask:
                     self.save_category()
 
                 if args.text:
-                    self.task = format_task_text(args.text)
+                    self.task = format_list_text(args.text)
 
                     if args.preview:
                         self._show_preview()

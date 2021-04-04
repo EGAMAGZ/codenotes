@@ -2,7 +2,7 @@ import unittest
 from datetime import datetime
 
 from codenotes import parse_args
-from codenotes.cli.tasks import AddTask, SearchTask
+from codenotes.cli.tasks import CreateTask, SearchTask
 
 
 class TestAddTask(unittest.TestCase):
@@ -10,14 +10,14 @@ class TestAddTask(unittest.TestCase):
     def test_add_bad_input_task(self):
         """ Test bad task input, when is only typed ; """
         args = parse_args(['task', 'create', ';'])
-        add_task = AddTask(args)
+        add_task = CreateTask(args)
 
         self.assertTrue(isinstance(add_task.task, list))
         self.assertListEqual(add_task.task, [])
 
     def test_add_task_and_category(self):
         args = parse_args(['task', 'create', 'CLI', 'task', '--category','CLI', 'Category'])
-        add_task = AddTask(args)
+        add_task = CreateTask(args)
 
         self.assertEqual(add_task.category_id, 2)
         self.assertEqual(add_task.category_name, 'CLI Category')
@@ -26,7 +26,7 @@ class TestAddTask(unittest.TestCase):
         args = parse_args([
             'task', 'create', 'Task', 'in','same', 'category', '--category','CLI', 'Category'
             ])
-        add_task = AddTask(args)
+        add_task = CreateTask(args)
 
         self.assertEqual(add_task.category_id, 2)
         self.assertEqual(add_task.category_name, 'CLI Category')
@@ -35,7 +35,7 @@ class TestAddTask(unittest.TestCase):
     def test_add_many_tasks(self):
         """ Test the storage of two tasks """
         args = parse_args(['task', 'create', 'New task #2;New task #3'])
-        add_task = AddTask(args)
+        add_task = CreateTask(args)
 
         self.assertTrue(isinstance(add_task.task, list))
         self.assertListEqual(add_task.task, ['New task #2', 'New task #3'])
@@ -43,7 +43,7 @@ class TestAddTask(unittest.TestCase):
     def test_add_one_task(self):
         """ Test the storage of one task """
         args = parse_args(['task', 'create', 'New task #1'])
-        add_task = AddTask(args)
+        add_task = CreateTask(args)
 
         self.assertTrue(isinstance(add_task.task, str))
         self.assertEqual(add_task.task, 'New task #1')
@@ -58,7 +58,7 @@ class TestSearchTask(unittest.TestCase):
     def test_search_month_task(self):
         # Stores a fourth task
         args = parse_args(['task', 'create', 'Different', 'task'])
-        AddTask.set_args(args)
+        CreateTask.set_args(args)
 
         expected_tasks = [
             ('New task #1', 0, self.date, self.default_category_name),

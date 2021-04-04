@@ -14,7 +14,7 @@ import codenotes.db.utilities.notes_categories as categories
 from codenotes.cli import PrintFormatted
 from codenotes.db.connection import SQLiteConnection
 from codenotes.util.sql import add_conditions_sql
-from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text, add_note_args_empty
+from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text, create_note_args_empty
 
 
 def sorter(query: tuple) -> Any:
@@ -34,7 +34,7 @@ def sorter(query: tuple) -> Any:
 
 
 @final
-class AddNote:
+class CreateNote:
     """ Class to create new notes and categories in the database
 
     This class only has the purpose to create and display the preview of notes, also create new categories and save 
@@ -80,7 +80,7 @@ class AddNote:
         self.db = SQLiteConnection()
         self.creation_date = datetime.now().date()
 
-        if not add_note_args_empty(args):
+        if not create_note_args_empty(args):
             try:
                 if args.category:
                     self.category_name = format_argument_text(args.category)

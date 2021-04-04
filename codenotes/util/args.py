@@ -75,7 +75,7 @@ def dates_to_search(args: Namespace) -> Union[list[date], date]:
         return days
 
 
-def add_note_args_empty(args: Namespace) -> bool:
+def create_note_args_empty(args: Namespace) -> bool:
     """ Functions that checks if the arguments required to create a new note are empty
 
     Parameters
@@ -99,7 +99,7 @@ def add_note_args_empty(args: Namespace) -> bool:
     return True
 
 
-def add_task_args_empty(args: Namespace) -> bool:
+def create_task_args_empty(args: Namespace) -> bool:
     """ Functions that checks if the arguments required to create a new task are empty
 
     Parameters
@@ -138,3 +138,24 @@ def format_argument_text(arg_text: list[str]) -> str:
     text = ' '.join(arg_text)
 
     return text.strip()
+
+def create_category_args_empty(args: Namespace) -> bool:
+    """ Check if arguments required to select an annotation type
+
+    Parameters
+    ----------
+    args: Namespace
+        Arguments capture
+
+    Returns
+    -------
+    empty : bool
+        Return boolean value if any args are empty
+    """
+    args_needed = [
+        args.note,
+        args.task
+    ]
+    if any(args_needed) and not args.text:
+        return False
+    return True
