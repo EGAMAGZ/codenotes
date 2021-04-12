@@ -76,6 +76,14 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     category_create_annotation.add_argument('--note','-n', action='store_true')
     category_create_annotation.add_argument('--task','-t', action='store_true')
 
+    category_search = category_actions.add_parser('search')
+    category_search.add_argument('text', type=str, nargs='*', action='store')
+
+    category_search_annotation = category_search.add_mutually_exclusive_group()
+    category_search_annotation.add_argument('--note','-n', action='store_true')
+    category_search_annotation.add_argument('--task','-t', action='store_true')
+    category_search_annotation.add_argument('--all','-a', action='store_true')
+
     tui = subparsers.add_parser('tui')
     tui.add_argument('window', choices=['note', 'task'])
 

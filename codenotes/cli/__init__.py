@@ -1,4 +1,4 @@
-from typing import final
+from typing import Optional, final
 
 from rich.theme import Theme
 from rich.console import Console
@@ -19,16 +19,16 @@ class PrintFormatted:
 
     console: Console
 
-    def __init__(self, custom_theme: Theme = None):
+    def __init__(self, custom_theme: Optional[Theme] = None):
         """ PrintFormatted Constructor 
         
         Parameters
         ----------
-        custom_theme: Theme
+        custom_theme: Optional[Theme]
             Theme use for Console class
         """
-        # If a theme is passed, while pass it through Console class
-        if custom_theme:
+
+        if custom_theme is not None:
             self.console = Console(theme=custom_theme)
         else:
             self.console = Console()
@@ -131,4 +131,11 @@ class PrintFormatted:
         })
         
         print_formatted = cls(custom_theme)
+        print_formatted.console.print(custom_text)
+
+    @classmethod
+    def interruption(cls) -> None:
+        custom_text = '[bold red]Interrupted[/bold red]'
+
+        print_formatted = cls()
         print_formatted.console.print(custom_text)

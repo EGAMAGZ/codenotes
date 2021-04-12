@@ -1,3 +1,6 @@
+from re import M
+from codenotes.exceptions import MissingArgsException
+from codenotes.util.sql import add_conditions_sql
 from typing import Union, final
 from argparse import Namespace
 
@@ -10,7 +13,41 @@ import codenotes.db.utilities.notes_categories as notes_categories
 from codenotes.cli import PrintFormatted
 from codenotes.util.text import format_list_text
 from codenotes.db.connection import SQLiteConnection
-from codenotes.util.args import create_category_args_empty
+from codenotes.util.args import format_argument_text
+
+
+def create_args_empty(args: Namespace) -> bool:
+    """ Check if arguments required to select an annotation type
+
+    Parameters
+    ----------
+    args: Namespace
+        Arguments capture
+
+    Returns
+    -------
+    empty : bool
+        Return boolean value if any args are empty
+    """
+    args_needed = [
+        args.note,
+        args.task
+    ]
+    if any(args_needed):
+        return False
+    return True
+
+
+def search_args_empty(args: Namespace) -> bool:
+
+    args_needed = [
+        args.note,
+        args.task,
+        args.all    
+    ]
+    if any(args_needed):
+        return False
+    return True
 
 
 @final
@@ -27,20 +64,23 @@ class CreateCategory:
         self.console = Console()
         self.db = SQLiteConnection()
 
-        if not create_category_args_empty(args):
-            try:
-                self.category = format_list_text(args.text)
-                self.__get_category_table(args)
+        try:
+            if create_args_empty(args):
+                raise MissingArgsException
 
-                if args.preview:
-                    self._show_preview()
+            self.category = format_list_text(args.text)
+            self.__get_category_table(args)
 
-                else:
-                    self.save_category()
+            if args.preview:
+                self._show_preview()
 
-            except KeyboardInterrupt:
-                self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
-        else:
+            else:
+                self.save_category()
+
+        except KeyboardInterrupt:
+            self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
+        
+        except MissingArgsException:
             print("ERROR")
 
     @classmethod
@@ -126,3 +166,50 @@ class CreateCategory:
                 '[yellow]Do you want to save them?(y/n):[/yellow]'
             ):
             self.save_category()
+
+
+class SearchCategory:
+    
+    console: Console
+    db: SQLiteConnection
+    search_category: str
+
+    def __init__(self, args: Namespace) -> None:
+        self.console = Console()
+        self.db = SQLiteConnection()
+        self.search_category = format_argument_text(args.text)
+
+        try:
+            if search_args_empty(args):
+                raise MissingArgsException
+            
+            self.search()
+
+        except MissingArgsException:
+            pass
+
+    @classmethod
+    def set_args(cls, args: Namespace) -> None:
+        """ Class method that initializes the class and automatically will do the search
+
+        Parameters
+        ----------
+        args: Namespace
+            Arguments of argparse
+        """
+        cls(args)
+
+    def search(self) -> None:
+        pass
+
+    def sql_query(self) -> None:
+        sql = ""
+
+        if self.search_category:
+            pass
+            # sql = add_conditions_sql(sql, f'WHERE {}' = '{}', 'AND')
+
+
+
+class DeleteCategory:
+    pass

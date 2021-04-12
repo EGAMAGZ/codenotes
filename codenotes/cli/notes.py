@@ -1,4 +1,5 @@
 from argparse import Namespace
+from codenotes.exceptions import MissingArgsException
 from datetime import datetime, date
 from typing import Final, final, Union, Any, Text
 from rich.theme import Theme
@@ -14,7 +15,7 @@ import codenotes.db.utilities.notes_categories as categories
 from codenotes.cli import PrintFormatted
 from codenotes.db.connection import SQLiteConnection
 from codenotes.util.sql import add_conditions_sql
-from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text, create_note_args_empty
+from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text
 
 
 def sorter(query: tuple) -> Any:
@@ -32,6 +33,29 @@ def sorter(query: tuple) -> Any:
     """
     return query[2]
 
+
+def create_args_empty(args: Namespace) -> bool:
+    """ Functions that checks if the arguments required to create a new note are empty
+
+    Parameters
+    ----------
+    args: Namespace
+        Arguments capture with argparse
+    
+    Returns
+    -------
+    empty: bool
+        Boolean value that indicates if the arguments required for a note are empty
+    """
+    args_needed = [
+        args.title,
+        args.category,
+        args.text
+    ]
+
+    if any(args_needed):
+        return False
+    return True
 
 @final
 class CreateNote:
@@ -80,24 +104,26 @@ class CreateNote:
         self.db = SQLiteConnection()
         self.creation_date = datetime.now().date()
 
-        if not create_note_args_empty(args):
-            try:
-                if args.category:
-                    self.category_name = format_argument_text(args.category)
-                    self.save_category()
+        try:
+            if create_args_empty(args):
+                raise MissingArgsException
 
-                if args.text or args.title:
-                    self._set_note_content(args)
+            if args.category:
+                self.category_name = format_argument_text(args.category)
+                self.save_category()
 
-                    if args.preview:
-                        self._show_preview()
+            if args.text or args.title:
+                self._set_note_content(args)
 
-                    else:
-                        self.save_note()
-            except KeyboardInterrupt:
-                self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
+                if args.preview:
+                    self._show_preview()
+
+                else:
+                    self.save_note()
+        except KeyboardInterrupt:
+            self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
         
-        else:
+        except MissingArgsException:
             PrintFormatted.print_help(help_text.ADD_NOTE_USAGE_TEXT)
 
 
@@ -265,9 +291,11 @@ class SearchNote:
         self.search_date = dates_to_search(args)
         self.search_text = format_argument_text(args.text)
 
-        if not date_args_empty(args):
-            self.search_note()
-        else:
+        try:
+            if date_args_empty(args):
+                self.search()
+        
+        except MissingArgsException:
             PrintFormatted.print_help(help_text.SEARCH_USAGE_TEXT)
 
     @classmethod
@@ -310,12 +338,12 @@ class SearchNote:
 
         return query.fetchall()
 
-    def search_note(self) -> None:
+    def search(self) -> None:
         """ Function that displays a tree with Panels as child nodes with the notes searched """
         root = Tree('📒[bold #964B00] List of Notes Found')
         query = self.sql_query()
 
-        if query:
+        if query:  # query != []
             notes_sorted = sorted(query, key=sorter)
             actual_note = notes_sorted[0]
             actual_category = actual_note[2]

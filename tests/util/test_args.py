@@ -3,7 +3,7 @@ import calendar
 from datetime import datetime, timedelta, date
 
 from codenotes import parse_args
-from codenotes.util.args import date_args_empty, dates_to_search, create_note_args_empty, create_task_args_empty
+from codenotes.util.args import date_args_empty, dates_to_search
 
 
 class TestDateArgsNeededEmpty(unittest.TestCase):
@@ -27,24 +27,6 @@ class TestDateArgsNeededEmpty(unittest.TestCase):
         args = parse_args(['task', 'search', 'New', 'task', 'added', '--today'])
 
         self.assertFalse(date_args_empty(args))
-
-
-class TestAddTaskArgsEmpty(unittest.TestCase):
-    
-    def test_args_both(self):
-        args = parse_args(['task','create', 'New task', '--new-category', 'Sample', 'Category'])
-        self.assertFalse(create_task_args_empty(args))
-
-    def test_args_one(self):
-        args = parse_args(['task','create', 'New task'])
-        self.assertFalse(create_task_args_empty(args))
-
-        args = parse_args(['task','create', '--new-category', 'Sample', 'Category'])
-        self.assertFalse(create_task_args_empty(args))
-
-    def test_args_none(self):
-        args = parse_args(['task','create'])
-        self.assertTrue(create_task_args_empty(args))
 
 
 class TestDateToSearch(unittest.TestCase):
@@ -82,27 +64,6 @@ class TestDateToSearch(unittest.TestCase):
         args = parse_args(['task', 'search', '--week'])
 
         self.assertListEqual(dates_to_search(args), days)
-
-
-class TestAddNoteArgsEmpty(unittest.TestCase):
-
-    def test_args_three(self):
-        args = parse_args(['note','create', 'New', 'note', '-t', 'Sample', 'title', '--new-category', 'Category'])
-        self.assertFalse(create_note_args_empty(args))
-
-    def test_args_one(self):
-        args = parse_args(['note','create', 'New', 'note'])
-        self.assertFalse(create_note_args_empty(args))
-
-        args = parse_args(['note','create', '--new-category', 'Category'])
-        self.assertFalse(create_note_args_empty(args))
-
-        args = parse_args(['note','create', '-t', 'Title'])
-        self.assertFalse(create_note_args_empty(args))
-
-    def test_args_none(self):
-        args = parse_args(['note','create'])
-        self.assertTrue(create_note_args_empty(args))
 
 
 if __name__ == "__main__":
