@@ -78,7 +78,7 @@ class CreateCategory:
                 self.save_category()
 
         except KeyboardInterrupt:
-            self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
+            PrintFormatted.interruption()
         
         except MissingArgsException:
             print("ERROR")
@@ -184,6 +184,9 @@ class SearchCategory:
                 raise MissingArgsException
             
             self.search()
+
+        except KeyboardInterrupt:
+            PrintFormatted.interruption()
 
         except MissingArgsException:
             pass

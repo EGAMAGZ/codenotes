@@ -1,6 +1,6 @@
 import calendar
 from argparse import Namespace
-from typing import overload, Union
+from typing import Optional, overload, Union
 from datetime import datetime, date, timedelta
 
 def date_args_empty(args: Namespace) -> bool:
@@ -21,7 +21,8 @@ def date_args_empty(args: Namespace) -> bool:
         args.text,
         args.today,
         args.week,
-        args.yesterday
+        args.yesterday,
+        args.ever
     ]
 
     if any(args_needed):
@@ -30,14 +31,14 @@ def date_args_empty(args: Namespace) -> bool:
 
 
 @overload
-def dates_to_search(args: Namespace) -> list[date]: ...
+def dates_to_search(args: Namespace) -> Optional[list[date]]: ...
 
 
 @overload
-def dates_to_search(args: Namespace) -> date: ...
+def dates_to_search(args: Namespace) -> Optional[date]: ...
 
 
-def dates_to_search(args: Namespace) -> Union[list[date], date]:
+def dates_to_search(args: Namespace) -> Optional[Union[list[date], date]]:
     """ Returns date to search depending of the user selection
 
     Parameters
@@ -73,6 +74,9 @@ def dates_to_search(args: Namespace) -> Union[list[date], date]:
         ]
 
         return days
+
+    elif args.ever:
+        return None
 
 
 def format_argument_text(arg_text: list[str]) -> str:

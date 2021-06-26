@@ -1,6 +1,6 @@
 from argparse import Namespace
 from codenotes.exceptions import MissingArgsException
-from typing import Any, Union, final
+from typing import Any, Optional, Union, final
 from datetime import datetime, date
 
 from rich import box
@@ -123,7 +123,7 @@ class CreateTask:
                     self.save_task()
 
         except KeyboardInterrupt:
-            self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
+            PrintFormatted.interruption()
 
         except MissingArgsException:
             PrintFormatted.print_help(help_text.ADD_TASK_USAGE_TEXT)
@@ -272,7 +272,7 @@ class SearchTask:
 
     console: Console
     db: SQLiteConnection
-    search_date: Union[date, list[date]]
+    search_date: Optional[Union[date, list[date]]]
     search_text: str
     
     def __init__(self, args: Namespace) -> None:
@@ -293,6 +293,9 @@ class SearchTask:
                 raise MissingArgsException
 
             self.__search_task()
+
+        except KeyboardInterrupt:
+            PrintFormatted.interruption()
 
         except MissingArgsException:
             PrintFormatted.print_help(help_text.SEARCH_USAGE_TEXT)

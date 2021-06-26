@@ -1,10 +1,10 @@
-from codenotes.cli.category import CreateCategory
 import sys
 import argparse
-from typing import Final, Text
+from typing import Optional
 
 import codenotes.util.help as help_text
 from codenotes.cli import PrintFormatted
+from codenotes.cli.category import CreateCategory
 from codenotes.cli.tasks import CreateTask, SearchTask
 from codenotes.cli.notes import CreateNote, SearchNote
 
@@ -46,6 +46,7 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     task_search_group.add_argument('--yesterday', '-y', action='store_true')
     task_search_group.add_argument('--week', '-w', action='store_true')
     task_search_group.add_argument('--month', '-m', action='store_true')
+    task_search_group.add_argument('--ever', '-e', action='store_true')
 
     note = subparsers.add_parser('note')
     note_actions = note.add_subparsers(dest='action')
@@ -64,6 +65,7 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     note_search_group.add_argument('--yesterday', '-y', action='store_true')
     note_search_group.add_argument('--week', '-w', action='store_true')
     note_search_group.add_argument('--month', '-m', action='store_true')
+    note_search_group.add_argument('--ever', '-e', action='store_true')
 
     category = subparsers.add_parser('category')
     category_actions = category.add_subparsers(dest='action')
@@ -92,12 +94,12 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     return parser.parse_args(sys_args)
 
 
-def print_usage(error_message: str = None) -> None:
+def print_usage(error_message: Optional[str] = None) -> None:
     """ Print usage text with rich console, and print error message passed when this function is called by argparse
 
     Parameters
     ----------
-    error_message: str
+    error_message: Optional[str]
         Error message through
     """
     if error_message is not None:
