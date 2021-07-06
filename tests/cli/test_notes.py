@@ -67,6 +67,19 @@ class TestSearchNote(unittest.TestCase):
         self.default_note_title = 'Lorem ipsum Note'
         self.default_category = 'General'
 
+    def test_search_ever(self):
+        expected_notes = [
+            (self.default_note_title, self.default_note_text, 'CLI Category', 0, self.date),
+            ('Lorem ipsum dolor sit amet, co', self.default_note_text, self.default_category, 0, self.date),
+            ('Empty Note', None, self.default_category, 0, self.date),
+            ('New Note in the same category', 'New Note in the same category','CLI Category', 0, self.date)
+        ]
+
+        args = parse_args(['note', 'search', '--ever'])
+        query = SearchNote(args).sql_query()
+
+        self.assertCountEqual(query, expected_notes)
+
     def test_search_month_note(self):
         expected_notes = [
             (self.default_note_title, self.default_note_text, 'CLI Category', 0, self.date),

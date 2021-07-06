@@ -3,6 +3,7 @@ from argparse import Namespace
 from typing import Optional, overload, Union
 from datetime import datetime, date, timedelta
 
+
 def date_args_empty(args: Namespace) -> bool:
     """ Check if arguments required to search are empty
 

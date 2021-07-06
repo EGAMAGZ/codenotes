@@ -121,7 +121,7 @@ class CreateNote:
                 else:
                     self.save_note()
         except KeyboardInterrupt:
-            self.console.print('[bold yellow]\nCorrectly Cancelled[/bold yellow]')
+            PrintFormatted.interruption()
         
         except MissingArgsException:
             PrintFormatted.print_help(help_text.ADD_NOTE_USAGE_TEXT)
@@ -293,8 +293,13 @@ class SearchNote:
 
         try:
             if date_args_empty(args):
-                self.search()
+                raise MissingArgsException
+            
+            self.search()
         
+        except KeyboardInterrupt:
+            PrintFormatted.interruption()
+
         except MissingArgsException:
             PrintFormatted.print_help(help_text.SEARCH_USAGE_TEXT)
 

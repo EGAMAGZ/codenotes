@@ -55,6 +55,19 @@ class TestSearchTask(unittest.TestCase):
         self.date = datetime.now().date().strftime('%Y-%m-%d')
         self.default_category_name = 'TODO Tasks'
 
+    def test_search_ever(self):
+        args = parse_args(['task', 'search', '--ever'])
+        expected_tasks = [
+            ('New task #1', 0, self.date, self.default_category_name),
+            ('New task #2', 0, self.date, self.default_category_name),
+            ('New task #3', 0, self.date, self.default_category_name),
+            ('CLI task', 0, self.date, 'CLI Category'),
+            ('Task in same category', 0, self.date, 'CLI Category')
+        ]
+        query = SearchTask(args).sql_query()
+        
+        self.assertCountEqual(query, expected_tasks)
+
     def test_search_month_task(self):
         # Stores a fourth task
         args = parse_args(['task', 'create', 'Different', 'task'])
