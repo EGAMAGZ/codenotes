@@ -1,3 +1,4 @@
+from codenotes.exceptions import CategoryNotExistsError
 import unittest
 from datetime import datetime
 
@@ -54,6 +55,21 @@ class TestSearchTask(unittest.TestCase):
     def setUp(self) -> None:
         self.date = datetime.now().date().strftime('%Y-%m-%d')
         self.default_category_name = 'TODO Tasks'
+
+    def test_search_by_category(self):
+        args = parse_args(['task', 'search', '--category', 'CLI', 'Category', '--ever'])
+        expected_tasks = [
+            ('CLI task', 0, self.date, 'CLI Category'),
+            ('Task in same category', 0, self.date, 'CLI Category')
+        ]
+        query = SearchTask(args).sql_query()
+
+        self.assertCountEqual(query, expected_tasks)
+
+        args = parse_args(['task', 'search', '--category', 'CLI', 'Categor', '--ever'])
+
+        with self.assertRaises(CategoryNotExistsError):
+            SearchTask(args).sql_query()
 
     def test_search_ever(self):
         args = parse_args(['task', 'search', '--ever'])

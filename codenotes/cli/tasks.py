@@ -1,22 +1,23 @@
 from argparse import Namespace
-from codenotes.exceptions import MissingArgsException
+from datetime import date, datetime
 from typing import Any, Optional, Union, final
-from datetime import datetime, date
 
 from rich import box
+from rich.console import Console
+from rich.table import Table
 from rich.theme import Theme
 from rich.tree import Tree
-from rich.table import Table
-from rich.console import Console
 
-import codenotes.util.help as help_text
 import codenotes.db.utilities.tasks as tasks
 import codenotes.db.utilities.tasks_categories as categories
+import codenotes.util.help as help_text
 from codenotes.cli import PrintFormatted
-from codenotes.util.sql import add_conditions_sql
 from codenotes.db.connection import SQLiteConnection
+from codenotes.exceptions import CategoryNotExistsError, MissingArgsException
+from codenotes.util.args import (date_args_empty, dates_to_search,
+                                 format_argument_text)
+from codenotes.util.sql import add_conditions_sql
 from codenotes.util.text import format_list_text, status_text
-from codenotes.util.args import format_argument_text, date_args_empty, dates_to_search
 
 
 def sorter(query: tuple) -> Any:
@@ -112,7 +113,7 @@ class CreateTask:
             if args.category:
                 # Will create a new category if not exists
                 self.category_name = format_argument_text(args.category)
-                self.save_category()
+                self.__save_category()
 
             if args.text:
                 self.task = format_list_text(args.text)
@@ -120,7 +121,7 @@ class CreateTask:
                 if args.preview:
                     self._show_preview()
                 else:
-                    self.save_task()
+                    self.__save_task()
 
         except KeyboardInterrupt:
             PrintFormatted.interruption()
@@ -140,7 +141,7 @@ class CreateTask:
         """
         cls(args)
 
-    def category_exists(self) -> bool:
+    def _category_exists(self) -> bool:
         """ Checks if the typed category exists
 
         Returns
@@ -152,19 +153,28 @@ class CreateTask:
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
 
-        if categories_list: # categories_list == []
+        if categories_list: # categories_list == (id,)
             self.category_id = categories_list[0][0]
             return True
         return False
 
-    def save_category(self) -> None:
+    def __save_category(self) -> None:
         """ Creates and saves a new category if not exists
 
         When the task(s) is going to be saved and is created a new category, it will set the id of this new one and 
         store the task(s) in this created category
         """
         if len(self.category_name) <= 30:
-            if not self.category_exists():
+            if self._category_exists():
+                
+                custom_theme = Theme({
+                    'msg': '#31f55f bold',
+                    'name': '#616161 italic'
+                })
+                PrintFormatted.custom_print(f'[msg]Category selected:[/msg][name]{self.category_name}[/name]',
+                                            custom_theme)
+            else:
+
                 sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_NAME}) VALUES (?)'
                 cursor = self.db.exec_sql(sql, (self.category_name,))
 
@@ -172,17 +182,10 @@ class CreateTask:
 
                 self.db.commit()
                 PrintFormatted.print_category_creation(self.category_name)
-            else:
-                custom_theme = Theme({
-                    'msg': '#31f55f bold',
-                    'name': '#616161 italic'
-                })
-                PrintFormatted.custom_print(f'[msg]Category selected:[/msg][name]{self.category_name}[/name]',
-                                            custom_theme)
         else:
             self._ask_category()
 
-    def save_task(self) -> None:
+    def __save_task(self) -> None:
         """ Function in charge to store the tasks in the database"""
 
         sql = f'INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_CONTENT},{tasks.COLUMN_CREATION}, '\
@@ -221,7 +224,7 @@ class CreateTask:
         while len(self.category_name) == 0 or len(self.category_name) > 30:
             self.category_name = self.console.input(text).strip()
         else:
-            self.save_category()
+            self.__save_category()
 
     def _show_preview(self) -> None:
         """ Method that displays a table with the tasks written"""
@@ -244,7 +247,7 @@ class CreateTask:
         if PrintFormatted.ask_confirmation(
                 '[yellow]Do you want to save them?(y/n):[/yellow]'
             ):
-            self.save_task()
+            self.__save_task()
 
 
 @final
@@ -274,6 +277,8 @@ class SearchTask:
     db: SQLiteConnection
     search_date: Optional[Union[date, list[date]]]
     search_text: str
+    search_category: str = None
+    search_category_id: int = None
     
     def __init__(self, args: Namespace) -> None:
         """ SearchTask Constructor 
@@ -292,7 +297,13 @@ class SearchTask:
             if date_args_empty(args):
                 raise MissingArgsException
 
+            if args.category:
+                self.search_category = format_argument_text(args.category)
+
             self.__search_task()
+
+        except CategoryNotExistsError:
+            PrintFormatted.custom_print(f'[red][bold]❌"{self.search_category}"[/bold] category does not exists[/red]')
 
         except KeyboardInterrupt:
             PrintFormatted.interruption()
@@ -337,9 +348,31 @@ class SearchTask:
         if self.search_text:
             sql = add_conditions_sql(sql, f'{tasks.COLUMN_CONTENT} LIKE "%{self.search_text}%"', 'AND')
 
+        if self.search_category:
+            if not self._category_exists():
+                raise CategoryNotExistsError
+            sql = add_conditions_sql(sql, f'{tasks.COLUMN_CATEGORY} = {self.search_category_id}', 'AND')
+
         query = self.db.exec_sql(sql)
 
         return query.fetchall()
+
+    def _category_exists(self) -> bool:
+        """ Checks if the typed category exists
+
+        Returns
+        -------
+        exists: bool
+            Boolean value flag if the category already exists
+        """
+        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.search_category}'"
+        query = self.db.exec_sql(sql)
+        categories_list: list[tuple] = query.fetchall()
+
+        if categories_list: # categories_list == (id,)
+            self.search_category_id = categories_list[0][0]
+            return True
+        return False
 
     def __search_task(self) -> None:
         """ Function that displays a tree with tables as child nodes with the tasks searched """
@@ -382,3 +415,8 @@ class SearchTask:
             root.add('[red]❌ No Task Found')
         self.console.print(root)
         # self.db.close() # FIXME: DATABASE DONT CLOSE CORRECTLY
+
+
+@final 
+class DeleteTask:
+    pass

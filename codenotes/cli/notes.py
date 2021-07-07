@@ -138,7 +138,7 @@ class CreateNote:
         """
         cls(args)
 
-    def category_exists(self) -> bool:
+    def _category_exists(self) -> bool:
         """ Checks if the typed category exists
 
         Returns
@@ -150,7 +150,7 @@ class CreateNote:
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
 
-        if categories_list: # categories_list == []
+        if categories_list: # # categories_list == (id,)
             self.category_id = categories_list[0][0]
             return True
         return False
@@ -163,7 +163,14 @@ class CreateNote:
         """
         if len(self.category_name) <= 30: # Category name can't be longer than 30 characters
 
-            if not self.category_exists():
+            if self._category_exists():
+                custom_theme = Theme({
+                    'msg': '#31f55f bold',
+                    'name': '#616161 italic'
+                })
+                PrintFormatted.custom_print(f'[msg]Category selected:[/msg][name]{self.category_name}[/name]',
+                                            custom_theme)
+            else:
                 sql = f'INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_NAME}) VALUES (?)'
                 cursor = self.db.exec_sql(sql, (self.category_name,))
 
@@ -171,13 +178,7 @@ class CreateNote:
 
                 self.db.commit()
                 PrintFormatted.print_category_creation(self.category_name)
-            else:
-                custom_theme = Theme({
-                    'msg': '#31f55f bold',
-                    'name': '#616161 italic'
-                })
-                PrintFormatted.custom_print(f'[msg]Category selected:[/msg][name]{self.category_name}[/name]',
-                                            custom_theme)
+                
         else:
             self._ask_category()
 

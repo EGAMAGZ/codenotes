@@ -30,16 +30,21 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     parser.add_argument('--version', '-v', action='version', version=__version__)
     subparsers = parser.add_subparsers(dest='subargs') # Types of annotation
 
+    # === Task ===
+
     task = subparsers.add_parser('task')
     task_actions = task.add_subparsers(dest='action')
 
+    # === Create Task ===
     task_create = task_actions.add_parser('create')
     task_create.add_argument('text', type=str, nargs='*', action='store')
     task_create.add_argument('--category', '-c', type=str, nargs='*', action='store')
     task_create.add_argument('--preview', '-p', action='store_true')
 
+    # === Seach Task ===
     task_search = task_actions.add_parser('search')
     task_search.add_argument('text', action='store', nargs='*')
+    task_search.add_argument('--category', '-c', type=str, nargs='*', action='store')
 
     task_search_group = task_search.add_mutually_exclusive_group()
     task_search_group.add_argument('--today', '-t', action='store_true')
@@ -48,15 +53,19 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     task_search_group.add_argument('--month', '-m', action='store_true')
     task_search_group.add_argument('--ever', '-e', action='store_true')
 
+    # === Note ===
+
     note = subparsers.add_parser('note')
     note_actions = note.add_subparsers(dest='action')
 
+    # === Create Note ===
     note_create = note_actions.add_parser('create')
     note_create.add_argument('text', type=str, nargs='*', action='store')
     note_create.add_argument('--title', '-t', type=str, nargs='*', action='store')
     note_create.add_argument('--category', '-c', type=str, nargs='*', action='store')
     note_create.add_argument('--preview', '-p', action='store_true')
 
+    # === Search Note ===
     note_search = note_actions.add_parser('search')
     note_search.add_argument('text', action='store', nargs='*')
 
@@ -67,9 +76,12 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     note_search_group.add_argument('--month', '-m', action='store_true')
     note_search_group.add_argument('--ever', '-e', action='store_true')
 
+    # === Category ===
+
     category = subparsers.add_parser('category')
     category_actions = category.add_subparsers(dest='action')
 
+    # === Create Cateogry ===
     category_create = category_actions.add_parser('create')
     category_create.add_argument('text', type=str, nargs='*', action='store')
     category_create.add_argument('--preview', '-p', action='store_true')
@@ -78,6 +90,7 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     category_create_annotation.add_argument('--note','-n', action='store_true')
     category_create_annotation.add_argument('--task','-t', action='store_true')
 
+    # === Search Category ===
     category_search = category_actions.add_parser('search')
     category_search.add_argument('text', type=str, nargs='*', action='store')
 
@@ -86,8 +99,6 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     category_search_annotation.add_argument('--task','-t', action='store_true')
     category_search_annotation.add_argument('--all','-a', action='store_true')
 
-    tui = subparsers.add_parser('tui')
-    tui.add_argument('window', choices=['note', 'task'])
 
     parser.error = print_usage
 
