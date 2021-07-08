@@ -57,11 +57,12 @@ class TestSearchTask(unittest.TestCase):
         self.default_category_name = 'TODO Tasks'
 
     def test_search_by_category(self):
-        args = parse_args(['task', 'search', '--category', 'CLI', 'Category', '--ever'])
         expected_tasks = [
             ('CLI task', 0, self.date, 'CLI Category'),
             ('Task in same category', 0, self.date, 'CLI Category')
         ]
+        
+        args = parse_args(['task', 'search', '--category', 'CLI', 'Category', '--ever'])
         query = SearchTask(args).sql_query()
 
         self.assertCountEqual(query, expected_tasks)

@@ -1,5 +1,5 @@
 from argparse import Namespace
-from codenotes.exceptions import MissingArgsException
+from codenotes.exceptions import CategoryNotExistsError, MissingArgsException
 from datetime import datetime, date
 from typing import Final, final, Union, Any, Text
 from rich.theme import Theme
@@ -278,6 +278,8 @@ class SearchNote:
     db: SQLiteConnection
     search_date: Union[list[date], date]
     search_text: str
+    search_category: str = None
+    search_category_id: int = None
 
     def __init__(self, args: Namespace) -> None:
         """ SearchNote constructor
@@ -296,8 +298,14 @@ class SearchNote:
             if date_args_empty(args):
                 raise MissingArgsException
             
+            if args.category:
+                self.search_category = format_argument_text(args.category)
+
             self.search()
         
+        except CategoryNotExistsError:
+            PrintFormatted.custom_print(f'[red][bold]❌"{self.search_category}"[/bold] category does not exists[/red]')
+
         except KeyboardInterrupt:
             PrintFormatted.interruption()
 
@@ -340,9 +348,31 @@ class SearchNote:
         if self.search_text:
             sql = add_conditions_sql(sql, f'{notes.COLUMN_TITLE} LIKE "%{self.search_text}%"', 'AND')
 
+        if self.search_category:
+            if not self._category_exists():
+                raise CategoryNotExistsError
+            sql = add_conditions_sql(sql, f'{notes.COLUMN_CATEGORY} = {self.search_category_id}', 'AND')
+
         query = self.db.exec_sql(sql)
 
         return query.fetchall()
+
+    def _category_exists(self) -> bool:
+        """ Checks if the typed category exists
+
+        Returns
+        -------
+        exists: bool
+            Boolean value flag if the category already exists
+        """
+        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.search_category}'"
+        query = self.db.exec_sql(sql)
+        categories_list: list[tuple] = query.fetchall()
+
+        if categories_list: # categories_list == (id,)
+            self.search_category_id = categories_list[0][0]
+            return True
+        return False
 
     def search(self) -> None:
         """ Function that displays a tree with Panels as child nodes with the notes searched """

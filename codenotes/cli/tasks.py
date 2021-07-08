@@ -300,7 +300,7 @@ class SearchTask:
             if args.category:
                 self.search_category = format_argument_text(args.category)
 
-            self.__search_task()
+            self.search()
 
         except CategoryNotExistsError:
             PrintFormatted.custom_print(f'[red][bold]❌"{self.search_category}"[/bold] category does not exists[/red]')
@@ -374,7 +374,7 @@ class SearchTask:
             return True
         return False
 
-    def __search_task(self) -> None:
+    def search(self) -> None:
         """ Function that displays a tree with tables as child nodes with the tasks searched """
         root = Tree('📒[bold blue] List of Tasks  Found')
         query = self.sql_query()

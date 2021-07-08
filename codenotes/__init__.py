@@ -68,6 +68,7 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     # === Search Note ===
     note_search = note_actions.add_parser('search')
     note_search.add_argument('text', action='store', nargs='*')
+    note_search.add_argument('--category', '-c', type=str, nargs='*', action='store')
 
     note_search_group = note_search.add_mutually_exclusive_group()
     note_search_group.add_argument('--today', '-t', action='store_true')

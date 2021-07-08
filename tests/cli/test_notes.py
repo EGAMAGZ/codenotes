@@ -1,3 +1,4 @@
+from codenotes.exceptions import CategoryNotExistsError
 from datetime import datetime
 import unittest
 
@@ -66,6 +67,21 @@ class TestSearchNote(unittest.TestCase):
                                   'incididunt ut labore et dolore magna aliqua.'
         self.default_note_title = 'Lorem ipsum Note'
         self.default_category = 'General'
+
+    def test_search_by_category(self):
+        expected_notes = [
+            ('Lorem ipsum dolor sit amet, co', self.default_note_text, self.default_category, 0, self.date),
+            ('Empty Note', None, self.default_category, 0, self.date),
+        ]
+
+        args = parse_args(['note', 'search', '--category', self.default_category, '--ever'])
+        query = SearchNote(args).sql_query()
+
+        self.assertCountEqual(query, expected_notes)
+
+        args = parse_args(['note', 'search', '--category', 'Generl', '--ever'])
+        with self.assertRaises(CategoryNotExistsError):
+            SearchNote(args).sql_query()
 
     def test_search_ever(self):
         expected_notes = [
