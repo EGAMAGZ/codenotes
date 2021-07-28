@@ -390,11 +390,11 @@ class SearchTask:
             actual_task = tasks_sorted[0]
             actual_category = actual_task[3]
 
-            child_node = root.add(f':file_folder:[#d898ed]{actual_category}')
+            child_branch = root.add(f':file_folder:[#d898ed]{actual_category}')
 
             for actual_task in tasks_sorted:
                 if actual_task[3] != actual_category:
-                    child_node.add(table)
+                    child_branch.add(table)
 
                     table = Table()
                     table.add_column('Tasks')
@@ -403,13 +403,13 @@ class SearchTask:
                     table.add_column('Creation Date', justify='center', style='yellow')
 
                     actual_category = actual_task[3]
-                    child_node = root.add(f':file_folder: [#d898ed]{actual_category}')
+                    child_branch = root.add(f':file_folder: [#d898ed]{actual_category}')
 
                 table.add_row(
                         actual_task[0], status_text(actual_task[1]), actual_task[3], actual_task[2]
                     )
             else:
-                child_node.add(table)
+                child_branch.add(table)
 
         else:
             root.add('[red]❌ No Task Found')
