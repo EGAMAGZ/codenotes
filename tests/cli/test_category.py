@@ -121,9 +121,6 @@ class TestSearchCategory(unittest.TestCase):
         ])
 
         query = SearchCategory(args).sql_query()
-        print(expected_categories)
-        print(query)
-        print(query == expected_categories)
         self.assertListEqual(query, expected_categories)
 
         expected_categories = [
