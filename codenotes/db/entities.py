@@ -4,28 +4,29 @@ from datetime import date
 
 @dataclass
 class Category:
-    """ Dataclass to store category information 
-    
+    """Dataclass to store category information
+
     Parameters
     ----------
     id: int
         Id of the category
-    
+
     name: str
         Category name
     """
+
     id: int
     name: str
 
     def __str__(self) -> str:
-        """ Return category name """
+        """Return category name"""
         return self.name
 
 
 @dataclass
 class Task:
-    """ Dataclass to store task information 
-    
+    """Dataclass to store task information
+
     Parameters
     ----------
     id: int
@@ -36,13 +37,14 @@ class Task:
 
     status: str
         Task status (Incomplete, In Process & Finished)
-        
+
     category: str
         Category name where is the task stored
 
     creation: date
         Date when the task was created
     """
+
     id: int
     content: str
     status: str
@@ -50,5 +52,5 @@ class Task:
     creation: date
 
     def __str__(self) -> str:
-        """ Return task content """
+        """Return task content"""
         return self.content

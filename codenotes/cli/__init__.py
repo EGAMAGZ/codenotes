@@ -1,14 +1,14 @@
 from typing import Optional, final
 
-from rich.theme import Theme
 from rich.console import Console
+from rich.theme import Theme
 
 
 @final
 class PrintFormatted:
-    """ Class to display in the terminal beautiful text
+    """Class to display in the terminal beautiful text
 
-    This class only has the purpose to print beautiful text using rich package. It is mainly created with @classmethod 
+    This class only has the purpose to print beautiful text using rich package. It is mainly created with @classmethod
     to print some specific type of text with its own theme
 
     Attributes
@@ -20,8 +20,8 @@ class PrintFormatted:
     console: Console
 
     def __init__(self, custom_theme: Optional[Theme] = None):
-        """ PrintFormatted Constructor 
-        
+        """PrintFormatted Constructor
+
         Parameters
         ----------
         custom_theme: Optional[Theme]
@@ -35,7 +35,7 @@ class PrintFormatted:
 
     @classmethod
     def custom_print(cls, text: str, theme: Theme = None) -> None:
-        """ Class method used to print custom formatted text
+        """Class method used to print custom formatted text
         Parameters
         ----------
         text : HTML
@@ -49,27 +49,24 @@ class PrintFormatted:
 
     @classmethod
     def print_category_creation(cls, category: str) -> None:
-        """ Class method used to print the creation of a new category
+        """Class method used to print the creation of a new category
 
         Parameters
         ----------
         category: str
             Name of the category created
         """
-        custom_txt = '[msg]Created new category:[/msg][name]{}[/name]'.format(category)
+        custom_txt = f"[msg]Created new category:[/msg][name]{category}[/name]"
 
-        custom_theme = Theme({
-            'msg': '#31f55f bold',
-            'name': '#616161 italic'
-        })
+        custom_theme = Theme({"msg": "#31f55f bold", "name": "#616161 italic"})
 
         print_formatted = cls(custom_theme)
         print_formatted.console.print(custom_txt)
 
     @classmethod
     def print_content_storage(cls, content: str, category: str) -> None:
-        """ Class method used to print the process of storage of tasks and notes
-        
+        """Class method used to print the process of storage of tasks and notes
+
         Parameters
         ----------
         content : str
@@ -78,25 +75,22 @@ class PrintFormatted:
         category : str
             Category where is stored
         """
-        custom_txt = '[msg]> Saved[{}]: [/msg][content]{}[/content]'.format(category, content)
+        custom_txt = f"[msg]> Saved[{category}]: [/msg][content]{content}[/content]"
 
-        custom_theme = Theme({
-            'msg': '#d898ed bold',
-            'content': '#616161 italic'
-        })
+        custom_theme = Theme({"msg": "#d898ed bold", "content": "#616161 italic"})
 
         print_formatted = cls(custom_theme)
         print_formatted.console.print(custom_txt)
 
     @classmethod
     def ask_confirmation(cls, text: str) -> bool:
-        """ Class method used to ask for confirmation
+        """Class method used to ask for confirmation
 
         Parameters
         ----------
         text: str
             Text that will be displayed to ask confirmation
-        
+
         Returns
         -------
         confirmation: bool
@@ -107,17 +101,17 @@ class PrintFormatted:
         custom_text = text  # Text with rich format
         answer = print_formatted.console.input(custom_text).strip()
 
-        while len(answer) > 0 and answer.lower() != 'n' and answer.lower() != 'y':
+        while len(answer) > 0 and answer.lower() != "n" and answer.lower() != "y":
             answer = print_formatted.console.input(custom_text)
 
-        if answer.lower() == 'y':
+        if answer.lower() == "y":
             return True
         return False
 
     @classmethod
     def print_help(cls, help_txt: str) -> None:
-        """ Class method used to print help text
-        
+        """Class method used to print help text
+
         Parameters
         ----------
         help_txt: str
@@ -125,17 +119,14 @@ class PrintFormatted:
         """
         custom_text = help_txt
 
-        custom_theme = Theme({
-            'header': 'white bold',
-            'quote': 'purple'
-        })
-        
+        custom_theme = Theme({"header": "white bold", "quote": "purple"})
+
         print_formatted = cls(custom_theme)
         print_formatted.console.print(custom_text)
 
     @classmethod
     def interruption(cls) -> None:
-        custom_text = '[bold red]Interrupted[/bold red]'
+        custom_text = "[bold red]Interrupted[/bold red]"
 
         print_formatted = cls()
         print_formatted.console.print(custom_text)

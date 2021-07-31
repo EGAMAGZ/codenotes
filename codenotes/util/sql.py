@@ -1,6 +1,6 @@
 def add_conditions_sql(sql: str, condition: str, type_condition: str = None) -> str:
-    """ Adds where conditions to sql
-    
+    """Adds where conditions to sql
+
     Parameters
     ----------
     sql : str
@@ -15,8 +15,8 @@ def add_conditions_sql(sql: str, condition: str, type_condition: str = None) -> 
     sql : str
         Returns the same SQL passed with the condition
     """
-    if 'where' in sql.lower():
-        sql = sql + f' {type_condition} {condition}'
+    if "where" in sql.lower():
+        sql = sql + f" {type_condition} {condition}"
     else:
-        sql = sql + f' WHERE {condition}'
+        sql = sql + f" WHERE {condition}"
     return sql

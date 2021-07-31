@@ -1,8 +1,7 @@
 from argparse import Namespace
-import logging
 from typing import Final, Union, final
 
-from rich import box, table
+from rich import box
 from rich.console import Console
 from rich.table import Table
 from rich.tree import Tree
@@ -18,7 +17,7 @@ from codenotes.util.text import format_list_text
 
 
 def create_args_empty(args: Namespace) -> bool:
-    """ Check if arguments required to select an annotation type
+    """Check if arguments required to select an annotation type
 
     Parameters
     ----------
@@ -30,11 +29,7 @@ def create_args_empty(args: Namespace) -> bool:
     empty : bool
         Return boolean value if any args are empty
     """
-    args_needed = [
-        args.note,
-        args.task,
-        args.text
-    ]
+    args_needed = [args.note, args.task, args.text]
     if any(args_needed):
         return False
     return True
@@ -42,11 +37,7 @@ def create_args_empty(args: Namespace) -> bool:
 
 def search_args_empty(args: Namespace) -> bool:
 
-    args_needed = [
-        args.note,
-        args.task,
-        args.all    
-    ]
+    args_needed = [args.note, args.task, args.all]
     if any(args_needed):
         return False
     return True
@@ -81,14 +72,14 @@ class CreateCategory:
 
         except KeyboardInterrupt:
             PrintFormatted.interruption()
-        
+
         except MissingArgsException:
             print("ERROR")
 
     @classmethod
     def set_args(cls, args: Namespace) -> None:
-        """ Class method that initializes the class and automatically will do the search
-        
+        """Class method that initializes the class and automatically will do the search
+
         Parameters
         ----------
         args : NameSpace
@@ -97,7 +88,7 @@ class CreateCategory:
         cls(args)
 
     def category_exists(self, category_name: str) -> bool:
-        """ Checks if the typed category exists
+        """Checks if the typed category exists
 
         Returns
         -------
@@ -108,14 +99,14 @@ class CreateCategory:
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
 
-        if categories_list: # categories_list == []
+        if categories_list:  # categories_list == []
             return True
         return False
 
     def save_category(self) -> None:
-        sql = f'INSERT INTO {self.category_table_name} ({self.category_name_column}) VALUES(?)'
-        
-        with self.console.status('[bold yellow]Saving Category...') as status:
+        sql = f"INSERT INTO {self.category_table_name} ({self.category_name_column}) VALUES(?)"
+
+        with self.console.status("[bold yellow]Saving Category...") as status:
             if isinstance(self.category, list):
                 # TODO: Validate if len of the category is 30
                 for category in self.category:
@@ -126,7 +117,9 @@ class CreateCategory:
                         PrintFormatted.print_category_creation(category)
 
                     else:
-                        PrintFormatted.custom_print(f'❌ [bold] [red]"{category}"[/bold] already exists')
+                        PrintFormatted.custom_print(
+                            f'❌ [bold] [red]"{category}"[/bold] already exists'
+                        )
 
             elif isinstance(self.category, str):
                 if not self.category_exists(self.category):
@@ -136,14 +129,16 @@ class CreateCategory:
                     PrintFormatted.print_category_creation(self.category)
 
                 else:
-                    PrintFormatted.custom_print(f'❌ [bold] [red]"{self.category}"[/bold] already exists')
-            
+                    PrintFormatted.custom_print(
+                        f'❌ [bold] [red]"{self.category}"[/bold] already exists'
+                    )
+
             if self.category:
-                self.console.print('[bold green]✔️ Category Saved')
+                self.console.print("[bold green]✔️ Category Saved")
 
             else:
-                self.console.print('[bold red] 💥 No Category Saved')
-            
+                self.console.print("[bold red] 💥 No Category Saved")
+
             status.stop()
 
         self.db.commit()
@@ -162,7 +157,7 @@ class CreateCategory:
 
     def _show_preview(self) -> None:
         table = Table(box=box.ROUNDED)
-        table.add_column('Categories')
+        table.add_column("Categories")
 
         if isinstance(self.category, list):
             for category in self.category:
@@ -171,18 +166,18 @@ class CreateCategory:
         elif isinstance(self.category, str):
             table.add_row(self.category)
 
-        self.console.print(table, justify='center')
+        self.console.print(table, justify="center")
 
         if PrintFormatted.ask_confirmation(
-                '[yellow]Do you want to save them?(y/n):[/yellow]'
-            ):
+            "[yellow]Do you want to save them?(y/n):[/yellow]"
+        ):
             self.save_category()
 
 
 class SearchCategory:
 
-    ANNOTATIONS_TYPES: Final[list[str]] = ['Tasks', 'Notes']
-    
+    ANNOTATIONS_TYPES: Final[list[str]] = ["Tasks", "Notes"]
+
     console: Console
     db: SQLiteConnection
     search_category: str
@@ -200,7 +195,7 @@ class SearchCategory:
             self.search_category = format_argument_text(args.text)
 
             self.__get_category_table(args)
-            
+
             self.search()
 
         except KeyboardInterrupt:
@@ -211,7 +206,7 @@ class SearchCategory:
 
     @classmethod
     def set_args(cls, args: Namespace) -> None:
-        """ Class method that initializes the class and automatically will do the search
+        """Class method that initializes the class and automatically will do the search
 
         Parameters
         ----------
@@ -230,68 +225,68 @@ class SearchCategory:
             self.category_table_name = task_categories.TABLE_NAME
             self.category_id_column = task_categories.COLUMN_ID
             self.category_name_column = task_categories.COLUMN_NAME
-        
+
         elif args.all:
             self.category_table_name = [
-                    task_categories.TABLE_NAME,
-                    notes_categories.TABLE_NAME
-                ]
+                task_categories.TABLE_NAME,
+                notes_categories.TABLE_NAME,
+            ]
             self.category_id_column = [
-                    task_categories.COLUMN_ID,
-                    notes_categories.COLUMN_ID
-                ]
+                task_categories.COLUMN_ID,
+                notes_categories.COLUMN_ID,
+            ]
             self.category_name_column = [
-                    task_categories.COLUMN_NAME,
-                    notes_categories.COLUMN_NAME
-                ]
+                task_categories.COLUMN_NAME,
+                notes_categories.COLUMN_NAME,
+            ]
 
     def sql_query(self) -> list[list[tuple]]:
         query_list = []
 
         if isinstance(self.category_table_name, str):
-            sql = f'SELECT {self.category_name_column} FROM {self.category_table_name}'
+            sql = f"SELECT {self.category_name_column} FROM {self.category_table_name}"
 
             if self.search_category:
-                sql = add_conditions_sql(sql, f'{self.category_name_column} LIKE "%{self.search_category}%"')
+                sql = add_conditions_sql(
+                    sql, f'{self.category_name_column} LIKE "%{self.search_category}%"'
+                )
 
-            query_list.append(
-                self.db.exec_sql(sql).fetchall()
-            )
+            query_list.append(self.db.exec_sql(sql).fetchall())
 
         elif isinstance(self.category_table_name, list):
             for i in range(len(self.ANNOTATIONS_TYPES)):
-                sql = f'SELECT {self.category_name_column[i]} FROM {self.category_table_name[i]}'
+                sql = f"SELECT {self.category_name_column[i]} FROM {self.category_table_name[i]}"
 
                 if self.search_category:
-                    sql = add_conditions_sql(sql, f'{self.category_name_column[i]} LIKE "%{self.search_category}%"')
+                    sql = add_conditions_sql(
+                        sql,
+                        f'{self.category_name_column[i]} LIKE "%{self.search_category}%"',
+                    )
 
-                query_list.append(
-                    self.db.exec_sql(sql).fetchall()
-                )
+                query_list.append(self.db.exec_sql(sql).fetchall())
 
         return query_list
 
-        
     def search(self) -> None:
-        root = Tree('📒[bold blue] List of Categories Found')
+        root = Tree("📒[bold blue] List of Categories Found")
         query = self.sql_query()
 
         if query:
             i = 0
             for categories_list in query:
-                child_branch = root.add(f'📒[#d898ed]{self.ANNOTATIONS_TYPES[i]}')
+                child_branch = root.add(f"📒[#d898ed]{self.ANNOTATIONS_TYPES[i]}")
 
                 table = Table()
-                table.add_column('Name')
+                table.add_column("Name")
 
                 for categories in categories_list:
                     table.add_row(categories[0])
-                
+
                 child_branch.add(table)
                 i += 1
 
         else:
-            root.add('[red]❌ No Category Found')
+            root.add("[red]❌ No Category Found")
         self.console.print(root)
 
 

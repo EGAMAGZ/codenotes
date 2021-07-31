@@ -5,7 +5,7 @@ from py_cui.widget_set import WidgetSet
 
 
 class TaskWindow:
- 
+
     COLUMNS: Final[int] = 5
     ROWS: Final[int] = 3
 
@@ -13,7 +13,7 @@ class TaskWindow:
     window: WidgetSet
 
     def __init__(self, root: PyCUI) -> None:
-        """ TaskWindow Constructor """
+        """TaskWindow Constructor"""
         self.root = root
         self.window = self.root.create_new_widget_set(self.ROWS, self.COLUMNS)
 
@@ -24,7 +24,7 @@ class TaskWindow:
 
     @classmethod
     def create_widget_set(cls, root: PyCUI) -> WidgetSet:
-        """ 
+        """
         Returns
         -------
         widget_set: WidgetSet

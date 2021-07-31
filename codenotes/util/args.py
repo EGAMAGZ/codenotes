@@ -1,11 +1,11 @@
 import calendar
 from argparse import Namespace
-from typing import Optional, overload, Union
-from datetime import datetime, date, timedelta
+from datetime import date, datetime, timedelta
+from typing import Optional, Union, overload
 
 
 def date_args_empty(args: Namespace) -> bool:
-    """ Check if arguments required to search are empty
+    """Check if arguments required to search are empty
 
     Parameters
     ----------
@@ -23,7 +23,7 @@ def date_args_empty(args: Namespace) -> bool:
         args.today,
         args.week,
         args.yesterday,
-        args.ever
+        args.ever,
     ]
 
     if any(args_needed):
@@ -32,15 +32,17 @@ def date_args_empty(args: Namespace) -> bool:
 
 
 @overload
-def dates_to_search(args: Namespace) -> Optional[list[date]]: ...
+def dates_to_search(args: Namespace) -> Optional[list[date]]:
+    ...
 
 
 @overload
-def dates_to_search(args: Namespace) -> Optional[date]: ...
+def dates_to_search(args: Namespace) -> Optional[date]:
+    ...
 
 
 def dates_to_search(args: Namespace) -> Optional[Union[list[date], date]]:
-    """ Returns date to search depending of the user selection
+    """Returns date to search depending of the user selection
 
     Parameters
     ----------
@@ -69,10 +71,7 @@ def dates_to_search(args: Namespace) -> Optional[Union[list[date], date]]:
 
     elif args.month:
         num_days = calendar.monthrange(now.year, now.month)[1]
-        days = [
-            date(now.year, now.month, 1),
-            date(now.year, now.month, num_days)
-        ]
+        days = [date(now.year, now.month, 1), date(now.year, now.month, num_days)]
 
         return days
 
@@ -81,8 +80,8 @@ def dates_to_search(args: Namespace) -> Optional[Union[list[date], date]]:
 
 
 def format_argument_text(arg_text: list[str]) -> str:
-    """ Function use to join the list of strings passed in the arguments
-    
+    """Function use to join the list of strings passed in the arguments
+
     Parameters
     ----------
     arg_text: list[str]
@@ -93,6 +92,6 @@ def format_argument_text(arg_text: list[str]) -> str:
     text_joined: str
         Returns text that was joined
     """
-    text = ' '.join(arg_text)
+    text = " ".join(arg_text)
 
     return text.strip()
