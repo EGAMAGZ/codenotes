@@ -11,10 +11,12 @@ from rich.tree import Tree
 import codenotes.db.utilities.tasks as tasks
 import codenotes.db.utilities.tasks_categories as categories
 import codenotes.util.help as help_text
+from codenotes.abstract import CreateABC, SearchABC
 from codenotes.cli import PrintFormatted
 from codenotes.db.connection import SQLiteConnection
 from codenotes.exceptions import CategoryNotExistsError, MissingArgsException
-from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text
+from codenotes.util.args import (date_args_empty, dates_to_search,
+                                 format_argument_text)
 from codenotes.util.sql import add_conditions_sql
 from codenotes.util.text import format_list_text, status_text
 
@@ -56,7 +58,7 @@ def create_args_empty(args: Namespace) -> bool:
 
 
 @final
-class CreateTask:
+class CreateTask(CreateABC):
     """Class to create new tasks and categories in the database
 
     This class only has the purpose to create and display the preview of tasks, also create new categories and save
@@ -115,9 +117,9 @@ class CreateTask:
                 self.task = format_list_text(args.text)
 
                 if args.preview:
-                    self._show_preview()
+                    self.show_preview()
                 else:
-                    self.__save_task()
+                    self.save()
 
         except KeyboardInterrupt:
             PrintFormatted.interruption()
@@ -136,23 +138,6 @@ class CreateTask:
         """
         cls(args)
 
-    def _category_exists(self) -> bool:
-        """Checks if the typed category exists
-
-        Returns
-        -------
-        exists: bool
-            Boolean value flag if the category already exists
-        """
-        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.category_name}'"
-        query = self.db.exec_sql(sql)
-        categories_list: list[tuple] = query.fetchall()
-
-        if categories_list:  # categories_list == (id,)
-            self.category_id = categories_list[0][0]
-            return True
-        return False
-
     def __save_category(self) -> None:
         """Creates and saves a new category if not exists
 
@@ -160,7 +145,7 @@ class CreateTask:
         store the task(s) in this created category
         """
         if len(self.category_name) <= 30:
-            if self._category_exists():
+            if self.category_exists():
 
                 custom_theme = Theme({"msg": "#31f55f bold", "name": "#616161 italic"})
                 PrintFormatted.custom_print(
@@ -179,7 +164,58 @@ class CreateTask:
         else:
             self._ask_category()
 
-    def __save_task(self) -> None:
+    def _ask_category(self) -> None:
+        """Function that asks to the user to introduce different category name"""
+
+        text = "⚠️[yellow]Category name is too long (Max. 30 characters).[/yellow]Write another name:"
+        self.category_name = self.console.input(text).strip()
+
+        while len(self.category_name) == 0 or len(self.category_name) > 30:
+            self.category_name = self.console.input(text).strip()
+        else:
+            self.__save_category()
+
+    def category_exists(self) -> bool:
+        """Checks if the typed category exists
+
+        Returns
+        -------
+        exists: bool
+            Boolean value flag if the category already exists
+        """
+        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.category_name}'"
+        query = self.db.exec_sql(sql)
+        categories_list: list[tuple] = query.fetchall()
+
+        if categories_list:  # categories_list == (id,)
+            self.category_id = categories_list[0][0]
+            return True
+        return False
+
+    def show_preview(self) -> None:
+        """Method that displays a table with the tasks written"""
+        formatted_date = self.creation_date.strftime("%Y-%m-%d")
+
+        self.console.rule("Preview", style="purple")
+
+        table = Table(box=box.ROUNDED)
+        table.add_column("Task", overflow="fold")
+        table.add_column("Creation Date", justify="center", style="yellow")
+
+        if isinstance(self.task, list):
+            for task in self.task:
+                table.add_row(task, formatted_date)
+        elif isinstance(self.task, str):
+            table.add_row(self.task, formatted_date)
+
+        self.console.print(table, justify="center")
+
+        if PrintFormatted.ask_confirmation(
+            "[yellow]Do you want to save them?(y/n):[/yellow]"
+        ):
+            self.save()
+
+    def save(self) -> None:
         """Function in charge to store the tasks in the database"""
 
         sql = (
@@ -211,43 +247,9 @@ class CreateTask:
         self.db.commit()
         self.db.close()
 
-    def _ask_category(self) -> None:
-        """Function that asks to the user to introduce different category name"""
-
-        text = "⚠️[yellow]Category name is too long (Max. 30 characters).[/yellow]Write another name:"
-        self.category_name = self.console.input(text).strip()
-
-        while len(self.category_name) == 0 or len(self.category_name) > 30:
-            self.category_name = self.console.input(text).strip()
-        else:
-            self.__save_category()
-
-    def _show_preview(self) -> None:
-        """Method that displays a table with the tasks written"""
-        formatted_date = self.creation_date.strftime("%Y-%m-%d")
-
-        self.console.rule("Preview", style="purple")
-
-        table = Table(box=box.ROUNDED)
-        table.add_column("Task", overflow="fold")
-        table.add_column("Creation Date", justify="center", style="yellow")
-
-        if isinstance(self.task, list):
-            for task in self.task:
-                table.add_row(task, formatted_date)
-        elif isinstance(self.task, str):
-            table.add_row(self.task, formatted_date)
-
-        self.console.print(table, justify="center")
-
-        if PrintFormatted.ask_confirmation(
-            "[yellow]Do you want to save them?(y/n):[/yellow]"
-        ):
-            self.__save_task()
-
 
 @final
-class SearchTask:
+class SearchTask(SearchABC):
     """Class to search and display tasks in the database
 
     This class only has the purpose to search and display the tasks. The arguments that will be used to filter the
@@ -320,6 +322,23 @@ class SearchTask:
         """
         cls(args)
 
+    def category_exists(self) -> bool:
+        """Checks if the typed category exists
+
+        Returns
+        -------
+        exists: bool
+            Boolean value flag if the category already exists
+        """
+        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.search_category}'"
+        query = self.db.exec_sql(sql)
+        categories_list: list[tuple] = query.fetchall()
+
+        if categories_list:  # categories_list == (id,)
+            self.search_category_id = categories_list[0][0]
+            return True
+        return False
+
     def sql_query(self) -> list[tuple]:
         """Function that makes a query of related information of tasks, and also adds more statements to the main sql
         sql
@@ -356,7 +375,7 @@ class SearchTask:
             )
 
         if self.search_category:
-            if not self._category_exists():
+            if not self.category_exists():
                 raise CategoryNotExistsError
             sql = add_conditions_sql(
                 sql, f"{tasks.COLUMN_CATEGORY} = {self.search_category_id}", "AND"
@@ -365,23 +384,6 @@ class SearchTask:
         query = self.db.exec_sql(sql)
 
         return query.fetchall()
-
-    def _category_exists(self) -> bool:
-        """Checks if the typed category exists
-
-        Returns
-        -------
-        exists: bool
-            Boolean value flag if the category already exists
-        """
-        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.search_category}'"
-        query = self.db.exec_sql(sql)
-        categories_list: list[tuple] = query.fetchall()
-
-        if categories_list:  # categories_list == (id,)
-            self.search_category_id = categories_list[0][0]
-            return True
-        return False
 
     def search(self) -> None:
         """Function that displays a tree with tables as child nodes with the tasks searched"""

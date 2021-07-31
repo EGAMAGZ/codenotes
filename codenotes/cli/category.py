@@ -8,6 +8,7 @@ from rich.tree import Tree
 
 import codenotes.db.utilities.notes_categories as notes_categories
 import codenotes.db.utilities.tasks_categories as task_categories
+from codenotes.abstract import CreateABC, SearchABC
 from codenotes.cli import PrintFormatted
 from codenotes.db.connection import SQLiteConnection
 from codenotes.exceptions import MissingArgsException
@@ -17,7 +18,7 @@ from codenotes.util.text import format_list_text
 
 
 def create_args_empty(args: Namespace) -> bool:
-    """Check if arguments required to select an annotation type
+    """Checks if arguments required to create a category in a type of annotation are empty
 
     Parameters
     ----------
@@ -26,7 +27,7 @@ def create_args_empty(args: Namespace) -> bool:
 
     Returns
     -------
-    empty : bool
+    empty: bool
         Return boolean value if any args are empty
     """
     args_needed = [args.note, args.task, args.text]
@@ -36,7 +37,18 @@ def create_args_empty(args: Namespace) -> bool:
 
 
 def search_args_empty(args: Namespace) -> bool:
+    """Checks if arguments required to search a category in the types of annotations are empty
 
+    Parameters
+    ----------
+    args: Namespace
+        Arguments capture
+
+    Returns
+    -------
+    empty: bool
+        Return boolean value if any args are empty
+    """
     args_needed = [args.note, args.task, args.all]
     if any(args_needed):
         return False
@@ -44,7 +56,7 @@ def search_args_empty(args: Namespace) -> bool:
 
 
 @final
-class CreateCategory:
+class CreateCategory(CreateABC):
 
     category: Union[list[str], str]
     category_table_name: str
@@ -65,10 +77,10 @@ class CreateCategory:
             self.__get_category_table(args)
 
             if args.preview:
-                self._show_preview()
+                self.show_preview()
 
             else:
-                self.save_category()
+                self.save()
 
         except KeyboardInterrupt:
             PrintFormatted.interruption()
@@ -87,6 +99,17 @@ class CreateCategory:
         """
         cls(args)
 
+    def __get_category_table(self, args: Namespace) -> None:
+        if args.note:
+            self.category_table_name = notes_categories.TABLE_NAME
+            self.category_id_column = notes_categories.COLUMN_ID
+            self.category_name_column = notes_categories.COLUMN_NAME
+
+        elif args.task:
+            self.category_table_name = task_categories.TABLE_NAME
+            self.category_id_column = task_categories.COLUMN_ID
+            self.category_name_column = task_categories.COLUMN_NAME
+
     def category_exists(self, category_name: str) -> bool:
         """Checks if the typed category exists
 
@@ -103,7 +126,25 @@ class CreateCategory:
             return True
         return False
 
-    def save_category(self) -> None:
+    def show_preview(self) -> None:
+        table = Table(box=box.ROUNDED)
+        table.add_column("Categories")
+
+        if isinstance(self.category, list):
+            for category in self.category:
+                table.add_row(category)
+
+        elif isinstance(self.category, str):
+            table.add_row(self.category)
+
+        self.console.print(table, justify="center")
+
+        if PrintFormatted.ask_confirmation(
+            "[yellow]Do you want to save them?(y/n):[/yellow]"
+        ):
+            self.save()
+
+    def save(self) -> None:
         sql = f"INSERT INTO {self.category_table_name} ({self.category_name_column}) VALUES(?)"
 
         with self.console.status("[bold yellow]Saving Category...") as status:
@@ -144,37 +185,8 @@ class CreateCategory:
         self.db.commit()
         self.db.close()
 
-    def __get_category_table(self, args: Namespace) -> None:
-        if args.note:
-            self.category_table_name = notes_categories.TABLE_NAME
-            self.category_id_column = notes_categories.COLUMN_ID
-            self.category_name_column = notes_categories.COLUMN_NAME
 
-        elif args.task:
-            self.category_table_name = task_categories.TABLE_NAME
-            self.category_id_column = task_categories.COLUMN_ID
-            self.category_name_column = task_categories.COLUMN_NAME
-
-    def _show_preview(self) -> None:
-        table = Table(box=box.ROUNDED)
-        table.add_column("Categories")
-
-        if isinstance(self.category, list):
-            for category in self.category:
-                table.add_row(category)
-
-        elif isinstance(self.category, str):
-            table.add_row(self.category)
-
-        self.console.print(table, justify="center")
-
-        if PrintFormatted.ask_confirmation(
-            "[yellow]Do you want to save them?(y/n):[/yellow]"
-        ):
-            self.save_category()
-
-
-class SearchCategory:
+class SearchCategory(SearchABC):
 
     ANNOTATIONS_TYPES: Final[list[str]] = ["Tasks", "Notes"]
 
@@ -239,6 +251,9 @@ class SearchCategory:
                 task_categories.COLUMN_NAME,
                 notes_categories.COLUMN_NAME,
             ]
+
+    def category_exists(self) -> bool:
+        pass
 
     def sql_query(self) -> list[list[tuple]]:
         query_list = []

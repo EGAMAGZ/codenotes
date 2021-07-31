@@ -11,10 +11,12 @@ from rich.tree import Tree
 import codenotes.db.utilities.notes as notes
 import codenotes.db.utilities.notes_categories as categories
 import codenotes.util.help as help_text
+from codenotes.abstract import CreateABC, SearchABC
 from codenotes.cli import PrintFormatted
 from codenotes.db.connection import SQLiteConnection
 from codenotes.exceptions import CategoryNotExistsError, MissingArgsException
-from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text
+from codenotes.util.args import (date_args_empty, dates_to_search,
+                                 format_argument_text)
 from codenotes.util.sql import add_conditions_sql
 
 
@@ -35,7 +37,7 @@ def sorter(query: tuple) -> Any:
 
 
 def create_args_empty(args: Namespace) -> bool:
-    """Functions that checks if the arguments required to create a new note are empty
+    """Checks if the arguments required to create a new note are empty
 
     Parameters
     ----------
@@ -55,7 +57,7 @@ def create_args_empty(args: Namespace) -> bool:
 
 
 @final
-class CreateNote:
+class CreateNote(CreateABC):
     """Class to create new notes and categories in the database
 
     This class only has the purpose to create and display the preview of notes, also create new categories and save
@@ -113,10 +115,10 @@ class CreateNote:
                 self._set_note_content(args)
 
                 if args.preview:
-                    self._show_preview()
+                    self.show_preview()
 
                 else:
-                    self.save_note()
+                    self.save()
         except KeyboardInterrupt:
             PrintFormatted.interruption()
 
@@ -133,75 +135,6 @@ class CreateNote:
             Arguments of argparse
         """
         cls(args)
-
-    def _category_exists(self) -> bool:
-        """Checks if the typed category exists
-
-        Returns
-        -------
-        exists: bool
-            Boolean value flag if the category already exists
-        """
-        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.category_name}'"
-        query = self.db.exec_sql(sql)
-        categories_list: list[tuple] = query.fetchall()
-
-        if categories_list:  # # categories_list == (id,)
-            self.category_id = categories_list[0][0]
-            return True
-        return False
-
-    def save_category(self) -> None:
-        """Creates and saves a new category if not exists
-
-        When the note(s) is going to be saved and is created a new category, it will set the id of this new one and
-        store the note(s) in this created category
-        """
-        if (
-            len(self.category_name) <= 30
-        ):  # Category name can't be longer than 30 characters
-
-            if self._category_exists():
-                custom_theme = Theme({"msg": "#31f55f bold", "name": "#616161 italic"})
-                PrintFormatted.custom_print(
-                    f"[msg]Category selected:[/msg][name]{self.category_name}[/name]",
-                    custom_theme,
-                )
-            else:
-                sql = f"INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_NAME}) VALUES (?)"
-                cursor = self.db.exec_sql(sql, (self.category_name,))
-
-                self.category_id = cursor.lastrowid
-
-                self.db.commit()
-                PrintFormatted.print_category_creation(self.category_name)
-
-        else:
-            self._ask_category()
-
-    def save_note(self) -> None:
-        """Saves the note created in the database and setting category to store"""
-        sql = (
-            f"INSERT INTO {notes.TABLE_NAME} ({notes.COLUMN_TITLE}, {notes.COLUMN_CONTENT}, "
-            f"{notes.COLUMN_CATEGORY}, {notes.COLUMN_CREATION}) VALUES (?,?,?,?);"
-        )
-
-        with self.console.status("[bold yellow]Saving Note") as status:
-            values = (
-                self.note_title,
-                self.note_text,
-                self.category_id,
-                self.creation_date,
-            )
-            self.db.exec_sql(sql, values)
-
-            PrintFormatted.print_content_storage(self.note_title, self.category_name)
-
-            self.console.print("[bold green]✔️ Note Correctly Saved")
-            status.stop()
-
-        self.db.commit()
-        self.db.close()
 
     def _set_note_content(self, args) -> None:
         """Set the content (title and text) of the note according to the arguments"""
@@ -241,7 +174,52 @@ class CreateNote:
             while len(self.note_title) == 0 or len(self.note_title) > 30:
                 self.note_text = self.console.input(text).strip()
 
-    def _show_preview(self) -> None:
+    def save_category(self) -> None:
+        """Creates and saves a new category if not exists
+
+        When the note(s) is going to be saved and is created a new category, it will set the id of this new one and
+        store the note(s) in this created category
+        """
+        if (
+            len(self.category_name) <= 30
+        ):  # Category name can't be longer than 30 characters
+
+            if self.category_exists():
+                custom_theme = Theme({"msg": "#31f55f bold", "name": "#616161 italic"})
+                PrintFormatted.custom_print(
+                    f"[msg]Category selected:[/msg][name]{self.category_name}[/name]",
+                    custom_theme,
+                )
+            else:
+                sql = f"INSERT INTO {categories.TABLE_NAME} ({categories.COLUMN_NAME}) VALUES (?)"
+                cursor = self.db.exec_sql(sql, (self.category_name,))
+
+                self.category_id = cursor.lastrowid
+
+                self.db.commit()
+                PrintFormatted.print_category_creation(self.category_name)
+
+        else:
+            self._ask_category()
+
+    def category_exists(self) -> bool:
+        """Checks if the typed category exists
+
+        Returns
+        -------
+        exists: bool
+            Boolean value flag if the category already exists
+        """
+        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.category_name}'"
+        query = self.db.exec_sql(sql)
+        categories_list: list[tuple] = query.fetchall()
+
+        if categories_list:  # # categories_list == (id,)
+            self.category_id = categories_list[0][0]
+            return True
+        return False
+
+    def show_preview(self) -> None:
         """Method that displays a panel with the title and text of the note"""
 
         self.console.rule("Preview", style="purple")
@@ -255,11 +233,35 @@ class CreateNote:
         if PrintFormatted.ask_confirmation(
             "[yellow]Do you want to save it?(y/n):[/yellow]"
         ):
-            self.save_note()
+            self.save()
+
+    def save(self) -> None:
+        """Saves the note created in the database and setting category to store"""
+        sql = (
+            f"INSERT INTO {notes.TABLE_NAME} ({notes.COLUMN_TITLE}, {notes.COLUMN_CONTENT}, "
+            f"{notes.COLUMN_CATEGORY}, {notes.COLUMN_CREATION}) VALUES (?,?,?,?);"
+        )
+
+        with self.console.status("[bold yellow]Saving Note") as status:
+            values = (
+                self.note_title,
+                self.note_text,
+                self.category_id,
+                self.creation_date,
+            )
+            self.db.exec_sql(sql, values)
+
+            PrintFormatted.print_content_storage(self.note_title, self.category_name)
+
+            self.console.print("[bold green]✔️ Note Correctly Saved")
+            status.stop()
+
+        self.db.commit()
+        self.db.close()
 
 
 @final
-class SearchNote:
+class SearchNote(SearchABC):
     """Class to search and display notes in the database
 
     This class only has the purpouse to search and display the notes. The arguments that will be used to filter the
@@ -332,6 +334,23 @@ class SearchNote:
         """
         cls(args)
 
+    def category_exists(self) -> bool:
+        """Checks if the typed category exists
+
+        Returns
+        -------
+        exists: bool
+            Boolean value flag if the category already exists
+        """
+        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.search_category}'"
+        query = self.db.exec_sql(sql)
+        categories_list: list[tuple] = query.fetchall()
+
+        if categories_list:  # categories_list == (id,)
+            self.search_category_id = categories_list[0][0]
+            return True
+        return False
+
     def sql_query(self) -> list[tuple]:
         """Function that makes a query of related information of notes, and also adds more statements to the main sql
 
@@ -367,7 +386,7 @@ class SearchNote:
             )
 
         if self.search_category:
-            if not self._category_exists():
+            if not self.category_exists():
                 raise CategoryNotExistsError
             sql = add_conditions_sql(
                 sql, f"{notes.COLUMN_CATEGORY} = {self.search_category_id}", "AND"
@@ -376,23 +395,6 @@ class SearchNote:
         query = self.db.exec_sql(sql)
 
         return query.fetchall()
-
-    def _category_exists(self) -> bool:
-        """Checks if the typed category exists
-
-        Returns
-        -------
-        exists: bool
-            Boolean value flag if the category already exists
-        """
-        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.search_category}'"
-        query = self.db.exec_sql(sql)
-        categories_list: list[tuple] = query.fetchall()
-
-        if categories_list:  # categories_list == (id,)
-            self.search_category_id = categories_list[0][0]
-            return True
-        return False
 
     def search(self) -> None:
         """Function that displays a tree with Panels as child nodes with the notes searched"""
