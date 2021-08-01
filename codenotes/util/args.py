@@ -51,7 +51,7 @@ def dates_to_search(args: Namespace) -> Optional[Union[list[date], date]]:
 
     Returns
     -------
-    search_date : Union[list[date], date]
+    search_date : Optional[Union[list[date], date]]
         Returns date to search
     """
     now = datetime.now().date()

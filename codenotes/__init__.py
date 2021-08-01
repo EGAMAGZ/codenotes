@@ -109,7 +109,6 @@ def parse_args(sys_args: list) -> argparse.Namespace:
 def enable_logging() -> None:
     logging.basicConfig(
         filename="codenotes.log",
-        encoding="utf-8",
         format="%(asctime)s-%(name)s-%(levelname)s:%(message)s",
         level=logging.INFO,
         datefmt="%m/%d/%Y %I:%M:%S %p",

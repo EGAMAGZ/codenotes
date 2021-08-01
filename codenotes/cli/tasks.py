@@ -145,7 +145,7 @@ class CreateTask(CreateABC):
         store the task(s) in this created category
         """
         if len(self.category_name) <= 30:
-            if self.category_exists():
+            if self.category_exists(self.category_name):
 
                 custom_theme = Theme({"msg": "#31f55f bold", "name": "#616161 italic"})
                 PrintFormatted.custom_print(
@@ -175,7 +175,7 @@ class CreateTask(CreateABC):
         else:
             self.__save_category()
 
-    def category_exists(self) -> bool:
+    def category_exists(self, category_name: str) -> bool:
         """Checks if the typed category exists
 
         Returns
@@ -185,7 +185,7 @@ class CreateTask(CreateABC):
         """
         sql = (
             f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE "
-            f"{categories.COLUMN_NAME} = '{self.category_name}'"
+            f"{categories.COLUMN_NAME} = '{category_name}'"
         )
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
@@ -325,7 +325,7 @@ class SearchTask(SearchABC):
         """
         cls(args)
 
-    def category_exists(self) -> bool:
+    def category_exists(self, category_name: str) -> bool:
         """Checks if the typed category exists
 
         Returns
@@ -335,7 +335,7 @@ class SearchTask(SearchABC):
         """
         sql = (
             f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE "
-            f"{categories.COLUMN_NAME} = '{self.search_category}'"
+            f"{categories.COLUMN_NAME} = '{category_name}'"
         )
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
@@ -381,7 +381,7 @@ class SearchTask(SearchABC):
             )
 
         if self.search_category:
-            if not self.category_exists():
+            if not self.category_exists(self.search_category):
                 raise CategoryNotExistsError
             sql = add_conditions_sql(
                 sql, f"{tasks.COLUMN_CATEGORY} = {self.search_category_id}", "AND"

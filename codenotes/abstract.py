@@ -20,7 +20,7 @@ class CreateABC(ABC):
         ...
 
     @abstractmethod
-    def category_exists(self) -> bool:
+    def category_exists(self, category_name: str) -> bool:
         ...
 
     @abstractmethod
@@ -45,7 +45,7 @@ class SearchABC(ABC):
         ...
 
     @abstractmethod
-    def category_exists(self) -> bool:
+    def category_exists(self, category_name: str) -> bool:
         ...
 
     @abstractmethod

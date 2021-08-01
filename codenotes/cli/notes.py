@@ -1,6 +1,6 @@
 from argparse import Namespace
 from datetime import date, datetime
-from typing import Any, Union, final
+from typing import Any, Optional, Union, final
 
 from rich.console import Console
 from rich.markdown import Markdown
@@ -184,7 +184,7 @@ class CreateNote(CreateABC):
             len(self.category_name) <= 30
         ):  # Category name can't be longer than 30 characters
 
-            if self.category_exists():
+            if self.category_exists(self.category_name):
                 custom_theme = Theme({"msg": "#31f55f bold", "name": "#616161 italic"})
                 PrintFormatted.custom_print(
                     f"[msg]Category selected:[/msg][name]{self.category_name}[/name]",
@@ -202,7 +202,7 @@ class CreateNote(CreateABC):
         else:
             self._ask_category()
 
-    def category_exists(self) -> bool:
+    def category_exists(self, category_name: str) -> bool:
         """Checks if the typed category exists
 
         Returns
@@ -212,7 +212,7 @@ class CreateNote(CreateABC):
         """
         sql = (
             f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE "
-            f"{categories.COLUMN_NAME} = '{self.category_name}'"
+            f"{categories.COLUMN_NAME} = '{category_name}'"
         )
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
@@ -288,7 +288,7 @@ class SearchNote(SearchABC):
 
     console: Console
     db: SQLiteConnection
-    search_date: Union[list[date], date]
+    search_date: Optional[Union[list[date], date]]
     search_text: str
     search_category: str = None
     search_category_id: int = None
@@ -337,7 +337,7 @@ class SearchNote(SearchABC):
         """
         cls(args)
 
-    def category_exists(self) -> bool:
+    def category_exists(self, category_name: str) -> bool:
         """Checks if the typed category exists
 
         Returns
@@ -347,7 +347,7 @@ class SearchNote(SearchABC):
         """
         sql = (
             f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE "
-            f"{categories.COLUMN_NAME} = '{self.search_category}'"
+            f"{categories.COLUMN_NAME} = '{category_name}'"
         )
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
@@ -392,7 +392,7 @@ class SearchNote(SearchABC):
             )
 
         if self.search_category:
-            if not self.category_exists():
+            if not self.category_exists(self.search_category):
                 raise CategoryNotExistsError
             sql = add_conditions_sql(
                 sql, f"{notes.COLUMN_CATEGORY} = {self.search_category_id}", "AND"

@@ -255,7 +255,8 @@ class SearchCategory(SearchABC):
                 notes_categories.COLUMN_NAME,
             ]
 
-    def category_exists(self) -> bool:
+    def category_exists(self, category_name: str) -> bool:
+        # TODO: Use this method
         pass
 
     def sql_query(self) -> list[list[tuple]]:
