@@ -183,7 +183,10 @@ class CreateTask(CreateABC):
         exists: bool
             Boolean value flag if the category already exists
         """
-        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.category_name}'"
+        sql = (
+            f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE "
+            f"{categories.COLUMN_NAME} = '{self.category_name}'"
+        )
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
 
@@ -330,7 +333,10 @@ class SearchTask(SearchABC):
         exists: bool
             Boolean value flag if the category already exists
         """
-        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.search_category}'"
+        sql = (
+            f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE "
+            f"{categories.COLUMN_NAME} = '{self.search_category}'"
+        )
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
 

@@ -23,4 +23,5 @@ CREATE_TABLE: Final[Text] = (
 
 # from datetime import datetime
 # datetime.now().date()
-# datetime.date(2020, 8, 12) <- This is how date is stored https://www.tutorialspoint.com/How-to-store-and-retrieve-date-into-Sqlite3-database-using-Python
+# datetime.date(2020, 8, 12) <- This is how date is stored
+# https://www.tutorialspoint.com/How-to-store-and-retrieve-date-into-Sqlite3-database-using-Python

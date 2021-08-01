@@ -118,7 +118,10 @@ class CreateCategory(CreateABC):
         exists: bool
             Boolean value flag if the category already exists
         """
-        sql = f"SELECT {self.category_id_column} FROM {self.category_table_name} WHERE {self.category_name_column} = '{category_name}'"
+        sql = (
+            f"SELECT {self.category_id_column} FROM {self.category_table_name} WHERE "
+            f"{self.category_name_column} = '{category_name}'"
+        )
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
 

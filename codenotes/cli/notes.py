@@ -1,6 +1,6 @@
 from argparse import Namespace
 from datetime import date, datetime
-from typing import Any, Final, Text, Union, final
+from typing import Any, Union, final
 
 from rich.console import Console
 from rich.markdown import Markdown
@@ -210,7 +210,10 @@ class CreateNote(CreateABC):
         exists: bool
             Boolean value flag if the category already exists
         """
-        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.category_name}'"
+        sql = (
+            f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE "
+            f"{categories.COLUMN_NAME} = '{self.category_name}'"
+        )
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
 
@@ -342,7 +345,10 @@ class SearchNote(SearchABC):
         exists: bool
             Boolean value flag if the category already exists
         """
-        sql = f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE {categories.COLUMN_NAME} = '{self.search_category}'"
+        sql = (
+            f"SELECT {categories.COLUMN_ID} FROM {categories.TABLE_NAME} WHERE "
+            f"{categories.COLUMN_NAME} = '{self.search_category}'"
+        )
         query = self.db.exec_sql(sql)
         categories_list: list[tuple] = query.fetchall()
 

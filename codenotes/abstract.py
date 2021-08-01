@@ -20,7 +20,7 @@ class CreateABC(ABC):
         ...
 
     @abstractmethod
-    def category_exists(self) -> None:
+    def category_exists(self) -> bool:
         ...
 
     @abstractmethod

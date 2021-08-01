@@ -1,7 +1,7 @@
 import os
 import sqlite3
 from sqlite3.dbapi2 import Connection, Cursor
-from typing import Any, AnyStr, Final
+from typing import Any, AnyStr, Final, Optional
 
 import codenotes.db.utilities.notes as notes
 import codenotes.db.utilities.notes_categories as notes_categories
@@ -65,7 +65,7 @@ class SQLiteConnection:
 
         self.connection.commit()
 
-    def exec_sql(self, sql: str, values: tuple[Any] = None) -> Cursor:
+    def exec_sql(self, sql: str, values: Optional[tuple[Any]] = None) -> Cursor:
         """Method that executes sql command
 
         Parameters
