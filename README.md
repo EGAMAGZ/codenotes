@@ -35,21 +35,21 @@ pip install --upgrade .
 Run `codenotes` to display the usage text.
 
 ```
-codenotes <action> <annotation> <flags>
+codenotes <annotation> <action> <flags>
 ```
 <img src="images/CodenotesSample.gif">
 
 **Features**
-* Creates notes and tasks, and saves them in a category optionally specified
-* Shows a preview of the annotation creation
-* Creates categories where tasks or notes will be saved
-* Searches for annotations created today, yesterday, during the week or month
-
+* Create notes and tasks, and saves them in a category optionally specified
+* Create categories for the different annotations
+* Check the annotations or categories that will be created with a preview
+* Create categories where tasks or notes will be saved
+* Search for annotations created today, yesterday, during the week, month and ever, and by keywords
+* Search for categories created in each type of annotation or in all of them at the same time, and search by keywords
 ## Unit Tests
-`codenotes` unit tests are written for `unittest`. To run the tests:
-```
-python -m unittest
-```
+`codenotes` unit tests are written for `unittest`, using `tox` and `pyenv`. List of python versions tested and supported:
+* 3.9
+* 3.10.0b3
 
 ## License
 MIT License
