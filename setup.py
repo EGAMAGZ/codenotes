@@ -11,7 +11,7 @@ with open('README.md', 'r') as readme_file:
 
 setup(
     name="Codenotes",
-    version="0.0.1",
+    version="0.0.2",
     author="Gamaliel Garcia",
     author_email="egamagz.dev@outlook.com",
     description='A simple CLI where you can save and view all your created annotations',
