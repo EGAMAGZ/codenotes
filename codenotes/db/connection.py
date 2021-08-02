@@ -86,7 +86,7 @@ class SQLiteConnection:
         return self.cursor.execute(sql)
 
     def commit(self) -> None:
-        """Method commits the current transaction"""
+        """Commits the current transaction"""
         self.connection.commit()
 
     def close(self) -> None:

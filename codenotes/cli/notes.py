@@ -205,6 +205,11 @@ class CreateNote(CreateABC):
     def category_exists(self, category_name: str) -> bool:
         """Checks if the typed category exists
 
+        Parameters
+        ----------
+        category_name: str
+            Name of the category which will be verified if it exists
+
         Returns
         -------
         exists: bool
@@ -284,6 +289,12 @@ class SearchNote(SearchABC):
 
     search_text: str
         Text to search in the title of the notes
+
+    search_category: str
+        Name of the category where the notes will be searched
+
+    search_category_id : int
+        Id of the category where the notes will be searched
     """
 
     console: Console
@@ -340,6 +351,11 @@ class SearchNote(SearchABC):
     def category_exists(self, category_name: str) -> bool:
         """Checks if the typed category exists
 
+        Parameters
+        ----------
+        category_name: str
+            Name of the category which will be verified if it exists
+
         Returns
         -------
         exists: bool
@@ -358,7 +374,7 @@ class SearchNote(SearchABC):
         return False
 
     def sql_query(self) -> list[tuple]:
-        """Function that makes a query of related information of notes, and also adds more statements to the main sql
+        """Makes a query of related information of notes, and also adds more statements to the main sql
 
         Returns
         -------
@@ -386,6 +402,7 @@ class SearchNote(SearchABC):
                     f'{notes.COLUMN_CREATION} BETWEEN date("{first_day}") '
                     f'AND date("{last_day}")',
                 )
+
         if self.search_text:
             sql = add_conditions_sql(
                 sql, f'{notes.COLUMN_TITLE} LIKE "%{self.search_text}%"', "AND"
@@ -394,6 +411,7 @@ class SearchNote(SearchABC):
         if self.search_category:
             if not self.category_exists(self.search_category):
                 raise CategoryNotExistsError
+
             sql = add_conditions_sql(
                 sql, f"{notes.COLUMN_CATEGORY} = {self.search_category_id}", "AND"
             )
@@ -403,7 +421,7 @@ class SearchNote(SearchABC):
         return query.fetchall()
 
     def search(self) -> None:
-        """Function that displays a tree with Panels as child nodes with the notes searched"""
+        """Displays a tree with Panels as child nodes with the notes searched"""
         root = Tree("📒[bold #964B00] List of Notes Found")
         query = self.sql_query()
 

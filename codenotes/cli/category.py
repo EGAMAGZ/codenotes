@@ -57,6 +57,31 @@ def search_args_empty(args: Namespace) -> bool:
 
 @final
 class CreateCategory(CreateABC):
+    """Class to create new categories in the database
+
+    This class only hast the purpose to create and display the preview of categories. The arguments that will be used
+    to create it are the name of the category and the type of annotation where it wil be created, both required.
+
+    Attributes
+    ----------
+    category: Union[list[str], str]
+        Single or list of category names that will be stored
+
+    category_table_name: str
+        Name of the annotation type table where the categories will be stored
+
+    category_id_column: str
+        Name of the annotation type id column used to check if a category already exists
+
+    category_name_column: str
+        Name of the annotation type name column where the categories will be stored
+
+    console: Console
+        (Rich) Console for beatiful printting
+
+    db: SQLiteConnection
+        Connection with the dabatase
+    """
 
     category: Union[list[str], str]
     category_table_name: str
@@ -66,6 +91,13 @@ class CreateCategory(CreateABC):
     db: SQLiteConnection
 
     def __init__(self, args: Namespace) -> None:
+        """CreateCategory Constructor
+
+        Parameters
+        ----------
+        args : NameSpace
+            Arguments of argparse
+        """
         self.console = Console()
         self.db = SQLiteConnection()
 
@@ -100,6 +132,13 @@ class CreateCategory(CreateABC):
         cls(args)
 
     def __get_category_table(self, args: Namespace) -> None:
+        """Sets a single or a list of table names and columns to store the category in a type of annation
+
+        Parameters
+        ----------
+        args: Namespace
+            Arguments of argparse
+        """
         if args.note:
             self.category_table_name = notes_categories.TABLE_NAME
             self.category_id_column = notes_categories.COLUMN_ID
@@ -130,6 +169,7 @@ class CreateCategory(CreateABC):
         return False
 
     def show_preview(self) -> None:
+        """Displays a table with the categories that will be stored"""
         table = Table(box=box.ROUNDED)
         table.add_column("Categories")
 
@@ -148,6 +188,8 @@ class CreateCategory(CreateABC):
             self.save()
 
     def save(self) -> None:
+        """Stores the categories in the database"""
+
         sql = f"INSERT INTO {self.category_table_name} ({self.category_name_column}) VALUES(?)"
 
         with self.console.status("[bold yellow]Saving Category...") as status:
@@ -190,6 +232,35 @@ class CreateCategory(CreateABC):
 
 
 class SearchCategory(SearchABC):
+    """Class to search and display categories in the database
+
+    This class only has the purpose to search and display the categories. The arguments that wil be used to filter the
+    search are text and type(s) of annotation. The SQL statement for the query will be dinamycally generate depending
+    on the captured (and previously mentioned arguments).
+
+    Attributes
+    ----------
+    ANNOTATIONS_TYPE: Final[list[str]]
+        Contant list with all the types of annotations
+
+    console: Console
+        (Rich) Console for beautiful printting
+
+    db: SQLiteConnection
+        Connection with the dabatase
+
+    search_category: str
+        Name of the category that will be searched in the type of annotations
+
+    category_table_name: str
+        Name of the annotation type table where the categories will be searched
+
+    category_id_column: str
+        Name of the annotation type id column used to check if a category already exists
+
+    category_name_column: str
+        Name of the annotation type name column where the categories will be seached
+    """
 
     ANNOTATIONS_TYPES: Final[list[str]] = ["Tasks", "Notes"]
 
@@ -201,6 +272,13 @@ class SearchCategory(SearchABC):
     category_name_column: Union[list[str], str]
 
     def __init__(self, args: Namespace) -> None:
+        """SearchCategory Constructor
+
+        Parameters
+        ----------
+        args : NameSpace
+            Arguments of argparse
+        """
         self.console = Console()
         self.db = SQLiteConnection()
         try:
@@ -231,6 +309,13 @@ class SearchCategory(SearchABC):
         cls(args)
 
     def __get_category_table(self, args: Namespace) -> None:
+        """Sets a single or a list of table names and columns to search the category in the types of annations
+
+        Parameters
+        ----------
+        args: Namespace
+            Arguments of argparse
+        """
         if args.note:
             self.category_table_name = notes_categories.TABLE_NAME
             self.category_id_column = notes_categories.COLUMN_ID
@@ -256,10 +341,18 @@ class SearchCategory(SearchABC):
             ]
 
     def category_exists(self, category_name: str) -> bool:
-        # TODO: Use this method
+        # TODO: Check if category typed exists in any type of annotation
         pass
 
     def sql_query(self) -> list[list[tuple]]:
+        """Makes a query of related information of tasks, and also adds more statements to the main sql
+        sql
+
+        Returns
+        -------
+        query: list[list[tuple]]
+            Query done to the database
+        """
         query_list = []
 
         if isinstance(self.category_table_name, str):
@@ -287,6 +380,7 @@ class SearchCategory(SearchABC):
         return query_list
 
     def search(self) -> None:
+        """Displays a tree with tables as child nodes with the categories searched"""
         root = Tree("📒[bold blue] List of Categories Found")
         query = self.sql_query()
 

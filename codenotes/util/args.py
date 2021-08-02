@@ -14,7 +14,7 @@ def date_args_empty(args: Namespace) -> bool:
 
     Returns
     -------
-    empty : bool
+    empty: bool
         Return boolean value if all related args to search are empty
     """
     args_needed = [
@@ -51,7 +51,7 @@ def dates_to_search(args: Namespace) -> Optional[Union[list[date], date]]:
 
     Returns
     -------
-    search_date : Optional[Union[list[date], date]]
+    search_date: Optional[Union[list[date], date]]
         Returns date to search
     """
     now = datetime.now().date()

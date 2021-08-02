@@ -178,6 +178,11 @@ class CreateTask(CreateABC):
     def category_exists(self, category_name: str) -> bool:
         """Checks if the typed category exists
 
+        Parameters
+        ----------
+        category_name: str
+            Name of the category which will be verified if it exists
+
         Returns
         -------
         exists: bool
@@ -196,7 +201,7 @@ class CreateTask(CreateABC):
         return False
 
     def show_preview(self) -> None:
-        """Method that displays a table with the tasks written"""
+        """Method that displays a table with the tasks that will be stored"""
         formatted_date = self.creation_date.strftime("%Y-%m-%d")
 
         self.console.rule("Preview", style="purple")
@@ -219,7 +224,7 @@ class CreateTask(CreateABC):
             self.save()
 
     def save(self) -> None:
-        """Function in charge to store the tasks in the database"""
+        """Stores the task(s) in the database"""
 
         sql = (
             f"INSERT INTO {tasks.TABLE_NAME} ({tasks.COLUMN_CONTENT},{tasks.COLUMN_CREATION}, "
@@ -272,6 +277,12 @@ class SearchTask(SearchABC):
 
     search_text: str
         Text to search in the content of the tasks
+
+    search_category: str
+        Name of the category where the notes will be searched
+
+    search_category_id : int
+        Id of the category where the notes will be searched
     """
 
     console: Console
@@ -328,6 +339,11 @@ class SearchTask(SearchABC):
     def category_exists(self, category_name: str) -> bool:
         """Checks if the typed category exists
 
+        Parameters
+        ----------
+        category_name: str
+            Name of the category which will be verified if it exists
+
         Returns
         -------
         exists: bool
@@ -346,7 +362,7 @@ class SearchTask(SearchABC):
         return False
 
     def sql_query(self) -> list[tuple]:
-        """Function that makes a query of related information of tasks, and also adds more statements to the main sql
+        """Makes a query of related information of tasks, and also adds more statements to the main sql
         sql
 
         Returns
@@ -392,7 +408,7 @@ class SearchTask(SearchABC):
         return query.fetchall()
 
     def search(self) -> None:
-        """Function that displays a tree with tables as child nodes with the tasks searched"""
+        """Displays a tree with tables as child nodes with the tasks searched"""
         root = Tree("📒[bold blue] List of Tasks  Found")
         query = self.sql_query()
 
