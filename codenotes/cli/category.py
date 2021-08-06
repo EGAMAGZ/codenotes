@@ -30,8 +30,8 @@ def create_args_empty(args: Namespace) -> bool:
     empty: bool
         Return boolean value if any args are empty
     """
-    args_needed = [args.note, args.task, args.text]
-    if any(args_needed):
+    args_needed = [args.note, args.task]
+    if any(args_needed) and args.text:
         return False
     return True
 
@@ -83,7 +83,7 @@ class CreateCategory(CreateABC):
         Connection with the dabatase
     """
 
-    category: Union[list[str], str]
+    category_name: Union[list[str], str]
     category_table_name: str
     category_id_column: str
     category_name_column: str
@@ -105,8 +105,9 @@ class CreateCategory(CreateABC):
             if create_args_empty(args):
                 raise MissingArgsException
 
-            self.category = format_list_text(args.text)
             self.__get_category_table(args)
+            self.category_name = format_list_text(args.text)
+            self._check_category_name()
 
             if args.preview:
                 self.show_preview()
@@ -149,6 +150,31 @@ class CreateCategory(CreateABC):
             self.category_id_column = task_categories.COLUMN_ID
             self.category_name_column = task_categories.COLUMN_NAME
 
+    def _check_category_name(self) -> None:
+        """Check if the category name can be saved
+
+        The name of the categories can't be longer than 30 characters
+        """
+        if isinstance(self.category_name, str):
+            if len(self.category_name) > 30:
+                text = f"⚠️[yellow]Category name is too long(Max. 30).[/yellow] Write another title:"
+                self.category_name = self.console.input(text).strip()
+
+                while len(self.category_name) == 0 or len(self.category_name) > 30:
+                    self.category_name = self.console.input(text).strip()
+
+        elif isinstance(self.category_name, list):
+            index = 0
+            for category in self.category_name:
+                if len(category) > 30:
+                    text = f'⚠️[yellow]"{category}" is too long(Max. 30).[/yellow] Write another title:'
+                    category = self.console.input(text).strip()
+
+                    while len(category) == 0 or len(category) > 30:
+                        category = self.console.input(text).strip()
+                    self.category_name[index] = category
+                index += 1
+
     def category_exists(self, category_name: str) -> bool:
         """Checks if the typed category exists
 
@@ -173,13 +199,14 @@ class CreateCategory(CreateABC):
         table = Table(box=box.ROUNDED)
         table.add_column("Categories")
 
-        if isinstance(self.category, list):
-            for category in self.category:
+        if isinstance(self.category_name, list):
+            for category in self.category_name:
                 table.add_row(category)
 
-        elif isinstance(self.category, str):
-            table.add_row(self.category)
+        elif isinstance(self.category_name, str):
+            table.add_row(self.category_name)
 
+        self.console.rule("Preview", style="purple")
         self.console.print(table, justify="center")
 
         if PrintFormatted.ask_confirmation(
@@ -193,9 +220,8 @@ class CreateCategory(CreateABC):
         sql = f"INSERT INTO {self.category_table_name} ({self.category_name_column}) VALUES(?)"
 
         with self.console.status("[bold yellow]Saving Category...") as status:
-            if isinstance(self.category, list):
-                # TODO: Validate if len of the category is 30
-                for category in self.category:
+            if isinstance(self.category_name, list):
+                for category in self.category_name:
                     if not self.category_exists(category):
                         values = (category,)
                         self.db.exec_sql(sql, values)
@@ -207,19 +233,19 @@ class CreateCategory(CreateABC):
                             f'❌ [bold] [red]"{category}"[/bold] already exists'
                         )
 
-            elif isinstance(self.category, str):
-                if not self.category_exists(self.category):
-                    values = (self.category,)
+            elif isinstance(self.category_name, str):
+                if not self.category_exists(self.category_name):
+                    values = (self.category_name,)
                     self.db.exec_sql(sql, values)
 
-                    PrintFormatted.print_category_creation(self.category)
+                    PrintFormatted.print_category_creation(self.category_name)
 
                 else:
                     PrintFormatted.custom_print(
-                        f'❌ [bold] [red]"{self.category}"[/bold] already exists'
+                        f'❌ [bold] [red]"{self.category_name}"[/bold] already exists'
                     )
 
-            if self.category:
+            if self.category_name:
                 self.console.print("[bold green]✔️ Category Saved")
 
             else:
@@ -385,9 +411,9 @@ class SearchCategory(SearchABC):
         query = self.sql_query()
 
         if query:
-            i = 0
+            index = 0
             for categories_list in query:
-                child_branch = root.add(f"📒[#d898ed]{self.ANNOTATIONS_TYPES[i]}")
+                child_branch = root.add(f"📒[#d898ed]{self.ANNOTATIONS_TYPES[index]}")
 
                 table = Table()
                 table.add_column("Name")
@@ -396,7 +422,7 @@ class SearchCategory(SearchABC):
                     table.add_row(categories[0])
 
                 child_branch.add(table)
-                i += 1
+                index += 1
 
         else:
             root.add("[red]❌ No Category Found")

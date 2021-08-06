@@ -9,8 +9,8 @@ class TestCreateCategory(unittest.TestCase):
         args = parse_args(["category", "create", ";", "--note"])
         create_category = CreateCategory(args)
 
-        self.assertTrue(isinstance(create_category.category, list))
-        self.assertListEqual(create_category.category, [])
+        self.assertTrue(isinstance(create_category.category_name, list))
+        self.assertListEqual(create_category.category_name, [])
 
     def test_create_one(self) -> None:
         expected_category = "New category #1"
@@ -18,8 +18,8 @@ class TestCreateCategory(unittest.TestCase):
         args = parse_args(["category", "create", "New", "category", "#1", "--task"])
         create_category = CreateCategory(args)
 
-        self.assertTrue(isinstance(create_category.category, str))
-        self.assertEqual(create_category.category, expected_category)
+        self.assertTrue(isinstance(create_category.category_name, str))
+        self.assertEqual(create_category.category_name, expected_category)
 
         # TODO: CREATE NEW CATEGORY IN NOTES, AND TEST IT
 
@@ -31,8 +31,8 @@ class TestCreateCategory(unittest.TestCase):
         )
         create_category = CreateCategory(args)
 
-        self.assertTrue(isinstance(create_category.category, list))
-        self.assertListEqual(create_category.category, expected_categories)
+        self.assertTrue(isinstance(create_category.category_name, list))
+        self.assertListEqual(create_category.category_name, expected_categories)
 
 
 class TestSearchCategory(unittest.TestCase):
