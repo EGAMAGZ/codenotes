@@ -1,6 +1,6 @@
 from argparse import Namespace
 from datetime import date, datetime
-from typing import Any, Optional, Union, final
+from typing import Any, Final, Optional, Union, final
 
 from rich.console import Console
 from rich.markdown import Markdown
@@ -15,8 +15,7 @@ from codenotes.abstract import CreateABC, SearchABC
 from codenotes.cli import PrintFormatted
 from codenotes.db.connection import SQLiteConnection
 from codenotes.exceptions import CategoryNotExistsError, MissingArgsException
-from codenotes.util.args import (date_args_empty, dates_to_search,
-                                 format_argument_text)
+from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text
 from codenotes.util.sql import add_conditions_sql
 
 
@@ -65,16 +64,22 @@ class CreateNote(CreateABC):
 
     Attributes
     ----------
+    DEFAULT_CATEGORY_ID: Final[int]
+        Constant with the id of the default category
+
+    DEFAULT_CATEGORY_NAME: Final[str]
+        Constant with the name of the default category
+
     category_id: int
         Category Id where the note will be stored (Default 1)
 
     category_name: str
         Category name where the note will be stored (Default 'General')
 
-    note_title: str
+    note_title: Optional[str]
         Note title that can be assigned by the user or by its content
 
-    note_text: str
+    note_text: Optional[str]
         Content title that can be assigned by the user or not
 
     creation_date: date
@@ -84,10 +89,13 @@ class CreateNote(CreateABC):
         (Rich) Console for beatiful printting
     """
 
-    category_id: int = 1  # Default Id of 'General' category
-    category_name: str = "General"  # Default category name
-    note_title: str = None
-    note_text: str = None
+    DEFAULT_CATEGORY_ID: Final[int] = 1
+    DEFAULT_CATEGORY_NAME: Final[str] = "General"
+
+    category_id: int = DEFAULT_CATEGORY_ID
+    category_name: str = DEFAULT_CATEGORY_NAME
+    note_title: Optional[str] = None
+    note_text: Optional[str] = None
     creation_date: date  # Today's date
     console: Console
 
@@ -109,7 +117,7 @@ class CreateNote(CreateABC):
 
             if args.category:
                 self.category_name = format_argument_text(args.category)
-                self.save_category()
+                self._save_category()
 
             if args.text or args.title:
                 self._set_note_content(args)
@@ -160,7 +168,7 @@ class CreateNote(CreateABC):
         while len(self.category_name) == 0 or len(self.category_name) > 30:
             self.category_name = self.console.input(text).strip()
         else:
-            self.save_category()
+            self._save_category()
 
     def _check_note_title(self) -> None:
         """Check if the note title can be saved
@@ -174,7 +182,7 @@ class CreateNote(CreateABC):
             while len(self.note_title) == 0 or len(self.note_title) > 30:
                 self.note_text = self.console.input(text).strip()
 
-    def save_category(self) -> None:
+    def _save_category(self) -> None:
         """Creates and saves a new category if not exists
 
         When the note(s) is going to be saved and is created a new category, it will set the id of this new one and
@@ -301,8 +309,8 @@ class SearchNote(SearchABC):
     db: SQLiteConnection
     search_date: Optional[Union[list[date], date]]
     search_text: str
-    search_category: str = None
-    search_category_id: int = None
+    search_category: Optional[str] = None
+    search_category_id: Optional[int] = None
 
     def __init__(self, args: Namespace) -> None:
         """SearchNote constructor

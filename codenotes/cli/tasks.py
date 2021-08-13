@@ -1,6 +1,6 @@
 from argparse import Namespace
 from datetime import date, datetime
-from typing import Any, Optional, Union, final
+from typing import Any, Final, Optional, Union, final
 
 from rich import box
 from rich.console import Console
@@ -66,6 +66,12 @@ class CreateTask(CreateABC):
 
     Attributes
     ----------
+    DEFAULT_CATEGORY_ID: Final[int]
+        Constant with the id of the default category
+
+    DEFAULT_CATEGORY_NAME: Final[str]
+        Constant with the name of the default category
+
     category_id: int
         Category Id where the note will be stored (Default 1)
 
@@ -85,8 +91,11 @@ class CreateTask(CreateABC):
         Connection with the dabatase
     """
 
-    category_id: int = 1
-    category_name: str = "TODO Task"
+    DEFAULT_CATEGORY_ID: Final[int] = 1
+    DEFAULT_CATEGORY_NAME: Final[str] = "TODO Taks"
+
+    category_id: int = DEFAULT_CATEGORY_ID
+    category_name: str = DEFAULT_CATEGORY_NAME
     creation_date: date
     task: Union[list[str], str]
     console: Console
@@ -111,7 +120,7 @@ class CreateTask(CreateABC):
             if args.category:
                 # Will create a new category if not exists
                 self.category_name = format_argument_text(args.category)
-                self.__save_category()
+                self._save_category()
 
             if args.text:
                 self.task = format_list_text(args.text)
@@ -138,7 +147,7 @@ class CreateTask(CreateABC):
         """
         cls(args)
 
-    def __save_category(self) -> None:
+    def _save_category(self) -> None:
         """Creates and saves a new category if not exists
 
         When the task(s) is going to be saved and is created a new category, it will set the id of this new one and
@@ -173,7 +182,7 @@ class CreateTask(CreateABC):
         while len(self.category_name) == 0 or len(self.category_name) > 30:
             self.category_name = self.console.input(text).strip()
         else:
-            self.__save_category()
+            self._save_category()
 
     def category_exists(self, category_name: str) -> bool:
         """Checks if the typed category exists
@@ -201,7 +210,7 @@ class CreateTask(CreateABC):
         return False
 
     def show_preview(self) -> None:
-        """Method that displays a table with the tasks that will be stored"""
+        """Displays a table with the tasks that will be stored"""
         formatted_date = self.creation_date.strftime("%Y-%m-%d")
 
         self.console.rule("Preview", style="purple")
@@ -289,8 +298,8 @@ class SearchTask(SearchABC):
     db: SQLiteConnection
     search_date: Optional[Union[date, list[date]]]
     search_text: str
-    search_category: str = None
-    search_category_id: int = None
+    search_category: Optional[str] = None
+    search_category_id: Optional[int] = None
 
     def __init__(self, args: Namespace) -> None:
         """SearchTask Constructor

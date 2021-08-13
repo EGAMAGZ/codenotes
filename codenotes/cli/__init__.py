@@ -101,7 +101,7 @@ class PrintFormatted:
         custom_text = text  # Text with rich format
         answer = print_formatted.console.input(custom_text).strip()
 
-        while len(answer) > 0 and answer.lower() != "n" and answer.lower() != "y":
+        while answer.lower() != "n" and answer.lower() != "y":
             answer = print_formatted.console.input(custom_text)
 
         if answer.lower() == "y":

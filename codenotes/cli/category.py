@@ -8,7 +8,7 @@ from rich.tree import Tree
 
 import codenotes.db.utilities.notes_categories as notes_categories
 import codenotes.db.utilities.tasks_categories as task_categories
-from codenotes.abstract import CreateABC, SearchABC
+from codenotes.abstract import CreateABC, DeleteABC, SearchABC
 from codenotes.cli import PrintFormatted
 from codenotes.db.connection import SQLiteConnection
 from codenotes.exceptions import MissingArgsException
@@ -157,7 +157,7 @@ class CreateCategory(CreateABC):
         """
         if isinstance(self.category_name, str):
             if len(self.category_name) > 30:
-                text = f"⚠️[yellow]Category name is too long(Max. 30).[/yellow] Write another title:"
+                text = "⚠️[yellow]Category name is too long(Max. 30).[/yellow] Write another title:"
                 self.category_name = self.console.input(text).strip()
 
                 while len(self.category_name) == 0 or len(self.category_name) > 30:
@@ -367,7 +367,6 @@ class SearchCategory(SearchABC):
             ]
 
     def category_exists(self, category_name: str) -> bool:
-        # TODO: Check if category typed exists in any type of annotation
         pass
 
     def sql_query(self) -> list[list[tuple]]:
@@ -429,5 +428,19 @@ class SearchCategory(SearchABC):
         self.console.print(root)
 
 
-class DeleteCategory:
-    pass
+class DeleteCategory(DeleteABC):
+    def __init__(self, args: Namespace) -> None:
+        pass
+
+    @classmethod
+    def set_args(cls, args: Namespace) -> None:
+        pass
+
+    def category_exists(self, category_name: str) -> bool:
+        pass
+
+    def sql_query(self) -> tuple:
+        pass
+
+    def delete(self) -> None:
+        pass
