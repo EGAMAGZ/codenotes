@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from argparse import Namespace
-from typing import Union, overload
+from typing import Union
 
 Query = list[tuple]
 QueriesList = list[list[tuple]]
@@ -62,21 +62,13 @@ class DeleteABC(ABC):
     def __init__(self, args: Namespace) -> None:
         ...
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def set_args(cls, args: Namespace) -> None:
         ...
 
     @abstractmethod
     def category_exists(self, category_name: str) -> bool:
-        ...
-    @overload
-    @abstractmethod
-    def sql_query(self) -> Query:
-        ...
-    @overload
-    @abstractmethod
-    def sql_query(self) -> QueriesList:
         ...
 
     @abstractmethod

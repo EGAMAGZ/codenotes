@@ -367,7 +367,7 @@ class SearchCategory(SearchABC):
             ]
 
     def category_exists(self, category_name: str) -> bool:
-        pass
+        pass  # The feature doesn't needs to check if category exists
 
     def sql_query(self) -> list[list[tuple]]:
         """Makes a query of related information of tasks, and also adds more statements to the main sql
