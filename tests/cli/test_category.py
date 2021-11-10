@@ -41,14 +41,14 @@ class TestSearchCategory(unittest.TestCase):
 
         args = parse_args(["category", "search", "--note"])
 
-        query = SearchCategory(args).sql_query()
+        query = SearchCategory(args).query
         self.assertListEqual(query, expected_categories)
 
         expected_categories = [[("General",)]]
 
         args = parse_args(["category", "search", "Gen", "--note"])
 
-        query = SearchCategory(args).sql_query()
+        query = SearchCategory(args).query
         self.assertListEqual(query, expected_categories)
 
     def test_search_tasks(self) -> None:
@@ -63,7 +63,7 @@ class TestSearchCategory(unittest.TestCase):
 
         args = parse_args(["category", "search", "--task"])
 
-        query = SearchCategory(args).sql_query()
+        query = SearchCategory(args).query
         self.assertListEqual(query, expected_categories)
 
         expected_categories = [
@@ -72,7 +72,7 @@ class TestSearchCategory(unittest.TestCase):
 
         args = parse_args(["category", "search", "categ", "--task"])
 
-        query = SearchCategory(args).sql_query()
+        query = SearchCategory(args).query
         self.assertListEqual(query, expected_categories)
 
     def test_search_all(self) -> None:
@@ -88,7 +88,7 @@ class TestSearchCategory(unittest.TestCase):
 
         args = parse_args(["category", "search", "--all"])
 
-        query = SearchCategory(args).sql_query()
+        query = SearchCategory(args).query
         self.assertListEqual(query, expected_categories)
 
         expected_categories = [
@@ -98,7 +98,7 @@ class TestSearchCategory(unittest.TestCase):
 
         args = parse_args(["category", "search", "ne", "--all"])
 
-        query = SearchCategory(args).sql_query()
+        query = SearchCategory(args).query
         self.assertListEqual(query, expected_categories)
 
 

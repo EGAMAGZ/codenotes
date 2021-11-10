@@ -3,7 +3,6 @@ from datetime import date, datetime
 from typing import Any, Final, Optional, Union, final
 
 from rich import box
-from rich.console import Console
 from rich.table import Table
 from rich.theme import Theme
 from rich.tree import Tree
@@ -13,10 +12,8 @@ import codenotes.db.utilities.tasks_categories as categories
 import codenotes.util.help as help_text
 from codenotes.abstract import CreateABC, SearchABC
 from codenotes.cli import PrintFormatted
-from codenotes.db.connection import SQLiteConnection
 from codenotes.exceptions import CategoryNotExistsError, MissingArgsException
-from codenotes.util.args import (date_args_empty, dates_to_search,
-                                 format_argument_text)
+from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text
 from codenotes.util.sql import add_conditions_sql
 from codenotes.util.text import format_list_text, status_text
 
@@ -83,12 +80,6 @@ class CreateTask(CreateABC):
 
     task: Union[list[str], str]
         Task or list of task that will be store in database
-
-    console: Console
-        (Rich) Console for beatiful printting
-
-    db: SQLiteConnection
-        Connection with the dabatase
     """
 
     DEFAULT_CATEGORY_ID: Final[int] = 1
@@ -98,8 +89,6 @@ class CreateTask(CreateABC):
     category_name: str = DEFAULT_CATEGORY_NAME
     creation_date: date
     task: Union[list[str], str]
-    console: Console
-    db: SQLiteConnection
 
     def __init__(self, args: Namespace) -> None:
         """Constructor fro AddTask class
@@ -109,8 +98,7 @@ class CreateTask(CreateABC):
         args : NameSpace
             Arguments of argparse
         """
-        self.console = Console()
-        self.db = SQLiteConnection()
+        super().__init__()
         self.creation_date = datetime.now().date()
 
         try:
@@ -181,8 +169,7 @@ class CreateTask(CreateABC):
 
         while len(self.category_name) == 0 or len(self.category_name) > 30:
             self.category_name = self.console.input(text).strip()
-        else:
-            self._save_category()
+        self._save_category()
 
     def category_exists(self, category_name: str) -> bool:
         """Checks if the typed category exists
@@ -275,12 +262,6 @@ class SearchTask(SearchABC):
 
     Attributes
     ----------
-    console: Console
-        (Rich) Console for beautiful printting
-
-    db: SQLiteConnection
-        Connection with the dabatase
-
     search_date: Union[date, list[date]]
         Date or list of dates to search the tasks
 
@@ -294,8 +275,6 @@ class SearchTask(SearchABC):
         Id of the category where the notes will be searched
     """
 
-    console: Console
-    db: SQLiteConnection
     search_date: Optional[Union[date, list[date]]]
     search_text: str
     search_category: Optional[str] = None
@@ -309,8 +288,7 @@ class SearchTask(SearchABC):
         args : NameSpace
             Arguments of argparse
         """
-        self.console = Console()
-        self.db = SQLiteConnection()
+        super().__init__()
         self.search_date = dates_to_search(args)
         self.search_text = format_argument_text(args.text)
 
@@ -419,16 +397,16 @@ class SearchTask(SearchABC):
     def search(self) -> None:
         """Displays a tree with tables as child nodes with the tasks searched"""
         root = Tree("📒[bold blue] List of Tasks  Found")
-        query = self.sql_query()
+        self.query = self.sql_query()
 
-        if query:  # When the list is not empty
+        if self.query:  # When the list is not empty
             table = Table()
             table.add_column("Tasks")
             table.add_column("Status")
             table.add_column("Category")
             table.add_column("Creation Date", justify="center", style="yellow")
 
-            tasks_sorted = sorted(query, key=sorter)
+            tasks_sorted = sorted(self.query, key=sorter)
             actual_task = tasks_sorted[0]
             actual_category = actual_task[3]
 

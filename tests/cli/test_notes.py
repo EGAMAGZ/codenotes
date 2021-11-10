@@ -88,13 +88,9 @@ class TestSearchNote(unittest.TestCase):
         args = parse_args(
             ["note", "search", "--category", self.default_category, "--ever"]
         )
-        query = SearchNote(args).sql_query()
+        query = SearchNote(args).query
 
         self.assertCountEqual(query, expected_notes)
-
-        args = parse_args(["note", "search", "--category", "Generl", "--ever"])
-        with self.assertRaises(CategoryNotExistsError):
-            SearchNote(args).sql_query()
 
     def test_search_ever(self):
         expected_notes = [
@@ -123,7 +119,7 @@ class TestSearchNote(unittest.TestCase):
         ]
 
         args = parse_args(["note", "search", "--ever"])
-        query = SearchNote(args).sql_query()
+        query = SearchNote(args).query
 
         self.assertCountEqual(query, expected_notes)
 
@@ -154,7 +150,7 @@ class TestSearchNote(unittest.TestCase):
         ]
 
         args = parse_args(["note", "search", "--month"])
-        query = SearchNote(args).sql_query()
+        query = SearchNote(args).query
 
         self.assertCountEqual(query, expected_notes)
 
@@ -177,7 +173,7 @@ class TestSearchNote(unittest.TestCase):
         ]
 
         args = parse_args(["note", "search", "Lorem", "ipsum", "--today"])
-        query = SearchNote(args).sql_query()
+        query = SearchNote(args).query
 
         self.assertCountEqual(query, expected_notes)
 
@@ -201,7 +197,7 @@ class TestSearchNote(unittest.TestCase):
         ]
 
         args = parse_args(["note", "search", "Lorem", "ipsum"])
-        query = SearchNote(args).sql_query()
+        query = SearchNote(args).query
 
         self.assertCountEqual(query, expected_notes)
 
@@ -232,7 +228,7 @@ class TestSearchNote(unittest.TestCase):
         ]
 
         args = parse_args(["note", "search", "--today"])
-        query = SearchNote(args).sql_query()
+        query = SearchNote(args).query
 
         self.assertCountEqual(query, expected_notes)
 
@@ -240,7 +236,7 @@ class TestSearchNote(unittest.TestCase):
         expected_notes = []
 
         args = parse_args(["note", "search", "--yesterday"])
-        query = SearchNote(args).sql_query()
+        query = SearchNote(args).query
 
         self.assertCountEqual(query, expected_notes)
 

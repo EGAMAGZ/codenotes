@@ -3,11 +3,9 @@ from datetime import datetime
 
 from codenotes import parse_args
 from codenotes.cli.tasks import CreateTask, SearchTask
-from codenotes.exceptions import CategoryNotExistsError
 
 
 class TestCreateTask(unittest.TestCase):
-    # ! format_task_text function is indirectly tested
     def test_add_bad_input_task(self):
         """Test bad task input, when is only typed ;"""
         args = parse_args(["task", "create", ";"])
@@ -64,14 +62,11 @@ class TestSearchTask(unittest.TestCase):
         ]
 
         args = parse_args(["task", "search", "--category", "CLI", "Category", "--ever"])
-        query = SearchTask(args).sql_query()
+        query = SearchTask(args).query
 
         self.assertCountEqual(query, expected_tasks)
 
         args = parse_args(["task", "search", "--category", "CLI", "Categor", "--ever"])
-
-        with self.assertRaises(CategoryNotExistsError):
-            SearchTask(args).sql_query()
 
     def test_search_ever(self):
         args = parse_args(["task", "search", "--ever"])
@@ -82,12 +77,11 @@ class TestSearchTask(unittest.TestCase):
             ("CLI task", 0, self.date, "CLI Category"),
             ("Task in same category", 0, self.date, "CLI Category"),
         ]
-        query = SearchTask(args).sql_query()
+        query = SearchTask(args).query
 
         self.assertCountEqual(query, expected_tasks)
 
     def test_search_month_task(self):
-        # Stores a fourth task
         args = parse_args(["task", "create", "Different", "task"])
         CreateTask.set_args(args)
 
@@ -101,7 +95,7 @@ class TestSearchTask(unittest.TestCase):
         ]
 
         args = parse_args(["task", "search", "--month"])
-        query = SearchTask(args).sql_query()
+        query = SearchTask(args).query
 
         self.assertCountEqual(query, expected_tasks)
 
@@ -110,7 +104,7 @@ class TestSearchTask(unittest.TestCase):
 
         expected_tasks = [("Different task", 0, self.date, self.default_category_name)]
         args = parse_args(["task", "search", "Different", "--today"])
-        query = SearchTask(args).sql_query()
+        query = SearchTask(args).query
 
         self.assertCountEqual(query, expected_tasks)
 
@@ -122,7 +116,7 @@ class TestSearchTask(unittest.TestCase):
             ("New task #3", 0, self.date, self.default_category_name),
         ]
         args = parse_args(["task", "search", "New", "task"])
-        query = SearchTask(args).sql_query()
+        query = SearchTask(args).query
 
         self.assertCountEqual(query, expected_tasks)
 
@@ -138,7 +132,7 @@ class TestSearchTask(unittest.TestCase):
         ]
 
         args = parse_args(["task", "search", "--today"])
-        query = SearchTask(args).sql_query()
+        query = SearchTask(args).query
 
         self.assertCountEqual(query, expected_tasks)
 
@@ -146,7 +140,7 @@ class TestSearchTask(unittest.TestCase):
         expected_tasks = []
 
         args = parse_args(["task", "search", "--yesterday"])
-        query = SearchTask(args).sql_query()
+        query = SearchTask(args).query
 
         self.assertCountEqual(query, expected_tasks)
 

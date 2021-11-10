@@ -1,18 +1,33 @@
 from abc import ABC, abstractmethod
-
 from argparse import Namespace
 from typing import Union
+
+from rich.console import Console
+
+from codenotes.db.connection import SQLiteConnection
 
 Query = list[tuple]
 QueriesList = list[list[tuple]]
 
 
 class CreateABC(ABC):
-    """Abstract class with methods required to create and store content in the database"""
+    """Abstract class with methods required to create and store content in the database
 
-    @abstractmethod
-    def __init__(self, args: Namespace) -> None:
-        ...
+    Attributes
+    ----------
+    console: Console
+        (Rich) Console for beautiful printing
+
+    db: SQLiteConnection
+        Connection with the database
+    """
+
+    console: Console
+    db: SQLiteConnection
+
+    def __init__(self) -> None:
+        self.console = Console()
+        self.db = SQLiteConnection()
 
     @classmethod
     @abstractmethod
@@ -33,11 +48,33 @@ class CreateABC(ABC):
 
 
 class SearchABC(ABC):
-    """Abstract class with methods required to search content in the database"""
+    """Abstract class with methods required to search content in the database
 
-    @abstractmethod
-    def __init__(self, args: Namespace) -> None:
-        ...
+    Attributes
+    ----------
+    console: Console
+        (Rich) Console for beautiful printing
+
+    db: SQLiteConnection
+        Connection with the database
+    """
+
+    _query: Union[Query, QueriesList]
+    console: Console
+    db: SQLiteConnection
+
+    def __init__(self) -> None:
+        self.console = Console()
+        self.db = SQLiteConnection()
+        self._query = None
+
+    @property
+    def query(self) -> Union[Query, QueriesList]:
+        return self._query
+
+    @query.setter
+    def query(self, value: Union[Query, QueriesList]) -> None:
+        self._query = value
 
     @classmethod
     @abstractmethod
@@ -58,9 +95,13 @@ class SearchABC(ABC):
 
 
 class DeleteABC(ABC):
-    @abstractmethod
-    def __init__(self, args: Namespace) -> None:
-        ...
+
+    console: Console
+    db: SQLiteConnection
+
+    def __init__(self) -> None:
+        self.console = Console()
+        self.db = SQLiteConnection()
 
     @classmethod
     @abstractmethod

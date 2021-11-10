@@ -2,7 +2,6 @@ from argparse import Namespace
 from typing import Final, Union, final
 
 from rich import box
-from rich.console import Console
 from rich.table import Table
 from rich.tree import Tree
 
@@ -10,7 +9,6 @@ import codenotes.db.utilities.notes_categories as notes_categories
 import codenotes.db.utilities.tasks_categories as task_categories
 from codenotes.abstract import CreateABC, DeleteABC, SearchABC
 from codenotes.cli import PrintFormatted
-from codenotes.db.connection import SQLiteConnection
 from codenotes.exceptions import MissingArgsException
 from codenotes.util.args import format_argument_text
 from codenotes.util.sql import add_conditions_sql
@@ -75,20 +73,12 @@ class CreateCategory(CreateABC):
 
     category_name_column: str
         Name of the annotation type name column where the categories will be stored
-
-    console: Console
-        (Rich) Console for beatiful printting
-
-    db: SQLiteConnection
-        Connection with the dabatase
     """
 
     category_name: Union[list[str], str]
     category_table_name: str
     category_id_column: str
     category_name_column: str
-    console: Console
-    db: SQLiteConnection
 
     def __init__(self, args: Namespace) -> None:
         """CreateCategory Constructor
@@ -98,8 +88,7 @@ class CreateCategory(CreateABC):
         args : NameSpace
             Arguments of argparse
         """
-        self.console = Console()
-        self.db = SQLiteConnection()
+        super().__init__()
 
         try:
             if create_args_empty(args):
@@ -267,13 +256,7 @@ class SearchCategory(SearchABC):
     Attributes
     ----------
     ANNOTATIONS_TYPE: Final[list[str]]
-        Contant list with all the types of annotations
-
-    console: Console
-        (Rich) Console for beautiful printting
-
-    db: SQLiteConnection
-        Connection with the dabatase
+        Constant list with all the types of annotations
 
     search_category: str
         Name of the category that will be searched in the type of annotations
@@ -290,8 +273,6 @@ class SearchCategory(SearchABC):
 
     ANNOTATIONS_TYPES: Final[list[str]] = ["Tasks", "Notes"]
 
-    console: Console
-    db: SQLiteConnection
     search_category: str
     category_table_name: Union[list[str], str]
     category_id_column: Union[list[str], str]
@@ -305,8 +286,7 @@ class SearchCategory(SearchABC):
         args : NameSpace
             Arguments of argparse
         """
-        self.console = Console()
-        self.db = SQLiteConnection()
+        super().__init__()
         try:
             if search_args_empty(args):
                 raise MissingArgsException
@@ -407,11 +387,11 @@ class SearchCategory(SearchABC):
     def search(self) -> None:
         """Displays a tree with tables as child nodes with the categories searched"""
         root = Tree("📒[bold blue] List of Categories Found")
-        query = self.sql_query()
+        self.query = self.sql_query()
 
-        if query:
+        if self.query:
             index = 0
-            for categories_list in query:
+            for categories_list in self.query:
                 child_branch = root.add(f"📒[#d898ed]{self.ANNOTATIONS_TYPES[index]}")
 
                 table = Table()
@@ -427,20 +407,12 @@ class SearchCategory(SearchABC):
             root.add("[red]❌ No Category Found")
         self.console.print(root)
 
+        self.db.close()
+
 
 class DeleteCategory(DeleteABC):
     def __init__(self, args: Namespace) -> None:
-        pass
-
-    @classmethod
-    def set_args(cls, args: Namespace) -> None:
-        pass
-
-    def category_exists(self, category_name: str) -> bool:
-        pass
-
-    def sql_query(self) -> tuple:
-        pass
+        super().__init__()
 
     def delete(self) -> None:
-        pass
+        return super().delete()

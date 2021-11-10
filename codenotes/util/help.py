@@ -1,7 +1,9 @@
 from typing import Text, Final
 
 
-CLI_USAGE_TEXT: Final[Text] = """[quote]Write any thought you have without quitting from the command line[/quote]
+CLI_USAGE_TEXT: Final[
+    Text
+] = """[quote]Write any thought you have without quitting from the command line[/quote]
 
 [header]USAGE[/header]
 codenotes <command> <annotation> <text> <flags>
@@ -25,7 +27,9 @@ $ codenotes search note --today
 Open an issue in [u]github.com/EGAMAGZ/codenotes[/u]"""
 
 
-ADD_NOTE_USAGE_TEXT: Final[Text] = """[quote]Write any thought you have without quitting from the command line[/quote]
+ADD_NOTE_USAGE_TEXT: Final[
+    Text
+] = """[quote]Write any thought you have without quitting from the command line[/quote]
 
 [header]USAGE[/header]
 codenotes add note <text> <flags>
@@ -40,7 +44,9 @@ codenotes add note <text> <flags>
 $ codenotes add note I got an idea for UI --title UI Idea --category Codenotes"""
 
 
-ADD_TASK_USAGE_TEXT: Final[Text] = """[quote]Write any thought you have without quitting from the command line[/quote]
+ADD_TASK_USAGE_TEXT: Final[
+    Text
+] = """[quote]Write any thought you have without quitting from the command line[/quote]
 
 [header]USAGE[/header]
 codenotes add task <text> <flags>
@@ -56,7 +62,9 @@ To save two or more task, use the symbol ; to indicate the ending of a task.
 $ codenotes add task Finish coding the tests --new-categoery Reminders
 $ codenotes add task Create documentation for the codenotes proyect; Release the proyect -p"""
 
-SEARCH_USAGE_TEXT: Final[Text] = """[quote]Write any thought you have without quitting from the command line[/quote]
+SEARCH_USAGE_TEXT: Final[
+    Text
+] = """[quote]Write any thought you have without quitting from the command line[/quote]
 
 [header]USAGE[/header]
 codenotes search <annotation> <text> <flags>

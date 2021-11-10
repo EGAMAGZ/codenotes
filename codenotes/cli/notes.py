@@ -2,7 +2,6 @@ from argparse import Namespace
 from datetime import date, datetime
 from typing import Any, Final, Optional, Union, final
 
-from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.theme import Theme
@@ -13,7 +12,6 @@ import codenotes.db.utilities.notes_categories as categories
 import codenotes.util.help as help_text
 from codenotes.abstract import CreateABC, SearchABC
 from codenotes.cli import PrintFormatted
-from codenotes.db.connection import SQLiteConnection
 from codenotes.exceptions import CategoryNotExistsError, MissingArgsException
 from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text
 from codenotes.util.sql import add_conditions_sql
@@ -84,9 +82,6 @@ class CreateNote(CreateABC):
 
     creation_date: date
         Date of the creation of the note (Today date)
-
-    console: Console
-        (Rich) Console for beatiful printting
     """
 
     DEFAULT_CATEGORY_ID: Final[int] = 1
@@ -97,7 +92,6 @@ class CreateNote(CreateABC):
     note_title: Optional[str] = None
     note_text: Optional[str] = None
     creation_date: date  # Today's date
-    console: Console
 
     def __init__(self, args: Namespace) -> None:
         """Constructor of AddTask class
@@ -107,8 +101,7 @@ class CreateNote(CreateABC):
         args : NameSpace
             Arguments of argparse
         """
-        self.console = Console()
-        self.db = SQLiteConnection()
+        super().__init__()
         self.creation_date = datetime.now().date()
 
         try:
@@ -167,8 +160,7 @@ class CreateNote(CreateABC):
 
         while len(self.category_name) == 0 or len(self.category_name) > 30:
             self.category_name = self.console.input(text).strip()
-        else:
-            self._save_category()
+        self._save_category()
 
     def _check_note_title(self) -> None:
         """Check if the note title can be saved
@@ -228,10 +220,10 @@ class CreateNote(CreateABC):
             f"{categories.COLUMN_NAME} = '{category_name}'"
         )
         query = self.db.exec_sql(sql)
-        categories_list: list[tuple] = query.fetchall()
+        categories_list: list[tuple] = query.fetchone()
 
-        if categories_list:  # # categories_list == (id,)
-            self.category_id = categories_list[0][0]
+        if categories_list:  # categories_list == (id,)
+            self.category_id = categories_list[0]
             return True
         return False
 
@@ -286,12 +278,6 @@ class SearchNote(SearchABC):
 
     Attributes
     ----------
-    console: Console
-        (Rich) Console for beautiful printting
-
-    db: SQLiteConnection
-        Connection with the dabatase
-
     search_date: Union[date, list[date]]
         Date or list of dates to search the notes
 
@@ -305,8 +291,6 @@ class SearchNote(SearchABC):
         Id of the category where the notes will be searched
     """
 
-    console: Console
-    db: SQLiteConnection
     search_date: Optional[Union[list[date], date]]
     search_text: str
     search_category: Optional[str] = None
@@ -320,8 +304,7 @@ class SearchNote(SearchABC):
         args: Namespace
             Arguments of argparse
         """
-        self.console = Console()
-        self.db = SQLiteConnection()
+        super().__init__()
         self.search_date = dates_to_search(args)
         self.search_text = format_argument_text(args.text)
 
@@ -374,7 +357,7 @@ class SearchNote(SearchABC):
             f"{categories.COLUMN_NAME} = '{category_name}'"
         )
         query = self.db.exec_sql(sql)
-        categories_list: list[tuple] = query.fetchall()
+        categories_list: tuple = query.fetchall()
 
         if categories_list:  # categories_list == (id,)
             self.search_category_id = categories_list[0][0]
@@ -418,6 +401,7 @@ class SearchNote(SearchABC):
 
         if self.search_category:
             if not self.category_exists(self.search_category):
+                print("Sample")
                 raise CategoryNotExistsError
 
             sql = add_conditions_sql(
@@ -431,10 +415,10 @@ class SearchNote(SearchABC):
     def search(self) -> None:
         """Displays a tree with Panels as child nodes with the notes searched"""
         root = Tree("📒[bold #964B00] List of Notes Found")
-        query = self.sql_query()
+        self.query = self.sql_query()
 
-        if query:  # query != []
-            notes_sorted = sorted(query, key=sorter)
+        if self.query:  # query != []
+            notes_sorted = sorted(self.query, key=sorter)
             actual_note = notes_sorted[0]
             actual_category = actual_note[2]
 
@@ -466,4 +450,4 @@ class SearchNote(SearchABC):
             root.add("[red]❌ No Note Found")
         self.console.print(root)
 
-        # self.db.close() # FIXME: DATABASE DONT CLOSE CORRECTLY
+        self.db.close()
