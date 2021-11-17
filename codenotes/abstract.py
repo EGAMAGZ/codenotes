@@ -66,7 +66,6 @@ class SearchABC(ABC):
     def __init__(self) -> None:
         self.console = Console()
         self.db = SQLiteConnection()
-        self._query = None
 
     @property
     def query(self) -> Union[Query, QueriesList]:

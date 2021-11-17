@@ -13,7 +13,7 @@ class SQLiteConnection:
 
     """Connection with SQLite3 class
 
-    Class has the purpouse to manage the connection with the database created with
+    Class has the purpose to manage the connection with the database created with
     sqlite3. Everytime the constructor is executed, it connects to the database, then
     execute the SQL statements that creates the tables if they not exist. Also, this class
     allows you to execute sql, commit the transactions and close the connection with
@@ -51,10 +51,10 @@ class SQLiteConnection:
         self.connection = sqlite3.connect(self.DATABASE_PATH)
         self.cursor = self.connection.cursor()
 
-        if self._is_databse_empty():
+        if self._is_database_empty():
             self._generate_tables()
 
-    def _is_databse_empty(self) -> bool:
+    def _is_database_empty(self) -> bool:
         """Checks if database contains any table previously created
 
         Return
@@ -118,5 +118,5 @@ class SQLiteConnection:
     def __enter__(self):
         return self
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, exec_type, exec_value, exec_traceback):
         self.close()

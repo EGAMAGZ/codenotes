@@ -401,7 +401,6 @@ class SearchNote(SearchABC):
 
         if self.search_category:
             if not self.category_exists(self.search_category):
-                print("Sample")
                 raise CategoryNotExistsError
 
             sql = add_conditions_sql(

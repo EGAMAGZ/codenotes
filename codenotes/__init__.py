@@ -9,11 +9,11 @@ from codenotes.cli.category import CreateCategory, SearchCategory
 from codenotes.cli.notes import CreateNote, SearchNote
 from codenotes.cli.tasks import CreateTask, SearchTask
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
 
 def parse_args(sys_args: list) -> argparse.Namespace:
-    """Function incharge to declare the Argumen Parser and add arguments to it
+    """Function in charge to declare the ArgumentParser and add arguments to it
 
     Parameters
     ----------
@@ -23,7 +23,7 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     Returns
     -------
     args: Namespace
-        All the arguments that are in ArgumenParser
+        All the arguments that are in ArgumentParser
     """
 
     parser = argparse.ArgumentParser(prog="codenotes")
@@ -42,7 +42,7 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     task_create.add_argument("--category", "-c", type=str, nargs="*", action="store")
     task_create.add_argument("--preview", "-p", action="store_true")
 
-    # === Seach Task ===
+    # === Search Task ===
     task_search = task_actions.add_parser("search")
     task_search.add_argument("text", action="store", nargs="*")
     task_search.add_argument("--category", "-c", type=str, nargs="*", action="store")
