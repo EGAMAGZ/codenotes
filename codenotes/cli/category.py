@@ -7,7 +7,7 @@ from rich.tree import Tree
 
 import codenotes.db.utilities.notes_categories as notes_categories
 import codenotes.db.utilities.tasks_categories as task_categories
-from codenotes.abstract import CreateABC, DeleteABC, SearchABC
+from codenotes.abstract import CreateABC, DeleteABC, QueriesList, Query, SearchABC
 from codenotes.cli import PrintFormatted
 from codenotes.exceptions import MissingArgsException
 from codenotes.util.args import format_argument_text
@@ -177,9 +177,9 @@ class CreateCategory(CreateABC):
             f"{self.category_name_column} = '{category_name}'"
         )
         query = self.db.exec_sql(sql)
-        categories_list: list[tuple] = query.fetchall()
+        categories_list = query.fetchone()
 
-        if categories_list:  # categories_list == []
+        if categories_list:
             return True
         return False
 
@@ -349,16 +349,16 @@ class SearchCategory(SearchABC):
     def category_exists(self, category_name: str) -> bool:
         pass  # The feature doesn't needs to check if category exists
 
-    def sql_query(self) -> list[list[tuple]]:
+    def sql_query(self) -> Union[Query, QueriesList]:
         """Makes a query of related information of tasks, and also adds more statements to the main sql
         sql
 
         Returns
         -------
-        query: list[list[tuple]]
+        query: QueryList
             Query done to the database
         """
-        query_list = []
+        query_list: QueriesList = []
 
         if isinstance(self.category_table_name, str):
             sql = f"SELECT {self.category_name_column} FROM {self.category_table_name}"

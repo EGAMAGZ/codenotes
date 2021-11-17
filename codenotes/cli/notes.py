@@ -10,7 +10,7 @@ from rich.tree import Tree
 import codenotes.db.utilities.notes as notes
 import codenotes.db.utilities.notes_categories as categories
 import codenotes.util.help as help_text
-from codenotes.abstract import CreateABC, SearchABC
+from codenotes.abstract import CreateABC, QueriesList, Query, SearchABC
 from codenotes.cli import PrintFormatted
 from codenotes.exceptions import CategoryNotExistsError, MissingArgsException
 from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text
@@ -220,9 +220,9 @@ class CreateNote(CreateABC):
             f"{categories.COLUMN_NAME} = '{category_name}'"
         )
         query = self.db.exec_sql(sql)
-        categories_list: list[tuple] = query.fetchone()
+        categories_list = query.fetchone()
 
-        if categories_list:  # categories_list == (id,)
+        if categories_list:
             self.category_id = categories_list[0]
             return True
         return False
@@ -357,19 +357,19 @@ class SearchNote(SearchABC):
             f"{categories.COLUMN_NAME} = '{category_name}'"
         )
         query = self.db.exec_sql(sql)
-        categories_list: tuple = query.fetchall()
+        categories_list = query.fetchone()
 
-        if categories_list:  # categories_list == (id,)
-            self.search_category_id = categories_list[0][0]
+        if categories_list:
+            self.search_category_id = categories_list[0]
             return True
         return False
 
-    def sql_query(self) -> list[tuple]:
+    def sql_query(self) -> Union[Query, QueriesList]:
         """Makes a query of related information of notes, and also adds more statements to the main sql
 
         Returns
         -------
-        query: list[tuple]
+        query: Query
             Query done to the database
         """
         sql = (

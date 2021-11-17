@@ -51,6 +51,27 @@ class SQLiteConnection:
         self.connection = sqlite3.connect(self.DATABASE_PATH)
         self.cursor = self.connection.cursor()
 
+        if self._is_databse_empty():
+            self._generate_tables()
+
+    def _is_databse_empty(self) -> bool:
+        """Checks if database contains any table previously created
+
+        Return
+        ------
+        is_empty : bool
+
+        """
+        sql = "SELECT * FROM sqlite_master WHERE type = 'table';"
+
+        cursor = self.exec_sql(sql)
+        tables = cursor.fetchone()
+
+        if tables is None:
+            return True
+        return False
+
+    def _generate_tables(self) -> None:
         self.exec_sql(notes_categories.CREATE_TABLE)  # Notes Category Table
         self.cursor.execute(
             notes_categories.INSERT_DEFAULT_CATEGORY
@@ -93,3 +114,9 @@ class SQLiteConnection:
         """Close database and cursor connection"""
         self.cursor.close()
         self.connection.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.close()

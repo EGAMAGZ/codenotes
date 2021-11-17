@@ -189,10 +189,10 @@ class CreateTask(CreateABC):
             f"{categories.COLUMN_NAME} = '{category_name}'"
         )
         query = self.db.exec_sql(sql)
-        categories_list: list[tuple] = query.fetchall()
+        categories_list = query.fetchone()
 
-        if categories_list:  # categories_list == (id,)
-            self.category_id = categories_list[0][0]
+        if categories_list:
+            self.category_id = categories_list[0]
             return True
         return False
 
@@ -341,10 +341,10 @@ class SearchTask(SearchABC):
             f"{categories.COLUMN_NAME} = '{category_name}'"
         )
         query = self.db.exec_sql(sql)
-        categories_list: list[tuple] = query.fetchall()
+        categories_list = query.fetchone()
 
-        if categories_list:  # categories_list == (id,)
-            self.search_category_id = categories_list[0][0]
+        if categories_list:
+            self.search_category_id = categories_list[0]
             return True
         return False
 
@@ -431,13 +431,13 @@ class SearchTask(SearchABC):
                     actual_task[3],
                     actual_task[2],
                 )
-            else:
-                child_branch.add(table)
+
+            child_branch.add(table)
 
         else:
             root.add("[red]❌ No Task Found")
         self.console.print(root)
-        # self.db.close() # FIXME: DATABASE DONT CLOSE CORRECTLY
+        self.db.close()
 
 
 @final
