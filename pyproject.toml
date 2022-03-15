@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "codenotes"
+version = "0.1.0"
+description = ""
+authors = ["EGAMAGZ <46827955+EGAMAGZ@users.noreply.github.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+rich = "^12.0.0"
+windows-curses = "^2.3.0"
+
+[tool.poetry.dev-dependencies]
+tox = "^3.24.5"
+pylint = "^2.12.2"
+virtualenv = "^20.13.3"
+black = "^22.1.0"
+flake8 = "^4.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
