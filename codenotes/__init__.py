@@ -4,6 +4,7 @@ import sys
 from typing import Optional
 
 import codenotes.util.help as help_text
+from codenotes.db import Base, engine
 from codenotes.cli import PrintFormatted
 from codenotes.cli.category import CreateCategory, SearchCategory
 from codenotes.cli.notes import CreateNote, SearchNote
@@ -131,6 +132,9 @@ def print_usage(error_message: Optional[str] = None) -> None:
 
 def main():
     """Main function"""
+
+    Base.metadata.create_all(engine)
+
     args = parse_args(sys.argv[1:])
     if len(sys.argv) > 1:
 
