@@ -1,23 +1,16 @@
-from typing import Any
-
-from sqlalchemy.orm import Session
-
+from codenotes.db import Session
 from codenotes.db.models.tasks import TaskModel
 from codenotes.db.repository import BaseRepository
 
 
 class TaskRepository(BaseRepository):
-
-    def __init__(self, session: Session):
-        super().__init__(session)
-
     def add(self, value: TaskModel) -> None:
-        with self.session.begin() as session:
+        with Session() as session, session.begin():
             session.add(value)
-            session.commit()
 
     def add_all(self, value: list[TaskModel]) -> None:
-        pass
+        with Session() as session, session.begin():
+            session.add_all(value)
 
     def get(self, id: int) -> TaskModel:
         pass
@@ -27,4 +20,3 @@ class TaskRepository(BaseRepository):
 
     def list(self) -> list[TaskModel]:
         pass
-

@@ -1,14 +1,13 @@
 import argparse
 import logging
 import sys
-from typing import Optional
 
-import codenotes.util.help as help_text
-from codenotes.db import Base, engine
-from codenotes.cli import PrintFormatted
+import click
+
 from codenotes.cli.category import CreateCategory, SearchCategory
 from codenotes.cli.notes import CreateNote, SearchNote
 from codenotes.cli.tasks import CreateTask, SearchTask
+from codenotes.db import Base, engine
 
 __version__ = "0.0.2"
 
@@ -102,8 +101,6 @@ def parse_args(sys_args: list) -> argparse.Namespace:
     category_search_annotation.add_argument("--task", "-t", action="store_true")
     category_search_annotation.add_argument("--all", "-a", action="store_true")
 
-    parser.error = print_usage
-
     return parser.parse_args(sys_args)
 
 
@@ -116,18 +113,10 @@ def enable_logging() -> None:
     )
 
 
-def print_usage(error_message: Optional[str] = None) -> None:
-    """Print usage text with rich console, and print error message passed when this function is called by argparse
-
-    Parameters
-    ----------
-    error_message: Optional[str]
-        Error message through
-    """
-    if error_message is not None:
-        PrintFormatted.custom_print(f"[red]{error_message}[/red]")
-
-    PrintFormatted.print_help(help_text.CLI_USAGE_TEXT)
+@click.command()
+@click.option("--name", "-n", prompt=True)
+def main_args(name):
+    pass
 
 
 def main():
@@ -146,16 +135,12 @@ def main():
                 CreateTask.set_args(args)
             elif args.action == "search":
                 SearchTask.set_args(args)
-            else:
-                print_usage()
 
         elif args.subargs == "note":
             if args.action == "create":
                 CreateNote.set_args(args)
             elif args.action == "search":
                 SearchNote.set_args(args)
-            else:
-                print_usage()
 
         elif args.subargs == "category":
             if args.action == "create":
@@ -163,5 +148,6 @@ def main():
             if args.action == "search":
                 SearchCategory.set_args(args)
 
-    else:
-        print_usage()
+
+if __name__ == "__main__":
+    main_args()

@@ -1,15 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, Any
-
-from codenotes.db import Session
+from typing import Any
 
 
 class BaseRepository(ABC):
-    session: Session
-
-    def __init__(self, session: Session):
-        self.session = session
-
     @abstractmethod
     def add(self, value) -> None:
         raise NotImplementedError

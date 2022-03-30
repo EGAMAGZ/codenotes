@@ -9,9 +9,9 @@ from rich.tree import Tree
 
 import codenotes.db.utilities.tasks as tasks
 import codenotes.db.utilities.tasks_categories as categories
-import codenotes.util.help as help_text
 from codenotes.abstract import CreateABC, SearchABC
 from codenotes.cli import PrintFormatted
+from codenotes.db.repository.tasks import TaskRepository
 from codenotes.exceptions import CategoryNotExistsError, MissingArgsException
 from codenotes.util.args import date_args_empty, dates_to_search, format_argument_text
 from codenotes.util.sql import add_conditions_sql
@@ -85,6 +85,8 @@ class CreateTask(CreateABC):
     DEFAULT_CATEGORY_ID: Final[int] = 1
     DEFAULT_CATEGORY_NAME: Final[str] = "TODO Taks"
 
+    task_repository = TaskRepository()
+
     category_id: int = DEFAULT_CATEGORY_ID
     category_name: str = DEFAULT_CATEGORY_NAME
     creation_date: date
@@ -122,7 +124,7 @@ class CreateTask(CreateABC):
             PrintFormatted.interruption()
 
         except MissingArgsException:
-            PrintFormatted.print_help(help_text.ADD_TASK_USAGE_TEXT)
+            pass
 
     @classmethod
     def set_args(cls, args: Namespace) -> None:
@@ -310,7 +312,7 @@ class SearchTask(SearchABC):
             PrintFormatted.interruption()
 
         except MissingArgsException:
-            PrintFormatted.print_help(help_text.SEARCH_USAGE_TEXT)
+            pass
 
     @classmethod
     def set_args(cls, args: Namespace) -> None:

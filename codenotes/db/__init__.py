@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 BASE_DIR: Final[AnyStr] = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DATABASE_NAME: Final[str] = "codenotes.db"
+DATABASE_NAME: Final[str] = "codenotes_sql.db"
 DATABASE_PATH: Final[str] = os.path.join(BASE_DIR, DATABASE_NAME)
 
 engine = create_engine(f"sqlite:///{DATABASE_PATH}", future=True)

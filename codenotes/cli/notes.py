@@ -6,10 +6,11 @@ from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.theme import Theme
 from rich.tree import Tree
+from sqlalchemy.sql import select
 
 import codenotes.db.utilities.notes as notes
 import codenotes.db.utilities.notes_categories as categories
-import codenotes.util.help as help_text
+
 from codenotes.abstract import CreateABC, QueriesList, Query, SearchABC
 from codenotes.cli import PrintFormatted
 from codenotes.exceptions import CategoryNotExistsError, MissingArgsException
@@ -124,7 +125,7 @@ class CreateNote(CreateABC):
             PrintFormatted.interruption()
 
         except MissingArgsException:
-            PrintFormatted.print_help(help_text.ADD_NOTE_USAGE_TEXT)
+            pass
 
     @classmethod
     def set_args(cls, args: Namespace) -> None:
@@ -326,7 +327,7 @@ class SearchNote(SearchABC):
             PrintFormatted.interruption()
 
         except MissingArgsException:
-            PrintFormatted.print_help(help_text.SEARCH_USAGE_TEXT)
+            pass
 
     @classmethod
     def set_args(cls, args: Namespace) -> None:
