@@ -7,5 +7,4 @@ class Annotations(Enum):
 
     @classmethod
     def list_names(cls) -> list[str]:
-        m = map(lambda c: c.name, cls)
-        return list(m)
+        return [annotation.name for annotation in cls]
