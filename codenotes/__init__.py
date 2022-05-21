@@ -10,14 +10,6 @@ BASE_DIR = get_base_dir()
 LOG_ROOT = BASE_DIR / "codenotes.log"
 
 
-@click.group()
-@click.option("--log", is_flag=True, hidden=True)
-def main(log) -> None:
-    Base.metadata.create_all(engine)
-    if log:
-        enable_logging()
-
-
 def enable_logging() -> None:
     logging.basicConfig(
         filename=LOG_ROOT,
@@ -26,6 +18,15 @@ def enable_logging() -> None:
         datefmt="%m/%d/%Y %I:%M:%S %p",
     )
     logging.info(f"Logging enable. Log file root: {LOG_ROOT}")
+
+
+@click.group()
+@click.option("--log", is_flag=True, hidden=True)
+def main(log) -> None:
+    if log:
+        enable_logging()
+    Base.metadata.create_all(engine)
+    logging.info("Database created all.")
 
 
 @main.group()
@@ -37,7 +38,7 @@ def category():
 @click.argument("name", required=True)
 @click.option("--preview", "-p", is_flag=True)
 @click.option(
-    "--annotation-type",
+    "--annotation-type", '-a',
     type=click.Choice(Annotations.list_names(), case_sensitive=False),
     required=True,
 )
