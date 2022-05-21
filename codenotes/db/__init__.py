@@ -10,6 +10,5 @@ DATABASE_PATH = BASE_DIR / DATABASE_NAME
 
 engine = create_engine(f"sqlite:///{DATABASE_PATH}", future=True)
 Session = sessionmaker(engine)
-session = Session()
 
 Base = declarative_base()

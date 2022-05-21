@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import date
 
-from sqlalchemy import Column, Integer, DateTime
+from sqlalchemy import Column, Integer, Date
 
 
 class AnnotationMixin:
     id = Column(Integer, primary_key=True)
-    created_at = Column(DateTime, default=datetime.now())
+    created_at = Column(Date, default=date.today())
