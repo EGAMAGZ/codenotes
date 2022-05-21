@@ -6,7 +6,7 @@ from codenotes.db.models import AnnotationMixin
 
 
 class CategoryModel(AnnotationMixin, Base):
-    name = Column(String(50), nullable=False, unique=True)
+    name = Column(String, nullable=False, unique=True)
     annotation_type = Column(Enum(Annotations), nullable=False)
 
     def __str__(self) -> str:

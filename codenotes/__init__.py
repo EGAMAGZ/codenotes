@@ -35,14 +35,14 @@ def category():
 
 
 @category.command(name="create")
-@click.argument("name", required=True)
-@click.option("--preview", "-p", is_flag=True)
+@click.argument("name", nargs=-1, required=True)
+@click.option('--preview', "-p", is_flag=True)
 @click.option(
     "--annotation-type", '-a',
     type=click.Choice(Annotations.list_names(), case_sensitive=False),
     required=True,
 )
 def create_category(name, preview, annotation_type) -> None:
-    print(name)
+    print(name, type(name))
     print(preview)
     print(annotation_type)
