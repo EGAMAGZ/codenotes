@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from codenotes import Annotations
 from codenotes.db.dao.category import CategoryDao
 from codenotes.db.models.category import CategoryModel
@@ -10,7 +12,7 @@ class CreateCategory:
     annotation_type: int
     preview: bool
 
-    def __init__(self, category_name: tuple[str], annotation_name: str, preview: bool):
+    def __init__(self, category_name: Tuple[str], annotation_name: str, preview: bool):
         self.dao = CategoryDao()
         self.category_name = tuple_to_str(category_name)
         self.annotation_type = Annotations.get_value_by_key(annotation_name)
