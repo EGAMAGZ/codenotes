@@ -1,4 +1,4 @@
-import codenotes
+from codenotes import main
 
 if __name__ == "__main__":
-    codenotes.main()
+    main()

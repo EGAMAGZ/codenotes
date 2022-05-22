@@ -1,0 +1,58 @@
+[tool.poetry]
+name = "codenotes"
+version = "0.1.0"
+description = "A CLI to manage your tasks and notes without leave the console"
+authors = ["EGAMAGZ <46827955+EGAMAGZ@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/EGAMAGZ/codenotes"
+homepage = "https://github.com/EGAMAGZ/codenotes"
+
+keywords = ["cli tui notes tasks codenotes"]
+
+classifiers = [
+    'Development Status :: 3 - Alpha',
+    'License :: OSI Approved :: MIT License',
+    'Environment :: Console',
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Typing :: Typed",
+]
+
+exclude = ["tests"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+rich = "^12.4.1"
+SQLAlchemy = "^1.4.36"
+click = "^8.0.4"
+
+[tool.poetry.dev-dependencies]
+tox = "^3.24.5"
+pylint = "^2.13.9"
+virtualenv = "^20.13.3"
+black = "^22.1.0"
+flake8 = "^4.0.1"
+mypy = "^0.950"
+pytest = "^7.1.2"
+
+[tool.poetry.scripts]
+codenotes = "codenotes:main"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = true
+ignore_missing_imports = true
+no_implicit_optional = true
+show_error_codes = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+no_implicit_reexport = true

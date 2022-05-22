@@ -6,6 +6,7 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/codenotes)
 ![PyPI - Status](https://img.shields.io/pypi/status/codenotes)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![Test](https://github.com/EGAMAGZ/codenotes/actions/workflows/tests.yml/badge.svg)
 
 A simple CLI where you can save and view all your created annotations
 
