@@ -8,4 +8,3 @@ class CategoryModel(AnnotationMixin, Base):
     __tablename__ = "category"
 
     name = Column(String, nullable=False, unique=True)
-    annotation_type = Column(Integer, nullable=False)

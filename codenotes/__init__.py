@@ -3,7 +3,6 @@ import logging
 import click
 from click.testing import CliRunner
 
-from codenotes.annotations import Annotations
 from codenotes.cli.category import CreateCategory
 from codenotes.db import Base, engine
 from codenotes.utils import get_base_dir
@@ -39,16 +38,11 @@ def category():
 @category.command(name="create")
 @click.argument("name", nargs=-1, required=True)
 @click.option('--preview', "-p", is_flag=True)
-@click.option(
-    "--annotation-type", '-a',
-    type=click.Choice(Annotations.list_names(), case_sensitive=False),
-    required=True,
-)
-def create_category(name, preview, annotation_type) -> None:
-    create_category = CreateCategory(name, annotation_type, preview)
+def create_category(name, preview) -> None:
+    create = CreateCategory(name, preview)
+    create.start()
 
 
 if __name__ == '__main__':
     runner = CliRunner()
     runner.invoke(main, ['category', 'create', 'Sample', '-a', 'task'])
-
