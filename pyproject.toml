@@ -25,7 +25,6 @@ exclude = ["tests"]
 [tool.poetry.dependencies]
 python = "^3.8"
 rich = "^12.4.1"
-windows-curses = "^2.3.0"
 SQLAlchemy = "^1.4.36"
 click = "^8.0.4"
 

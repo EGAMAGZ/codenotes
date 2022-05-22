@@ -109,14 +109,3 @@ sqlalchemy==1.4.36; (python_version >= "2.7" and python_full_version < "3.0.0") 
 typing-extensions==4.2.0; python_full_version >= "3.6.3" and python_full_version < "4.0.0" and python_version < "3.9" and python_version >= "3.7" \
     --hash=sha256:6657594ee297170d19f67d55c05852a874e7eb634f4f753dbd667855e07c1708 \
     --hash=sha256:f1c24655a0da0d1b67f07e17a5e6b2a105894e6824b92096378bb3668ef02376
-windows-curses==2.3.0 \
-    --hash=sha256:a3a63a0597729e10f923724c2cf972a23ea677b400d2387dee1d668cf7116177 \
-    --hash=sha256:7a35eda4cb120b9e1a5ae795f3bc06c55b92c9d391baba6be1903285a05f3551 \
-    --hash=sha256:4d5fb991d1b90a41c2332f02241a1f84c8a1e6bc8f6e0d26f532d0da7a9f7b51 \
-    --hash=sha256:170c0d941c2e0cdf864e7f0441c1bdf0709232bf4aa7ce7f54d90fc76a4c0504 \
-    --hash=sha256:d5cde8ec6d582aa77af791eca54f60858339fb3f391945f9cad11b1ab71062e3 \
-    --hash=sha256:e913dc121446d92b33fe4f5bcca26d3a34e4ad19f2af160370d57c3d1e93b4e1 \
-    --hash=sha256:fbc2131cec57e422c6660e6cdb3420aff5be5169b8e45bb7c471f884b0590a2b \
-    --hash=sha256:cc5fa913780d60f4a40824d374a4f8ca45b4e205546e83a2d85147315a57457e \
-    --hash=sha256:935be95cfdb9213f6f5d3d5bcd489960e3a8fbc9b574e7b2e8a3a3cc46efff49 \
-    --hash=sha256:c860f596d28377e47f322b7382be4d3573fd76d1292234996bb7f72e0bc0ed0d
