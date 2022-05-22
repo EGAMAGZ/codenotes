@@ -45,4 +45,6 @@ def create_category(name, preview) -> None:
 
 if __name__ == '__main__':
     runner = CliRunner()
-    runner.invoke(main, ['category', 'create', 'Sample', '-a', 'task'])
+    result = runner.invoke(main, ['category', 'create'])
+    print(result.exit_code)
+    print(result.exc_info)
