@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 
 class Annotations(Enum):
@@ -6,7 +7,7 @@ class Annotations(Enum):
     NOTE = 2
 
     @classmethod
-    def list_names(cls) -> list[str]:
+    def list_names(cls) -> List[str]:
         return [annotation.name for annotation in cls]
 
     @classmethod
