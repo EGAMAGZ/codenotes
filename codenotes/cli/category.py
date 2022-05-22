@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from codenotes import Annotations
+from codenotes.annotations import Annotations
 from codenotes.db.dao.category import CategoryDao
 from codenotes.db.models.category import CategoryModel
 from codenotes.utils.text import tuple_to_str

@@ -9,6 +9,3 @@ class CategoryModel(AnnotationMixin, Base):
 
     name = Column(String, nullable=False, unique=True)
     annotation_type = Column(Integer, nullable=False)
-
-    def __str__(self) -> str:
-        return self.name
