@@ -5,7 +5,9 @@ from codenotes import main
 
 
 class TestCategoryCli:
-    @pytest.mark.parametrize('test_input,expected', [("category create", 2), ("category create -c", 2)])
+    @pytest.mark.parametrize(
+        "test_input,expected", [("category create", 2), ("category create -c", 2)]
+    )
     def test_invalid_argument(self, test_input, expected) -> None:
         runner = CliRunner()
         result = runner.invoke(main, test_input)

@@ -1,6 +1,3 @@
-from typing import Tuple
-
-import click
 from rich import box
 from rich.table import Table
 from sqlalchemy.exc import IntegrityError
@@ -43,7 +40,9 @@ class CreateCategory:
                 self.dao.create(category)
                 self.print_formatted.success("Task saved successfully")
             except IntegrityError:
-                self.print_formatted.error("Error trying to create category. Category might already exists")
+                self.print_formatted.error(
+                    "Error trying to create category. Category might already exists"
+                )
             finally:
                 status.stop()
 

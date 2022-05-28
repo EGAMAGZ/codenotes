@@ -37,14 +37,14 @@ def category():
 
 @category.command(name="create")
 @click.option("--category-name", "-c", required=True)
-@click.option('--preview', "-p", is_flag=True)
+@click.option("--preview", "-p", is_flag=True)
 def create_category(category_name, preview) -> None:
     create = CreateCategory(category_name, preview)
     create.start()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     runner = CliRunner()
-    result = runner.invoke(main, ['category', 'create'])
+    result = runner.invoke(main, ["category", "create"])
     print(result.exit_code)
     print(result.exc_info)

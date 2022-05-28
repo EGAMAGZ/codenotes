@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String
 
 from codenotes.db import Base
 from codenotes.db.models import AnnotationMixin
