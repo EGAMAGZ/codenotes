@@ -36,10 +36,10 @@ def category():
 
 
 @category.command(name="create")
-@click.argument("name", nargs=-1, required=True)
+@click.option("--category-name", "-c", required=True)
 @click.option('--preview', "-p", is_flag=True)
-def create_category(name, preview) -> None:
-    create = CreateCategory(name, preview)
+def create_category(category_name, preview) -> None:
+    create = CreateCategory(category_name, preview)
     create.start()
 
 

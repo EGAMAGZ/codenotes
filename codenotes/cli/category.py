@@ -1,5 +1,6 @@
 from typing import Tuple
 
+import click
 from rich import box
 from rich.table import Table
 from sqlalchemy.exc import IntegrityError
@@ -7,7 +8,6 @@ from sqlalchemy.exc import IntegrityError
 from codenotes.cli.print_formatted import PrintFormatted
 from codenotes.db.dao.category import CategoryDao
 from codenotes.db.models.category import CategoryModel
-from codenotes.utils.text import tuple_to_str
 
 
 class CreateCategory:
@@ -17,11 +17,11 @@ class CreateCategory:
     print_formatted: PrintFormatted
     preview: bool
 
-    def __init__(self, category_name: Tuple[str], preview: bool):
+    def __init__(self, category_name: str, preview: bool):
         self.dao = CategoryDao()
         self.print_formatted = PrintFormatted()
 
-        self.category_name = tuple_to_str(category_name)
+        self.category_name = category_name.strip()
         self.preview = preview
 
     def show_preview(self) -> None:
