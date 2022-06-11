@@ -1,9 +1,8 @@
 import logging
 
 import click
-from click.testing import CliRunner
 
-from codenotes.cli.category import CreateCategory
+from codenotes.cli.category import CreateCategory, SearchCategory
 from codenotes.db import Base, engine
 from codenotes.utils import get_base_dir
 
@@ -36,15 +35,21 @@ def category():
 
 
 @category.command(name="create")
-@click.option("--category-name", "-c", required=True)
-@click.option("--preview", "-p", is_flag=True)
+@click.option(
+    "--category-name", "-c", required=True, help="Name of the category to be created."
+)
+@click.option(
+    "--preview", "-p", is_flag=True, help="Shows a preview and ask for confirmation."
+)
 def create_category(category_name, preview) -> None:
     create = CreateCategory(category_name, preview)
     create.start()
 
 
-if __name__ == "__main__":
-    runner = CliRunner()
-    result = runner.invoke(main, ["category", "create"])
-    print(result.exit_code)
-    print(result.exc_info)
+@category.command(name="search")
+@click.option(
+    "--category-name", "-c", required=True, help="Name of the category to be searched."
+)
+def search_category(category_name) -> None:
+    search = SearchCategory(category_name)
+    search.start()
