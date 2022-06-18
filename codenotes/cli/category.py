@@ -74,7 +74,9 @@ class SearchCategory:
 
             self.print_formatted.console.print(table)
         else:
-            self.print_formatted.console.print("[missing]No categories found.[/missing]")
+            self.print_formatted.console.print(
+                "[missing]No categories found.[/missing]"
+            )
 
     def start(self) -> None:
         self.search()
