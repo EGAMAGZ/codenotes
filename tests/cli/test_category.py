@@ -32,7 +32,7 @@ class TestCategoryCli:
 
     def test_create_category_that_already_exists(self) -> None:
         expected_message = "Error trying to create category. Category might " \
-                           "already exists. "
+                           "already exists."
 
         args = 'category create -c "TODOS"'
 
