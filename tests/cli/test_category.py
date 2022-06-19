@@ -56,7 +56,7 @@ class TestCategoryCli:
         assert expected_message in result.output
         assert result.exit_code == expected
 
-    def test_search_category_that_not_exists(self) -> None:
+    def test_search_category_that_exists(self) -> None:
         expected_message = "TODOS"
 
         args = 'category search -c "TODOS"'

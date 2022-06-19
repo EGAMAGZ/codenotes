@@ -36,20 +36,32 @@ def category():
 
 @category.command(name="create")
 @click.option(
-    "--category-name", "-c", required=True, help="Name of the category to be created."
+    "--category-name",
+    "-c",
+    required=True,
+    help="Name of the category to be " "created.",
 )
 @click.option(
-    "--preview", "-p", is_flag=True, help="Shows a preview and ask for confirmation."
+    "--preview", "-p",
+    is_flag=True,
+    help="Shows a preview and ask for " "confirmation."
 )
 def create_category(category_name, preview) -> None:
+    logging.info(
+        f"Command executed: category create -c {category_name} -p {preview}"
+    )
     create = CreateCategory(category_name, preview)
     create.start()
 
 
 @category.command(name="search")
 @click.option(
-    "--category-name", "-c", required=True, help="Name of the category to be searched."
+    "--category-name",
+    "-c",
+    required=True,
+    help="Name of the category to be " "searched.",
 )
 def search_category(category_name) -> None:
+    logging.info(f"Command executed: category search -c {category_name}")
     search = SearchCategory(category_name)
     search.start()

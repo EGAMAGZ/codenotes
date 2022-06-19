@@ -1,6 +1,6 @@
 from rich.theme import Theme
 
-codenotes_theme = Theme(
+CODENOTES_THEME = Theme(
     {
         "confirmation": "italic yellow",
         "error": "bold red",
