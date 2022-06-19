@@ -18,9 +18,6 @@ class CreateCategory:
     category_name : str
         The name of the category that will be created.
 
-    dao : CategoryDao
-        The DAO that will be used to create the category.
-
     print_formatted : PrintFormatted
         Instance of PrintFormatted that will be used to print messages about
         the process.
@@ -30,7 +27,6 @@ class CreateCategory:
         not.
     """
     category_name: str
-    dao: CategoryDao
     print_formatted: PrintFormatted
     preview: bool
 
@@ -47,7 +43,6 @@ class CreateCategory:
             Flag indicating whether to print preview of the category creation
             or not.
         """
-        self.dao = CategoryDao()
         self.print_formatted = PrintFormatted()
 
         self.category_name = category_name
@@ -79,7 +74,7 @@ class CreateCategory:
                 status="Saving category...") as status:
             try:
                 category = CategoryModel(name=self.category_name)
-                self.dao.create(category)
+                CategoryDao.create()
                 self.print_formatted.success("Task saved successfully")
                 logging.info(
                     f"Category {self.category_name} created successfully")
@@ -111,15 +106,11 @@ class SearchCategory:
     category_name : str
         The name of the category to search for.
 
-    dao: CategoryDao
-     The DAO that will be used to find categories in the database.
-
     print_formatted: PrintFormatted
         Instance of PrintFormatted that will be used to print messages about
         the process.
     """
     category_name: str
-    dao: CategoryDao
     print_formatted: PrintFormatted
 
     def __init__(self, category_name: str) -> None:
@@ -131,7 +122,6 @@ class SearchCategory:
         category_name : str
             The name of the category to be searched for.
         """
-        self.dao = CategoryDao()
         self.print_formatted = PrintFormatted()
 
         self.category_name = category_name
@@ -141,7 +131,7 @@ class SearchCategory:
         Searches for the category with the given name and displays the results
         in a table. If none is found, a message is printed indicating this.
         """
-        categories = self.dao.get_by_name(self.category_name)
+        categories = CategoryDao.get_by_name(self.category_name)
         if categories:
             table = Table()
             table.add_column("Categories")

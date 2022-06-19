@@ -5,11 +5,13 @@ from codenotes.db.models.category import CategoryModel
 
 
 class CategoryDao:
-    def create(self, category: CategoryModel) -> None:
+    @staticmethod
+    def create(category: CategoryModel) -> None:
         with Session.begin() as session:
             session.add(category)
 
-    def get_by_name(self, category_name: str) -> List[CategoryModel]:
+    @staticmethod
+    def get_by_name(category_name: str) -> List[CategoryModel]:
         with Session() as session:
             result: List[CategoryModel] = (
                 session.query(CategoryModel)
