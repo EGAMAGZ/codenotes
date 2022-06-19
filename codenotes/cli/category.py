@@ -74,7 +74,7 @@ class CreateCategory:
                 status="Saving category...") as status:
             try:
                 category = CategoryModel(name=self.category_name)
-                CategoryDao.create()
+                CategoryDao.create(category)
                 self.print_formatted.success("Task saved successfully")
                 logging.info(
                     f"Category {self.category_name} created successfully")
