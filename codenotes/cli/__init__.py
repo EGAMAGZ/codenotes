@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-from codenotes.cli import print_formatted
 from codenotes.cli.print_formatted import PrintFormatted
 
 

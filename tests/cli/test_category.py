@@ -77,3 +77,27 @@ class TestCategoryCli:
 
         assert expected_message in result.output
         assert result.exit_code == 0
+
+    @pytest.mark.parametrize(
+        "test_input,expected",
+        [('category show -c', 2), ('category show -c "TODOS" --max-items', 2)]
+    )
+    def test_invalid_arguments_to_show_category(self, test_input,
+                                                expected) -> None:
+        expected_message = "Error:"
+        runner = CliRunner()
+        result = runner.invoke(main, test_input)
+
+        assert expected_message in result.output
+        assert result.exit_code == expected
+
+    def test_show_category_that_not_exists(self) -> None:
+        expected_message = "\"Sample\" category doesn't exist."
+
+        args = 'category show -c "Sample"'
+
+        runner = CliRunner()
+        result = runner.invoke(main, args)
+
+        assert expected_message in result.output
+        assert result.exit_code == 0

@@ -188,7 +188,10 @@ class ShowCategory(BaseCLIAction):
                 self.print_formatted.console.print(table)
                 status.stop()
         else:
-            print("Not forund")
+            self.print_formatted.console.print(
+                f"[missing]\"{self.category_name}\" category doesn't exist."
+                "[/missing]"
+            )
 
     def start(self) -> None:
         self.show()
