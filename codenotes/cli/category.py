@@ -1,15 +1,18 @@
 import logging
+from typing import Union
 
 from rich import box
+from rich.panel import Panel
 from rich.table import Table
+from rich.text import Text
 from sqlalchemy.exc import IntegrityError
 
-from codenotes.cli.print_formatted import PrintFormatted
+from codenotes.cli import BaseCLIAction
 from codenotes.db.dao.category import CategoryDao
 from codenotes.db.models.category import CategoryModel
 
 
-class CreateCategory:
+class CreateCategory(BaseCLIAction):
     """
     Creates a new category and stores it in the database.
 
@@ -18,16 +21,11 @@ class CreateCategory:
     category_name : str
         The name of the category that will be created.
 
-    print_formatted : PrintFormatted
-        Instance of PrintFormatted that will be used to print messages about
-        the process.
-
     preview : bool
         Flag indicating whether the category creation should be previewed or
         not.
     """
     category_name: str
-    print_formatted: PrintFormatted
     preview: bool
 
     def __init__(self, category_name: str, preview: bool):
@@ -43,8 +41,7 @@ class CreateCategory:
             Flag indicating whether to print preview of the category creation
             or not.
         """
-        self.print_formatted = PrintFormatted()
-
+        super().__init__()
         self.category_name = category_name
         self.preview = preview
 
@@ -97,7 +94,7 @@ class CreateCategory:
             self.create()
 
 
-class SearchCategory:
+class SearchCategory(BaseCLIAction):
     """
     Search for categories in the database.
 
@@ -105,13 +102,8 @@ class SearchCategory:
     ----------
     category_name : str
         The name of the category to search for.
-
-    print_formatted: PrintFormatted
-        Instance of PrintFormatted that will be used to print messages about
-        the process.
     """
     category_name: str
-    print_formatted: PrintFormatted
 
     def __init__(self, category_name: str) -> None:
         """
@@ -122,8 +114,7 @@ class SearchCategory:
         category_name : str
             The name of the category to be searched for.
         """
-        self.print_formatted = PrintFormatted()
-
+        super().__init__()
         self.category_name = category_name
 
     def search(self) -> None:
@@ -131,7 +122,7 @@ class SearchCategory:
         Searches for the category with the given name and displays the results
         in a table. If none is found, a message is printed indicating this.
         """
-        categories = CategoryDao.get_by_name(self.category_name)
+        categories = CategoryDao.search_by_name(self.category_name)
         if categories:
             table = Table()
             table.add_column("Categories")
@@ -150,3 +141,54 @@ class SearchCategory:
         Starts the process of searching for a category.
         """
         self.search()
+
+
+class ShowCategory(BaseCLIAction):
+    category_name: str
+    max_items: int
+
+    def __init__(self, category_name: str, max_items: int) -> None:
+        super().__init__()
+        self.category_name = category_name
+        self.max_items = max_items
+
+    def task_information(self) -> Union[Table, Panel]:
+        table = Table(show_header=False, pad_edge=False, box=None, expand=True)
+        table.add_column("", ratio=1)
+        table.add_column("", ratio=1)
+
+        table.add_row(Text("Sample"), Text("Sample"))
+
+        return table
+
+    def generate_table(self, category: CategoryModel) -> Table:
+        table = Table.grid(padding=1, pad_edge=True)
+        table.title = "Rich features"
+        table.add_column("Feature", no_wrap=True, justify="center",
+                         style="bold red")
+        table.add_column("Demonstration")
+
+        table.add_row(
+            "Created at",
+            Text(f"{category.created_at}", justify="center")
+        )
+        table.add_row(
+            "Tasks",
+            self.task_information()
+        )
+
+        return table
+
+    def show(self) -> None:
+        category = CategoryDao.get_by_name(self.category_name)
+        if category:
+            with self.print_formatted.console.status(
+                    status="Searching") as status:
+                table = self.generate_table(category)
+                self.print_formatted.console.print(table)
+                status.stop()
+        else:
+            print("Not forund")
+
+    def start(self) -> None:
+        self.show()

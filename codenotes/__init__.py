@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from codenotes.cli.category import CreateCategory, SearchCategory
+from codenotes.cli.category import CreateCategory, SearchCategory, ShowCategory
 from codenotes.db import Base, engine
 from codenotes.utils import get_base_dir
 
@@ -65,3 +65,25 @@ def search_category(category_name) -> None:
     logging.info(f"Command executed: category search -c {category_name}")
     search = SearchCategory(category_name)
     search.start()
+
+
+@category.command(name="show")
+@click.option(
+    "--category-name",
+    "-c",
+    required=True,
+    help="Name of the category to show information about it and the "
+         "annotations store in it."
+)
+@click.option(
+    '--max-items',
+    '-m',
+    type=int,
+    default=5,
+    show_default=True,
+    help="Maximum number of items to show."
+)
+def show_category(category_name, max_items) -> None:
+    logging.info(f"Command executed: category show -c {category_name}")
+    show = ShowCategory(category_name, max_items)
+    show.start()
