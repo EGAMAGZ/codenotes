@@ -2,6 +2,7 @@ import logging
 from typing import Union
 
 from rich import box
+from rich.columns import Columns
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
@@ -162,19 +163,35 @@ class ShowCategory(BaseCLIAction):
         return table
 
     def generate_table(self, category: CategoryModel) -> Table:
-        table = Table.grid(padding=1, pad_edge=True)
-        table.title = "Rich features"
-        table.add_column("Feature", no_wrap=True, justify="center",
-                         style="bold red")
+        table = Table.grid(padding=1, pad_edge=True, expand=True)
+        table.title = f"[b]Category[/b]: {self.category_name}"
+        table.add_column(
+            "Feature",
+            justify="center",
+            style="bold red",
+            no_wrap=True
+        )
         table.add_column("Demonstration")
 
         table.add_row(
             "Created at",
-            Text(f"{category.created_at}", justify="center")
+            Panel(
+                Text(
+                    f"{category.created_at}",
+                    justify="center",
+                    style=""
+                )
+            )
         )
         table.add_row(
             "Tasks",
-            self.task_information()
+            Columns(
+                [
+                    Text("SAmpl"),
+                    Panel(Text("Total"))
+                ],
+                expand=True
+            )
         )
 
         return table
