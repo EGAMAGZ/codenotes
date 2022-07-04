@@ -17,6 +17,3 @@ class TaskModel(AnnotationMixin, Base):
 
     def __init__(self, content: str) -> None:
         self.content = content
-
-    def __str__(self) -> str:
-        return self.content

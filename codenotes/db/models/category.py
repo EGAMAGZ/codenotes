@@ -14,6 +14,3 @@ class CategoryModel(AnnotationMixin, Base):
 
     def __init__(self, name: str) -> None:
         self.name = name
-
-    def __str__(self) -> str:
-        self.name
