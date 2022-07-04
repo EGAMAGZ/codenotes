@@ -51,7 +51,8 @@ class CategoryDao:
     @staticmethod
     def get_by_name(category_name: str) -> CategoryModel:
         """
-        Gets a single category by its name. In case it is not found, returns None.
+        Gets a single category by its name. In case it is not found, returns
+        None.
 
         Parameters
         ----------

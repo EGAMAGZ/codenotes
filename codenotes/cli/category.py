@@ -197,7 +197,7 @@ class ShowCategory(BaseCLIAction):
         return table
 
     def show(self) -> None:
-        category = get_by_name(self.category_name)
+        category = CategoryDao.get_by_name(self.category_name)
         if category:
             with self.print_formatted.console.status(
                     status="Searching") as status:
