@@ -48,26 +48,26 @@ class CategoryDao:
             )
         return result
 
+    @staticmethod
+    def get_by_name(category_name: str) -> CategoryModel:
+        """
+        Gets a single category by its name. In case it is not found, returns None.
 
-def get_by_name(category_name: str) -> CategoryModel:
-    """
-    Gets a single category by its name. In case it is not found, returns None.
+        Parameters
+        ----------
+        category_name : str
+            Name of the category that will be searched.
 
-    Parameters
-    ----------
-    category_name : str
-        Name of the category that will be searched.
-
-    Returns
-    -------
-    category: CategoryModel
-        Category that might have been found by the search.
-    """
-    logging.info("Query executed: CategoryDao.get_by_name")
-    with Session() as session:
-        result: CategoryModel = (
-            session.query(CategoryModel)
-            .filter(CategoryModel.name == category_name)
-            .one_or_none()
-        )
-    return result
+        Returns
+        -------
+        category: CategoryModel
+            Category that might have been found by the search.
+        """
+        logging.info("Query executed: CategoryDao.get_by_name")
+        with Session() as session:
+            result: CategoryModel = (
+                session.query(CategoryModel)
+                .filter(CategoryModel.name == category_name)
+                .one_or_none()
+            )
+        return result
