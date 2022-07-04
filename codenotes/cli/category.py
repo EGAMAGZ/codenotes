@@ -73,7 +73,7 @@ class CreateCategory(BaseCLIAction):
             try:
                 category = CategoryModel(name=self.category_name)
                 CategoryDao.create(category)
-                self.print_formatted.success("Task saved successfully")
+                self.print_formatted.success("Category created successfully.")
                 logging.info(
                     f"Category {self.category_name} created successfully")
             except IntegrityError:

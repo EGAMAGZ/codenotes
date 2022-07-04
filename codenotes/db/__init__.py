@@ -8,7 +8,8 @@ BASE_DIR = get_base_dir()
 DATABASE_NAME = "codenotes_sql.db"
 DATABASE_PATH = BASE_DIR / DATABASE_NAME
 
-engine = create_engine(f"sqlite:///{DATABASE_PATH}", future=True)
-Session = sessionmaker(engine)
+engine = create_engine(f"sqlite:///{DATABASE_PATH}")
+Session = sessionmaker()
+Session.configure(bind=engine)
 
 Base = declarative_base()

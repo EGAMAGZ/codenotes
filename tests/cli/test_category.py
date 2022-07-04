@@ -22,7 +22,7 @@ class TestCategoryCli:
         assert result.exit_code == expected_code
 
     def test_create_new_category(self) -> None:
-        expected_message = "Task saved successfully"
+        expected_message = "Category created successfully."
 
         args = 'category create -c "TODOS"'
 
