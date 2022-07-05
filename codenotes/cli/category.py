@@ -2,7 +2,9 @@ import logging
 from typing import Union
 
 from rich import box
+from rich.box import Box
 from rich.columns import Columns
+from rich.console import Group
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
@@ -10,6 +12,7 @@ from sqlalchemy.exc import IntegrityError
 
 from codenotes.cli import BaseCLIAction
 from codenotes.db.dao.category import CategoryDao
+from codenotes.db.dao.task import TaskDao
 from codenotes.db.models.category import CategoryModel
 
 
@@ -153,25 +156,57 @@ class ShowCategory(BaseCLIAction):
         self.category_name = category_name
         self.max_items = max_items
 
-    def task_information(self) -> Union[Table, Panel]:
-        table = Table(show_header=False, pad_edge=False, box=None, expand=True)
-        table.add_column("", ratio=1)
-        table.add_column("", ratio=1)
+    def generate_task_table(self, category_id: int) -> Union[Table, Panel]:
+        tasks = TaskDao.get_tasks_with_limit(category_id, self.max_items)
 
-        table.add_row(Text("Sample"), Text("Sample"))
+        if tasks:
+            renderable = Table()
+        else:
+            renderable = Panel(
+                Text("No tasks found.", justify="center")
+            )
 
-        return table
+        return renderable
+
+    def generate_task_stats(self, category_id: int) -> Group:
+        total_tasks = TaskDao.count_tasks(category_id)
+        total_tasks_completed = TaskDao.count_tasks_completed(
+            category_id
+        )
+        total_tasks_uncompleted = TaskDao.count_tasks_completed(
+            category_id, False)
+
+        group = Group(
+            Text(f"Total: {total_tasks}"),
+            Text(f"Completed: {total_tasks_completed}"),
+            Text(f"Uncompleted: {total_tasks_uncompleted}")
+        )
+
+        return group
+
+    def task_information(self, category_id: int) -> Columns:
+
+        columns = Columns(
+            [
+                self.generate_task_table(category_id),
+                Panel(
+                    self.generate_task_stats(category_id)
+                )
+            ], expand=True
+        )
+
+        return columns
 
     def generate_table(self, category: CategoryModel) -> Table:
         table = Table.grid(padding=1, pad_edge=True, expand=True)
         table.title = f"[b]Category[/b]: {self.category_name}"
         table.add_column(
-            "Feature",
+            "Information",
             justify="center",
             style="bold red",
             no_wrap=True
         )
-        table.add_column("Demonstration")
+        table.add_column("Details")
 
         table.add_row(
             "Created at",
@@ -179,19 +214,13 @@ class ShowCategory(BaseCLIAction):
                 Text(
                     f"{category.created_at}",
                     justify="center",
-                    style=""
+                    style="yellow"
                 )
             )
         )
         table.add_row(
             "Tasks",
-            Columns(
-                [
-                    Text("SAmpl"),
-                    Panel(Text("Total"))
-                ],
-                expand=True
-            )
+            self.task_information(category.id)
         )
 
         return table
