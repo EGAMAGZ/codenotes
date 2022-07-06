@@ -2,7 +2,6 @@ import logging
 from typing import Union
 
 from rich import box
-from rich.box import Box
 from rich.columns import Columns
 from rich.console import Group
 from rich.panel import Panel
@@ -158,9 +157,9 @@ class ShowCategory(BaseCLIAction):
 
     def generate_task_table(self, category_id: int) -> Union[Table, Panel]:
         tasks = TaskDao.get_tasks_with_limit(category_id, self.max_items)
-
         if tasks:
             renderable = Table()
+
         else:
             renderable = Panel(
                 Text("No tasks found.", justify="center")
@@ -168,30 +167,32 @@ class ShowCategory(BaseCLIAction):
 
         return renderable
 
-    def generate_task_stats(self, category_id: int) -> Group:
+    def generate_task_stats(self, category_id: int) -> Panel:
         total_tasks = TaskDao.count_tasks(category_id)
         total_tasks_completed = TaskDao.count_tasks_completed(
             category_id
         )
-        total_tasks_uncompleted = TaskDao.count_tasks_completed(
-            category_id, False)
+        try:
+            percentage = round((total_tasks * 100) / total_tasks)
+        except ZeroDivisionError:
+            percentage = 0
 
-        group = Group(
-            Text(f"Total: {total_tasks}"),
-            Text(f"Completed: {total_tasks_completed}"),
-            Text(f"Uncompleted: {total_tasks_uncompleted}")
+        panel = Panel(
+            Group(
+                Text(f"Total: {total_tasks}"),
+                Text(f"Completed: {total_tasks_completed}")
+            ),
+            subtitle=f"Completion percentage: {percentage}%"
         )
 
-        return group
+        return panel
 
     def task_information(self, category_id: int) -> Columns:
 
         columns = Columns(
             [
                 self.generate_task_table(category_id),
-                Panel(
-                    self.generate_task_stats(category_id)
-                )
+                self.generate_task_stats(category_id)
             ], expand=True
         )
 

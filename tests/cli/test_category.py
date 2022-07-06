@@ -108,6 +108,10 @@ class TestCategoryCli:
         expected_date = str(date.today())
         expected_category = 'TODOS'
 
+        expected_tasks_found = "No tasks found."
+        expected_total_tasks = "0"
+        expected_completion_percentage = "Completion percentage: 0"
+
         args = 'category show -c "TODOS"'
 
         runner = CliRunner()
@@ -115,4 +119,9 @@ class TestCategoryCli:
 
         assert expected_date in result.output
         assert expected_category in result.output
+
+        assert expected_tasks_found in result.output
+        assert expected_total_tasks in result.output
+        assert expected_completion_percentage in result.output
+
         assert result.exit_code == 0
