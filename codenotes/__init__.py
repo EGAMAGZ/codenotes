@@ -1,10 +1,8 @@
 import logging
 
 import click
-from click.testing import CliRunner
 
-from codenotes.annotations import Annotations
-from codenotes.cli.category import CreateCategory
+from codenotes.cli.category import CreateCategory, SearchCategory, ShowCategory
 from codenotes.db import Base, engine
 from codenotes.utils import get_base_dir
 
@@ -25,6 +23,7 @@ def enable_logging() -> None:
 @click.group()
 @click.option("--log", is_flag=True, hidden=True)
 def main(log) -> None:
+    """A simple CLI where you can save and view all your created annotations"""
     if log:
         enable_logging()
     Base.metadata.create_all(engine)
@@ -33,22 +32,62 @@ def main(log) -> None:
 
 @main.group()
 def category():
+    """Show, create and search categories"""
     pass
 
 
 @category.command(name="create")
-@click.argument("name", nargs=-1, required=True)
-@click.option('--preview', "-p", is_flag=True)
 @click.option(
-    "--annotation-type", '-a',
-    type=click.Choice(Annotations.list_names(), case_sensitive=False),
+    "--category-name",
+    "-c",
     required=True,
+    help="Name of the category to be " "created.",
 )
-def create_category(name, preview, annotation_type) -> None:
-    create_category = CreateCategory(name, annotation_type, preview)
+@click.option(
+    "--preview", "-p",
+    is_flag=True,
+    help="Shows a preview and ask for " "confirmation."
+)
+def create_category(category_name, preview) -> None:
+    """Create a new category"""
+    logging.info(
+        f"Command executed: category create -c {category_name} -p {preview}"
+    )
+    create = CreateCategory(category_name, preview)
+    create.start()
 
 
-if __name__ == '__main__':
-    runner = CliRunner()
-    runner.invoke(main, ['category', 'create', 'Sample', '-a', 'task'])
+@category.command(name="search")
+@click.option(
+    "--category-name",
+    "-c",
+    required=True,
+    help="Name of the category to be " "searched.",
+)
+def search_category(category_name) -> None:
+    """Search all categories that match to the name that is searched"""
+    logging.info(f"Command executed: category search -c {category_name}")
+    search = SearchCategory(category_name)
+    search.start()
 
+
+@category.command(name="show")
+@click.option(
+    "--category-name",
+    "-c",
+    required=True,
+    help="Name of the category to show information about it and the "
+         "annotations store in it."
+)
+@click.option(
+    '--max-items',
+    type=int,
+    default=5,
+    show_default=True,
+    help="Maximum number of items to show."
+)
+def show_category(category_name, max_items) -> None:
+    """Show information about all annotations associated to a category"""
+    logging.info(f"Command executed: category show -c {category_name}")
+    show = ShowCategory(category_name, max_items)
+    show.start()
