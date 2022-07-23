@@ -23,6 +23,7 @@ def enable_logging() -> None:
 @click.group()
 @click.option("--log", is_flag=True, hidden=True)
 def main(log) -> None:
+    """A simple CLI where you can save and view all your created annotations"""
     if log:
         enable_logging()
     Base.metadata.create_all(engine)
@@ -31,6 +32,7 @@ def main(log) -> None:
 
 @main.group()
 def category():
+    """Show, create and search categories"""
     pass
 
 
@@ -47,6 +49,7 @@ def category():
     help="Shows a preview and ask for " "confirmation."
 )
 def create_category(category_name, preview) -> None:
+    """Create a new category"""
     logging.info(
         f"Command executed: category create -c {category_name} -p {preview}"
     )
@@ -62,6 +65,7 @@ def create_category(category_name, preview) -> None:
     help="Name of the category to be " "searched.",
 )
 def search_category(category_name) -> None:
+    """Search all categories that match to the name that is searched"""
     logging.info(f"Command executed: category search -c {category_name}")
     search = SearchCategory(category_name)
     search.start()
@@ -77,13 +81,13 @@ def search_category(category_name) -> None:
 )
 @click.option(
     '--max-items',
-    '-m',
     type=int,
     default=5,
     show_default=True,
     help="Maximum number of items to show."
 )
 def show_category(category_name, max_items) -> None:
+    """Show information about all annotations associated to a category"""
     logging.info(f"Command executed: category show -c {category_name}")
     show = ShowCategory(category_name, max_items)
     show.start()
