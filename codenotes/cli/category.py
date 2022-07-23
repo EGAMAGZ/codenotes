@@ -158,7 +158,7 @@ class ShowCategory(BaseCLIAction):
     def generate_task_table(self, category_id: int) -> Union[Table, Panel]:
         tasks = TaskDao.get_tasks_with_limit(category_id, self.max_items)
         if tasks:
-            renderable = Table()
+            renderable: Union[Table, Panel] = Table()
 
         else:
             renderable = Panel(
