@@ -1,7 +1,5 @@
 from typing import Tuple
 
-from mypy.typeshed.stdlib.builtins import enumerate
-
 from codenotes.cli import BaseCLIAction
 from codenotes.db.dao.category import CategoryDao
 from codenotes.db.dao.task import TaskDao
