@@ -15,5 +15,6 @@ class TaskModel(AnnotationMixin, Base):
     category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship("CategoryModel", back_populates="tasks")
 
-    def __init__(self, content: str) -> None:
+    def __init__(self, content: str, category) -> None:
         self.content = content
+        self.category = category
