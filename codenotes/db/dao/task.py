@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from codenotes.db import Session
@@ -5,6 +6,12 @@ from codenotes.db.models.task import TaskModel
 
 
 class TaskDao:
+    @staticmethod
+    def create(task: TaskModel) -> None:
+        logging.info("Query executed: TaskDao.create")
+        with Session.begin() as session:
+            session.add(task)
+
     @staticmethod
     def count_tasks(category_id: int) -> int:
         with Session() as session:

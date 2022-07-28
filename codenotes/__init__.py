@@ -3,6 +3,7 @@ import logging
 import click
 
 from codenotes.cli.category import CreateCategory, SearchCategory, ShowCategory
+from codenotes.cli.task import CreateTask
 from codenotes.db import Base, engine
 from codenotes.utils import get_base_dir
 
@@ -38,7 +39,7 @@ def category():
 
 @category.command(name="create")
 @click.option(
-    "--category-name",
+    "--category",
     "-c",
     required=True,
     help="Name of the category to be " "created.",
@@ -46,34 +47,34 @@ def category():
 @click.option(
     "--preview", "-p",
     is_flag=True,
-    help="Shows a preview and ask for " "confirmation."
+    help="Shows a preview and ask for confirmation."
 )
-def create_category(category_name, preview) -> None:
+def create_category(category, preview) -> None:
     """Create a new category"""
     logging.info(
-        f"Command executed: category create -c {category_name} -p {preview}"
+        f"Command executed: category create -c {category} -p {preview}"
     )
-    create = CreateCategory(category_name, preview)
+    create = CreateCategory(category, preview)
     create.start()
 
 
 @category.command(name="search")
 @click.option(
-    "--category-name",
+    "--category",
     "-c",
     required=True,
     help="Name of the category to be " "searched.",
 )
-def search_category(category_name) -> None:
+def search_category(category) -> None:
     """Search all categories that match to the name that is searched"""
-    logging.info(f"Command executed: category search -c {category_name}")
-    search = SearchCategory(category_name)
+    logging.info(f"Command executed: category search -c {category}")
+    search = SearchCategory(category)
     search.start()
 
 
 @category.command(name="show")
 @click.option(
-    "--category-name",
+    "--category",
     "-c",
     required=True,
     help="Name of the category to show information about it and the "
@@ -86,8 +87,25 @@ def search_category(category_name) -> None:
     show_default=True,
     help="Maximum number of items to show."
 )
-def show_category(category_name, max_items) -> None:
+def show_category(category, max_items) -> None:
     """Show information about all annotations associated to a category"""
-    logging.info(f"Command executed: category show -c {category_name}")
-    show = ShowCategory(category_name, max_items)
+    logging.info(f"Command executed: category show -c {category}")
+    show = ShowCategory(category, max_items)
     show.start()
+
+
+@main.group()
+def task():
+    """Create tasks"""
+    pass
+
+
+@task.command(name="create")
+@click.option('--message', '-m', required=True, multiple=True, help='')
+@click.option('--category', '-c', required=True, help='')
+def create_task(message, category) -> None:
+    """Create a new task"""
+    for msg in message:
+        logging.info(f"Command executed: task create -m {msg} -c {category}")
+    create = CreateTask(message, category)
+    create.start()
