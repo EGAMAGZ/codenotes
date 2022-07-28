@@ -47,7 +47,7 @@ def category():
 @click.option(
     "--preview", "-p",
     is_flag=True,
-    help="Shows a preview and ask for " "confirmation."
+    help="Shows a preview and ask for confirmation."
 )
 def create_category(category, preview) -> None:
     """Create a new category"""
@@ -96,6 +96,7 @@ def show_category(category, max_items) -> None:
 
 @main.group()
 def task():
+    """Create tasks"""
     pass
 
 
@@ -104,6 +105,7 @@ def task():
 @click.option('--category', '-c', required=True, help='')
 def create_task(message, category) -> None:
     """Create a new task"""
-    logging.info(f"Command executed: task create -m {message} -c {category}")
+    for msg in message:
+        logging.info(f"Command executed: task create -m {msg} -c {category}")
     create = CreateTask(message, category)
     create.start()
