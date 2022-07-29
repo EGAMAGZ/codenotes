@@ -125,3 +125,32 @@ class TestCategoryCli:
         assert expected_completion_percentage in result.output
 
         assert result.exit_code == 0
+
+    @pytest.mark.parametrize("test_input,",
+                             [("category delete",),
+                              ('category delete --force',)])
+    def test_invalid_arguments_to_delete_category(self, test_input) -> None:
+        expected_exit_code = 2
+        runner = CliRunner()
+        result = runner.invoke(main, test_input)
+
+        assert result.exit_code == expected_exit_code
+
+    def test_delete_category_without_force(self) -> None:
+        expected_exit_code = 2
+        category_name = "TempCategory"
+
+        runner = CliRunner()
+        # Creates a new category
+        runner.invoke(main, f'category create -c "{category_name}"')
+        # Search for the category created
+        result = runner.invoke(main, f'category search -c "{category_name}"')
+
+        assert category_name in result.output
+        assert result.exit_code == expected_exit_code
+
+        # Deletes category
+        result = runner.invoke(main, f'category delete "{category_name}"',
+                               input=category_name)
+
+        assert category_name in result.output
