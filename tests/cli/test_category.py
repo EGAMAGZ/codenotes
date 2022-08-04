@@ -136,7 +136,6 @@ class TestCategoryCli:
 
         assert result.exit_code == expected_exit_code
 
-    @pytest.mark.skip()
     def test_delete_category_without_force(self) -> None:
         expected_exit_code = 2
         category_name = "TempCategory"
@@ -148,10 +147,13 @@ class TestCategoryCli:
         result = runner.invoke(main, f'category search -c "{category_name}"')
 
         assert category_name in result.output
-        assert result.exit_code == expected_exit_code
 
         # Deletes category
         result = runner.invoke(main, f'category delete "{category_name}"',
                                input=category_name)
 
         assert category_name in result.output
+
+        result = runner.invoke(main, f'category search -c "{category_name}"')
+
+        assert category_name not in result.output

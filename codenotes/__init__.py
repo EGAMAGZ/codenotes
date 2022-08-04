@@ -111,10 +111,6 @@ def delete_category(category, force) -> None:
     )
     delete = DeleteCategory(category, force)
     delete.start()
-    print(type(category))
-    asd = Prompt.ask("Are you sure you want to delete this category?")
-    c = Console()
-    c.print(asd)
 
 
 @main.group()

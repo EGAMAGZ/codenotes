@@ -110,16 +110,17 @@ class DeleteCategory(BaseCLIAction):
         self.force_delete = force_delete
 
     def delete(self) -> None:
-        category_name = self.print_formatted.ask(
-            f"Type {self.category_name} to confirm deletion: "
-        )
-        while self.category_name != category_name:
-            self.print_formatted.error(
-                f"Sorry, your reply was invalid. You entered {category_name}"
-            )
+        if not self.force_delete:
             category_name = self.print_formatted.ask(
                 f"Type {self.category_name} to confirm deletion: "
             )
+            while self.category_name != category_name:
+                self.print_formatted.error(
+                    f"Sorry, your reply was invalid. You entered {category_name}"
+                )
+                category_name = self.print_formatted.ask(
+                    f"Type {self.category_name} to confirm deletion: "
+                )
 
         deleted = CategoryDao.delete_by_name(self.category_name)
         if deleted:
