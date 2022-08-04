@@ -1,3 +1,4 @@
+from email.mime import base
 from typing import List
 
 from rich.console import Console
@@ -59,6 +60,26 @@ class PrintFormatted:
 
         return response == choices[0]
 
+    def ask(self, message: str) -> str:
+        """
+
+        Parameters
+        ----------
+        message : str
+            Message to be displayed.
+
+        Returns
+        -------
+        response : str
+            Response of the question required.
+        """
+        base_message = f"[confirmation]{message}[/confirmation]"
+        response = self.console.input(base_message).strip()
+        while not response or response.isspace():
+            response = self.console.input(base_message).strip()
+
+        return response
+
     def success(self, message: str) -> None:
         """
         Display a success message in the console. The message will use by
@@ -87,5 +108,5 @@ class PrintFormatted:
             can not complete successfully.
 
         """
-        base_message = f"[error]{message}[/error]"
+        base_message = f"[error]X {message}[/error]"
         self.console.print(base_message)

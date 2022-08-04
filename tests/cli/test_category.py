@@ -136,6 +136,7 @@ class TestCategoryCli:
 
         assert result.exit_code == expected_exit_code
 
+    @pytest.mark.skip()
     def test_delete_category_without_force(self) -> None:
         expected_exit_code = 2
         category_name = "TempCategory"

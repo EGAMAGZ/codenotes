@@ -10,8 +10,11 @@ class CategoryModel(AnnotationMixin, Base):
     __tablename__ = "category"
 
     name = Column(String, nullable=False, unique=True)
-    tasks = relationship(TaskModel, back_populates="category", cascade='all, '
-                                                                       'delete')
+    tasks = relationship(
+        TaskModel,
+        back_populates="category",
+        cascade="all, delete-orphan"
+    )
 
     def __init__(self, name: str) -> None:
         self.name = name

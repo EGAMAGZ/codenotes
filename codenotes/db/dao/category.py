@@ -72,3 +72,14 @@ class CategoryDao:
                 .one_or_none()
             )
         return result
+
+    @staticmethod
+    def delete_by_name(category_name: str) -> bool:
+        logging.info("Query executed: CategoryDao.delete")
+        was_deleted = False
+        with Session.begin() as session:
+            category = session.query(CategoryModel).filter(CategoryModel.name == category_name).one_or_none()
+            if category:
+                session.delete(category)
+                was_deleted = True
+        return was_deleted

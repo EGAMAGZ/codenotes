@@ -4,7 +4,8 @@ import click
 from rich.console import Console
 from rich.prompt import Prompt
 
-from codenotes.cli.category import CreateCategory, SearchCategory, ShowCategory
+from codenotes.cli.category import CreateCategory, SearchCategory, ShowCategory, \
+    DeleteCategory
 from codenotes.cli.task import CreateTask
 from codenotes.db import Base, engine
 from codenotes.utils import get_base_dir
@@ -90,7 +91,7 @@ def search_category(category) -> None:
 )
 def show_category(category, max_items) -> None:
     """Show information about all annotations associated to a category"""
-    logging.info(f"Command executed: category show -c {category}")
+    logging.info(f"Command executed: category show -c {category} --max-items {max_items}")
     show = ShowCategory(category, max_items)
     show.start()
 
@@ -104,6 +105,13 @@ def show_category(category, max_items) -> None:
     help="Force deletion without ask for confirmation."
 )
 def delete_category(category, force) -> None:
+    logging.info(
+        f'Command executed: category delete "{category}" '
+        f'{"--force" if force else ""}'
+    )
+    delete = DeleteCategory(category, force)
+    delete.start()
+    print(type(category))
     asd = Prompt.ask("Are you sure you want to delete this category?")
     c = Console()
     c.print(asd)
