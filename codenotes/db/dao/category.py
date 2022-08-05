@@ -78,7 +78,10 @@ class CategoryDao:
         logging.info("Query executed: CategoryDao.delete")
         was_deleted = False
         with Session.begin() as session:
-            category = session.query(CategoryModel).filter(CategoryModel.name == category_name).one_or_none()
+            category = (
+                session.query(CategoryModel)
+                .filter(CategoryModel.name == category_name).one_or_none()
+            )
             if category:
                 session.delete(category)
                 was_deleted = True

@@ -116,7 +116,8 @@ class DeleteCategory(BaseCLIAction):
             )
             while self.category_name != category_name:
                 self.print_formatted.error(
-                    f"Sorry, your reply was invalid. You entered {category_name}"
+                    f"Sorry, your reply was invalid. "
+                    f"You entered {category_name}"
                 )
                 category_name = self.print_formatted.ask(
                     f"Type {self.category_name} to confirm deletion: "
@@ -129,7 +130,7 @@ class DeleteCategory(BaseCLIAction):
             )
         else:
             self.print_formatted.console.print(
-                f"[missing]Category doesn't exist.[/missing]"
+                "[missing]Category doesn't exist.[/missing]"
             )
 
     def start(self) -> None:

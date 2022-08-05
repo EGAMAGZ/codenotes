@@ -1,11 +1,9 @@
 import logging
 
 import click
-from rich.console import Console
-from rich.prompt import Prompt
 
-from codenotes.cli.category import CreateCategory, SearchCategory, ShowCategory, \
-    DeleteCategory
+from codenotes.cli.category import CreateCategory, SearchCategory, \
+    ShowCategory, DeleteCategory
 from codenotes.cli.task import CreateTask
 from codenotes.db import Base, engine
 from codenotes.utils import get_base_dir
@@ -55,7 +53,8 @@ def category():
 )
 def create_category(category, preview) -> None:
     """Create a new category"""
-    logging.info(f"Command executed: category create -c {category} -p {preview}")
+    logging.info(
+        f"Command executed: category create -c {category} -p {preview}")
     create = CreateCategory(category, preview)
     create.start()
 
@@ -80,7 +79,7 @@ def search_category(category) -> None:
     "-c",
     required=True,
     help="Name of the category to show information about it and the "
-    "annotations store in it.",
+         "annotations store in it.",
 )
 @click.option(
     "--max-items",
@@ -91,7 +90,9 @@ def search_category(category) -> None:
 )
 def show_category(category, max_items) -> None:
     """Show information about all annotations associated to a category"""
-    logging.info(f"Command executed: category show -c {category} --max-items {max_items}")
+    logging.info(
+        f"Command executed: category show -c {category} --max-items {max_items}"
+    )
     show = ShowCategory(category, max_items)
     show.start()
 

@@ -1,4 +1,3 @@
-from email.mime import base
 from typing import List
 
 from rich.console import Console
