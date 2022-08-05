@@ -125,11 +125,11 @@ class DeleteCategory(BaseCLIAction):
         deleted = CategoryDao.delete_by_name(self.category_name)
         if deleted:
             self.print_formatted.success(
-                "Category and annotations related to it deleted successfully."
+                "Category deleted successfully."
             )
         else:
             self.print_formatted.console.print(
-                "[missing]Category doesn't exist.[/missing]"
+                f"[missing]Category doesn't exist.[/missing]"
             )
 
     def start(self) -> None:
