@@ -9,18 +9,18 @@ from codenotes import main
 class TestCategoryCli:
     @pytest.mark.parametrize(
         "test_input",
-        ["category create", "category create -c"]
+        [
+            "category create",
+            "category create -c",
+            "category create -c New category"
+        ],
     )
-    def test_invalid_argument_to_create_category(
-            self, test_input
-    ) -> None:
+    def test_invalid_argument_to_create_category(self, test_input) -> None:
         expected_code = 2
-        expected_message = "Error:"
 
         runner = CliRunner()
         result = runner.invoke(main, test_input)
 
-        assert expected_message in result.output
         assert result.exit_code == expected_code
 
     def test_create_new_category(self) -> None:
@@ -35,7 +35,7 @@ class TestCategoryCli:
 
     def test_create_category_that_exists(self) -> None:
         expected_message = (
-            "Error trying to create category. Category might " "already exists."
+            "Error trying to create category. Category might already exists."
         )
 
         args = 'category create -c "TODOS"'
@@ -46,30 +46,20 @@ class TestCategoryCli:
         assert expected_message in result.output
 
     @pytest.mark.parametrize(
-        "test_input,expected_code",
-        [("category search", 2), ("category search -c", 2)]
+        "args",
+        [
+            "category search",
+            "category search -c",
+            "category search -c New Category"
+        ],
     )
-    def test_invalid_arguments_to_search_category(
-            self, test_input, expected_code
-    ) -> None:
-        expected_message = "Error:"
-
-        runner = CliRunner()
-        result = runner.invoke(main, test_input)
-
-        assert expected_message in result.output
-        assert result.exit_code == expected_code
-
-    def test_search_category_that_exists(self) -> None:
-        expected_output = "TODOS"
-
-        args = 'category search -c "TOD"'
+    def test_invalid_arguments_to_search_category(self, args) -> None:
+        expected_code = 2
 
         runner = CliRunner()
         result = runner.invoke(main, args)
 
-        assert expected_output in result.output
-        assert result.exit_code == 0
+        assert result.exit_code == expected_code
 
     def test_search_category_that_not_exists(self) -> None:
         expected_message = "No categories found."
@@ -81,19 +71,31 @@ class TestCategoryCli:
 
         assert expected_message in result.output
 
-    @pytest.mark.parametrize(
-        "test_input,expected_code",
-        [("category show -c", 2), ('category show -c "TODOS" --max-items', 2)],
-    )
-    def test_invalid_arguments_to_show_category(
-            self, test_input, expected_code
-    ) -> None:
-        expected_message = "Error:"
+    @pytest.mark.parametrize("category_name", ["TODOS", "OD", "OS", "DO"])
+    def test_search_category_that_exists(self, category_name) -> None:
+        expected_output = "TODOS"
+
+        args = f'category search -c "{category_name}"'
 
         runner = CliRunner()
-        result = runner.invoke(main, test_input)
+        result = runner.invoke(main, args)
 
-        assert expected_message in result.output
+        assert expected_output in result.output
+
+    @pytest.mark.parametrize(
+        "args",
+        [
+            "category show -c",
+            'category show -c "TODOS" --max-items',
+            "category show -c New Category",
+        ],
+    )
+    def test_invalid_arguments_to_show_category(self, args) -> None:
+        expected_code = 2
+
+        runner = CliRunner()
+        result = runner.invoke(main, args)
+
         assert result.exit_code == expected_code
 
     def test_show_category_that_not_exists(self) -> None:
@@ -129,17 +131,17 @@ class TestCategoryCli:
         assert result.exit_code == 0
 
     @pytest.mark.parametrize(
-        "test_input",
+        "args",
         [
             "category delete",
             "category delete --force",
             "category delete Temp Category --force",
         ],
     )
-    def test_invalid_arguments_to_delete_category(self, test_input) -> None:
+    def test_invalid_arguments_to_delete_category(self, args) -> None:
         expected_exit_code = 2
         runner = CliRunner()
-        result = runner.invoke(main, test_input)
+        result = runner.invoke(main, args)
 
         assert result.exit_code == expected_exit_code
 
@@ -147,7 +149,7 @@ class TestCategoryCli:
         category_name = "Sample"
         expected_message = "Category doesn't exist."
 
-        args = f'category delete {category_name}'
+        args = f"category delete {category_name}"
 
         runner = CliRunner()
         result = runner.invoke(main, args, input=category_name)
@@ -195,8 +197,7 @@ class TestCategoryCli:
         # Delete category
         expected_input_message = f"Type {category_name} to confirm deletion:"
         expected_output_message = "Category deleted successfully."
-        result = runner.invoke(main,
-                               f'category delete "{category_name}" --force')
+        result = runner.invoke(main, f'category delete "{category_name}" --force')
 
         assert expected_input_message not in result.output
         assert expected_output_message in result.output
@@ -206,3 +207,11 @@ class TestCategoryCli:
         result = runner.invoke(main, f'category search -c "{category_name}"')
 
         assert expected_output_message not in result.output
+
+    @pytest.fixture(scope="class", autouse=True)
+    def cleanup(self, request) -> None:
+        def delete_test_category():
+            runner = CliRunner()
+            runner.invoke(main, 'category delete "TODOS" --force')
+
+        request.addfinalizer(delete_test_category)

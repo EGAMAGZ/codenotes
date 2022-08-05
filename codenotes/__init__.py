@@ -34,7 +34,7 @@ def main(log) -> None:
 
 @main.group()
 def category():
-    """Show, create and search categories"""
+    """Show, create, search and delete categories"""
     pass
 
 
@@ -43,7 +43,7 @@ def category():
     "--category",
     "-c",
     required=True,
-    help="Name of the category to be " "created.",
+    help="Name of the category to be created.",
 )
 @click.option(
     "--preview",
@@ -54,7 +54,9 @@ def category():
 def create_category(category, preview) -> None:
     """Create a new category"""
     logging.info(
-        f"Command executed: category create -c {category} -p {preview}")
+        f"Command executed: category create -c {category} -p {preview}"
+    )
+
     create = CreateCategory(category, preview)
     create.start()
 
@@ -64,11 +66,12 @@ def create_category(category, preview) -> None:
     "--category",
     "-c",
     required=True,
-    help="Name of the category to be " "searched.",
+    help="Name of the category to be searched.",
 )
 def search_category(category) -> None:
     """Search all categories that match to the name that is searched"""
     logging.info(f"Command executed: category search -c {category}")
+
     search = SearchCategory(category)
     search.start()
 
@@ -93,6 +96,7 @@ def show_category(category, max_items) -> None:
     logging.info(
         f"Command executed: category show -c {category} --max-items {max_items}"
     )
+
     show = ShowCategory(category, max_items)
     show.start()
 
@@ -110,6 +114,7 @@ def delete_category(category, force) -> None:
         f'Command executed: category delete "{category}" '
         f'{"--force" if force else ""}'
     )
+
     delete = DeleteCategory(category, force)
     delete.start()
 
@@ -127,5 +132,6 @@ def create_task(message, category) -> None:
     """Create a new task"""
     for msg in message:
         logging.info(f"Command executed: task create -m {msg} -c {category}")
+
     create = CreateTask(message, category)
     create.start()
