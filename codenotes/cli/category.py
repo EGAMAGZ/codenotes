@@ -17,12 +17,12 @@ from codenotes.db.models.category import CategoryModel
 
 class CreateCategory(BaseCLIAction):
     """
-    Creates a new category and stores it in the database.
+    Create a new category and stores it in the database.
 
     Attributes
     ----------
     category_name : str
-        The name of the category that will be created.
+        Name of the category that will be created.
 
     preview : bool
         Flag indicating whether the category creation should be previewed or
@@ -50,7 +50,7 @@ class CreateCategory(BaseCLIAction):
 
     def show_preview(self) -> None:
         """
-        Shows preview of the category creation. This will show the category
+        Show preview of the category creation. This will show the category
         that will be created and ask for confirmation.
         """
         table = Table(box=box.ROUNDED, title="Preview")
@@ -66,7 +66,7 @@ class CreateCategory(BaseCLIAction):
 
     def create(self) -> None:
         """
-        Creates a new category and displays a success message. If the
+        Create a new category and display a success message. If the
         category already exists, it will be displayed in the console an error
         message.
         """
@@ -89,7 +89,7 @@ class CreateCategory(BaseCLIAction):
 
     def start(self) -> None:
         """
-        Starts the process of creating a category.
+        Start the process of creating a category.
         """
         if self.preview:
             self.show_preview()
@@ -98,6 +98,18 @@ class CreateCategory(BaseCLIAction):
 
 
 class DeleteCategory(BaseCLIAction):
+    """
+    Delete a category from the database, and delete all content associated
+    with it.
+
+    Attributes
+    ----------
+    category_name : str
+        Name of the category that will be created.
+
+    force_delete : bool
+        Flag indicating whether to ask or not for confirmation to delete.
+    """
     category_name: str
     force_delete: bool
 
@@ -110,6 +122,11 @@ class DeleteCategory(BaseCLIAction):
         self.force_delete = force_delete
 
     def delete(self) -> None:
+        """
+        Delete the category and display a success message. In case of the
+        category doesn't exist, wil display a message indicating this. Before
+        deleting asks for confirmation.
+        """
         if not self.force_delete:
             category_name = self.print_formatted.ask(
                 f"Type {self.category_name} to confirm deletion: "
@@ -122,16 +139,21 @@ class DeleteCategory(BaseCLIAction):
                 category_name = self.print_formatted.ask(
                     f"Type {self.category_name} to confirm deletion: "
                 )
-
-        deleted = CategoryDao.delete_by_name(self.category_name)
-        if deleted:
-            self.print_formatted.success(
-                "Category deleted successfully."
-            )
-        else:
-            self.print_formatted.console.print(
-                "[missing]Category doesn't exist.[/missing]"
-            )
+        with self.print_formatted.console.status() as status:
+            deleted = CategoryDao.delete_by_name(self.category_name)
+            if deleted:
+                self.print_formatted.success(
+                    "Category deleted successfully."
+                )
+                logging.info(
+                    f"Category {self.category_name} deleted successfully."
+                )
+            else:
+                self.print_formatted.console.print(
+                    "[missing]Category doesn't exist.[/missing]"
+                )
+                logging.info(f"Category {self.category_name} doesn't exist.'")
+            status.stop()
 
     def start(self) -> None:
         """
@@ -165,7 +187,7 @@ class SearchCategory(BaseCLIAction):
 
     def search(self) -> None:
         """
-        Searches for the category with the given name and displays the results
+        Search for the category with the given name and displays the results
         in a table. If none is found, a message is printed indicating this.
         """
         categories = CategoryDao.search_by_name(self.category_name)
@@ -284,4 +306,7 @@ class ShowCategory(BaseCLIAction):
             )
 
     def start(self) -> None:
+        """
+        Start the process of showing a category.
+        """
         self.show()
