@@ -2,7 +2,8 @@ import logging
 
 import click
 
-from codenotes.cli.category import CreateCategory, SearchCategory, ShowCategory
+from codenotes.cli.category import CreateCategory, SearchCategory, \
+    ShowCategory, DeleteCategory
 from codenotes.cli.task import CreateTask
 from codenotes.db import Base, engine
 from codenotes.utils import get_base_dir
@@ -45,15 +46,15 @@ def category():
     help="Name of the category to be " "created.",
 )
 @click.option(
-    "--preview", "-p",
+    "--preview",
+    "-p",
     is_flag=True,
     help="Shows a preview and ask for confirmation."
 )
 def create_category(category, preview) -> None:
     """Create a new category"""
     logging.info(
-        f"Command executed: category create -c {category} -p {preview}"
-    )
+        f"Command executed: category create -c {category} -p {preview}")
     create = CreateCategory(category, preview)
     create.start()
 
@@ -78,20 +79,39 @@ def search_category(category) -> None:
     "-c",
     required=True,
     help="Name of the category to show information about it and the "
-         "annotations store in it."
+         "annotations store in it.",
 )
 @click.option(
-    '--max-items',
+    "--max-items",
     type=int,
     default=5,
     show_default=True,
-    help="Maximum number of items to show."
+    help="Maximum number of items to show.",
 )
 def show_category(category, max_items) -> None:
     """Show information about all annotations associated to a category"""
-    logging.info(f"Command executed: category show -c {category}")
+    logging.info(
+        f"Command executed: category show -c {category} --max-items {max_items}"
+    )
     show = ShowCategory(category, max_items)
     show.start()
+
+
+@category.command(name="delete")
+@click.argument("category", nargs=1)
+@click.option(
+    "--force",
+    "-f",
+    is_flag=True,
+    help="Force deletion without ask for confirmation."
+)
+def delete_category(category, force) -> None:
+    logging.info(
+        f'Command executed: category delete "{category}" '
+        f'{"--force" if force else ""}'
+    )
+    delete = DeleteCategory(category, force)
+    delete.start()
 
 
 @main.group()
@@ -101,8 +121,8 @@ def task():
 
 
 @task.command(name="create")
-@click.option('--message', '-m', required=True, multiple=True, help='')
-@click.option('--category', '-c', required=True, help='')
+@click.option("--message", "-m", required=True, multiple=True, help="")
+@click.option("--category", "-c", required=True, help="")
 def create_task(message, category) -> None:
     """Create a new task"""
     for msg in message:

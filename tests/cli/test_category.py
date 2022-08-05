@@ -8,11 +8,13 @@ from codenotes import main
 
 class TestCategoryCli:
     @pytest.mark.parametrize(
-        "test_input,expected_code",
-        [("category create", 2), ("category create -c", 2)]
+        "test_input",
+        ["category create", "category create -c"]
     )
-    def test_invalid_argument_to_create_category(self, test_input,
-                                                 expected_code) -> None:
+    def test_invalid_argument_to_create_category(
+            self, test_input
+    ) -> None:
+        expected_code = 2
         expected_message = "Error:"
 
         runner = CliRunner()
@@ -30,11 +32,11 @@ class TestCategoryCli:
         result = runner.invoke(main, args)
 
         assert expected_message in result.output
-        assert result.exit_code == 0
 
-    def test_create_category_that_already_exists(self) -> None:
-        expected_message = "Error trying to create category. Category might " \
-                           "already exists."
+    def test_create_category_that_exists(self) -> None:
+        expected_message = (
+            "Error trying to create category. Category might " "already exists."
+        )
 
         args = 'category create -c "TODOS"'
 
@@ -42,14 +44,14 @@ class TestCategoryCli:
         result = runner.invoke(main, args)
 
         assert expected_message in result.output
-        assert result.exit_code == 0
 
     @pytest.mark.parametrize(
         "test_input,expected_code",
         [("category search", 2), ("category search -c", 2)]
     )
-    def test_invalid_arguments_to_search_category(self, test_input,
-                                                  expected_code) -> None:
+    def test_invalid_arguments_to_search_category(
+            self, test_input, expected_code
+    ) -> None:
         expected_message = "Error:"
 
         runner = CliRunner()
@@ -78,15 +80,16 @@ class TestCategoryCli:
         result = runner.invoke(main, args)
 
         assert expected_message in result.output
-        assert result.exit_code == 0
 
     @pytest.mark.parametrize(
         "test_input,expected_code",
-        [('category show -c', 2), ('category show -c "TODOS" --max-items', 2)]
+        [("category show -c", 2), ('category show -c "TODOS" --max-items', 2)],
     )
-    def test_invalid_arguments_to_show_category(self, test_input,
-                                                expected_code) -> None:
+    def test_invalid_arguments_to_show_category(
+            self, test_input, expected_code
+    ) -> None:
         expected_message = "Error:"
+
         runner = CliRunner()
         result = runner.invoke(main, test_input)
 
@@ -94,7 +97,7 @@ class TestCategoryCli:
         assert result.exit_code == expected_code
 
     def test_show_category_that_not_exists(self) -> None:
-        expected_message = "\"Sample\" category doesn't exist."
+        expected_message = '"Sample" category doesn\'t exist.'
 
         args = 'category show -c "Sample"'
 
@@ -102,11 +105,10 @@ class TestCategoryCli:
         result = runner.invoke(main, args)
 
         assert expected_message in result.output
-        assert result.exit_code == 0
 
     def test_show_category_that_exists(self) -> None:
         expected_date = str(date.today())
-        expected_category = 'TODOS'
+        expected_category = "TODOS"
 
         expected_tasks_found = "No tasks found."
         expected_total_tasks = "0"
@@ -125,3 +127,82 @@ class TestCategoryCli:
         assert expected_completion_percentage in result.output
 
         assert result.exit_code == 0
+
+    @pytest.mark.parametrize(
+        "test_input",
+        [
+            "category delete",
+            "category delete --force",
+            "category delete Temp Category --force",
+        ],
+    )
+    def test_invalid_arguments_to_delete_category(self, test_input) -> None:
+        expected_exit_code = 2
+        runner = CliRunner()
+        result = runner.invoke(main, test_input)
+
+        assert result.exit_code == expected_exit_code
+
+    def test_delete_category_that_not_exists(self) -> None:
+        category_name = "Sample"
+        expected_message = "Category doesn't exist."
+
+        args = f'category delete {category_name}'
+
+        runner = CliRunner()
+        result = runner.invoke(main, args, input=category_name)
+
+        assert expected_message in result.output
+
+    def test_delete_category_without_force(self) -> None:
+        category_name = "TempCategory"
+
+        runner = CliRunner()
+        # Create a new category
+        runner.invoke(main, f'category create -c "{category_name}"')
+        # Search for the category created
+        result = runner.invoke(main, f'category search -c "{category_name}"')
+
+        assert category_name in result.output
+
+        # Delete category
+        expected_input_message = f"Type {category_name} to confirm deletion:"
+        expected_output_message = "Category deleted successfully."
+        result = runner.invoke(
+            main, f'category delete "{category_name}"', input=category_name
+        )
+
+        assert expected_input_message in result.output
+        assert expected_output_message in result.output
+
+        # Check if category deleted exists
+        expected_output_message = f'"{category_name}" category doesn\'t exist.'
+        result = runner.invoke(main, f'category search -c "{category_name}"')
+
+        assert expected_output_message not in result.output
+
+    def test_delete_category_with_force(self) -> None:
+        category_name = "TempCategory"
+
+        runner = CliRunner()
+        # Create a new category
+        runner.invoke(main, f'category create -c "{category_name}"')
+        # Search for the category created
+        result = runner.invoke(main, f'category search -c "{category_name}"')
+
+        assert category_name in result.output
+
+        # Delete category
+        expected_input_message = f"Type {category_name} to confirm deletion:"
+        expected_output_message = "Category deleted successfully."
+        result = runner.invoke(main,
+                               f'category delete "{category_name}" --force')
+
+        assert expected_input_message not in result.output
+        assert expected_output_message in result.output
+
+        # Check if category deleted exists
+        expected_output_message = f'"{category_name}" category doesn\'t exist.'
+        result = runner.invoke(main, f'category search -c "{category_name}"')
+
+        assert expected_output_message not in result.output

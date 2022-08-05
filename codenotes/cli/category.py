@@ -97,6 +97,49 @@ class CreateCategory(BaseCLIAction):
             self.create()
 
 
+class DeleteCategory(BaseCLIAction):
+    category_name: str
+    force_delete: bool
+
+    def __init__(self, category_name: str, force_delete: bool) -> None:
+        """
+        DeleteCategory constructor.
+        """
+        super().__init__()
+        self.category_name = category_name
+        self.force_delete = force_delete
+
+    def delete(self) -> None:
+        if not self.force_delete:
+            category_name = self.print_formatted.ask(
+                f"Type {self.category_name} to confirm deletion: "
+            )
+            while self.category_name != category_name:
+                self.print_formatted.error(
+                    f"Sorry, your reply was invalid. "
+                    f"You entered {category_name}"
+                )
+                category_name = self.print_formatted.ask(
+                    f"Type {self.category_name} to confirm deletion: "
+                )
+
+        deleted = CategoryDao.delete_by_name(self.category_name)
+        if deleted:
+            self.print_formatted.success(
+                "Category deleted successfully."
+            )
+        else:
+            self.print_formatted.console.print(
+                "[missing]Category doesn't exist.[/missing]"
+            )
+
+    def start(self) -> None:
+        """
+        Starts the process of deleting a category.
+        """
+        self.delete()
+
+
 class SearchCategory(BaseCLIAction):
     """
     Search for categories in the database.

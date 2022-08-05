@@ -12,7 +12,7 @@ class TaskModel(AnnotationMixin, Base):
     completed_at = Column(Date, nullable=True)
     completed = Column(Boolean, default=False)
 
-    category_id = Column(Integer, ForeignKey('category.id'))
+    category_id = Column(Integer, ForeignKey('category.id', ondelete="CASCADE"))
     category = relationship("CategoryModel", back_populates="tasks")
 
     def __init__(self, content: str, category) -> None:
