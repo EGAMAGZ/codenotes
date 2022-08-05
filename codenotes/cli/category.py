@@ -139,7 +139,8 @@ class DeleteCategory(BaseCLIAction):
                 category_name = self.print_formatted.ask(
                     f"Type {self.category_name} to confirm deletion: "
                 )
-        with self.print_formatted.console.status("Deleting category...") as status:
+        with self.print_formatted.console.status(
+                "Deleting category...") as status:
             deleted = CategoryDao.delete_by_name(self.category_name)
             if deleted:
                 self.print_formatted.success(

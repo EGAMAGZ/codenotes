@@ -197,7 +197,8 @@ class TestCategoryCli:
         # Delete category
         expected_input_message = f"Type {category_name} to confirm deletion:"
         expected_output_message = "Category deleted successfully."
-        result = runner.invoke(main, f'category delete "{category_name}" --force')
+        result = runner.invoke(main,
+                               f'category delete "{category_name}" --force')
 
         assert expected_input_message not in result.output
         assert expected_output_message in result.output
