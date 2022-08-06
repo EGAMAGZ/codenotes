@@ -13,7 +13,7 @@ class CategoryDao:
     @staticmethod
     def create(category: CategoryModel) -> None:
         """
-        Creates a new category.
+        Create a new category.
 
         Parameters
         ----------
@@ -21,6 +21,7 @@ class CategoryDao:
             Category model to create a category.
         """
         logging.info("Query executed: CategoryDao.create")
+
         with Session.begin() as session:
             session.add(category)
 
@@ -40,6 +41,7 @@ class CategoryDao:
             List of categories that contains the specified category name.
         """
         logging.info("Query executed: CategoryDao.search_by_name")
+
         with Session() as session:
             result: List[CategoryModel] = (
                 session.query(CategoryModel.name)
@@ -51,7 +53,7 @@ class CategoryDao:
     @staticmethod
     def get_by_name(category_name: str) -> CategoryModel:
         """
-        Gets a single category by its name. In case it is not found, returns
+        Get a single category by its name. In case it is not found, returns
         None.
 
         Parameters
@@ -65,6 +67,7 @@ class CategoryDao:
             Category that might have been found by the search.
         """
         logging.info("Query executed: CategoryDao.get_by_name")
+
         with Session() as session:
             result: CategoryModel = (
                 session.query(CategoryModel)
@@ -75,14 +78,31 @@ class CategoryDao:
 
     @staticmethod
     def delete_by_name(category_name: str) -> bool:
+        """
+        Delete a category by name, and all content associated with that
+        category. Whether category was deleted or not, it is indicated by
+        the flag returned.
+
+        Parameters
+        ----------
+        category_name : str
+            Name of the category to be deleted.
+
+        Returns
+        -------
+        deleted : bool
+            Indicate whether category was deleted or not.
+        """
         logging.info("Query executed: CategoryDao.delete")
-        was_deleted = False
+
+        deleted = False
         with Session.begin() as session:
             category = (
                 session.query(CategoryModel)
                 .filter(CategoryModel.name == category_name).one_or_none()
             )
+
             if category:
                 session.delete(category)
-                was_deleted = True
-        return was_deleted
+                deleted = True
+        return deleted

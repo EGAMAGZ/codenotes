@@ -42,7 +42,7 @@ class CreateTask(BaseCLIAction):
     def create(self) -> None:
         """
         Create a single or multiple tasks related with the given category
-        name, and displays a succes message. If the category doesn't exist,
+        name, and displays a success message. If the category doesn't exist,
         it will be displayed in the console and error message.
         """
         category = CategoryDao.get_by_name(self.category_name)
