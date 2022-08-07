@@ -1,5 +1,4 @@
 import logging
-from typing_extensions import Required
 
 import click
 
