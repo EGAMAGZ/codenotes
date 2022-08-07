@@ -6,7 +6,7 @@ from codenotes import main
 
 class TestTaskCli:
     def setup_class(self) -> None:
-        args = 'category create -c "TODOS"'
+        args = 'category create "TODOS"'
 
         runner = CliRunner()
         runner.invoke(main, args)
@@ -19,6 +19,7 @@ class TestTaskCli:
             "task create -c -m",
             'task create -c "TODOS" -m ',
             'task create -m -c "TODOS"',
+            'task create -m New Task -c "TODOS"',
             'task create -m "New Task" -m -c "TODOS"',
         ],
     )
