@@ -1,4 +1,5 @@
 import logging
+from typing_extensions import Required
 
 import click
 
@@ -29,7 +30,7 @@ def main(log) -> None:
     if log:
         enable_logging()
     Base.metadata.create_all(engine)
-    logging.info("Database created all.")
+    logging.info("Database created all")
 
 
 @main.group()
@@ -39,17 +40,16 @@ def category():
 
 
 @category.command(name="create")
-@click.option(
-    "--category",
-    "-c",
-    required=True,
-    help="Name of the category to be created.",
+@click.argument(
+    "category",
+    nargs=1,
+    required=True
 )
 @click.option(
     "--preview",
     "-p",
     is_flag=True,
-    help="Shows a preview and ask for confirmation."
+    help="Shows a preview and ask for confirmation"
 )
 def create_category(category, preview) -> None:
     """Create a new category"""
@@ -62,11 +62,10 @@ def create_category(category, preview) -> None:
 
 
 @category.command(name="search")
-@click.option(
-    "--category",
-    "-c",
-    required=True,
-    help="Name of the category to be searched.",
+@click.argument(
+    "category",
+    nargs=1,
+    required=True
 )
 def search_category(category) -> None:
     """Search all categories that match to the name that is searched"""
@@ -77,19 +76,17 @@ def search_category(category) -> None:
 
 
 @category.command(name="show")
-@click.option(
-    "--category",
-    "-c",
+@click.argument(
+    "category",
+    nargs=1,
     required=True,
-    help="Name of the category to show information about it and the "
-         "annotations store in it.",
 )
 @click.option(
     "--max-items",
     type=int,
     default=5,
     show_default=True,
-    help="Maximum number of items to show.",
+    help="Maximum number of items to show",
 )
 def show_category(category, max_items) -> None:
     """Show information about all annotations associated to a category"""
@@ -102,12 +99,16 @@ def show_category(category, max_items) -> None:
 
 
 @category.command(name="delete")
-@click.argument("category", nargs=1)
+@click.argument(
+    "category",
+    nargs=1,
+    required=True
+)
 @click.option(
     "--force",
     "-f",
     is_flag=True,
-    help="Force deletion without ask for confirmation."
+    help="Force deletion without ask for confirmation"
 )
 def delete_category(category, force) -> None:
     logging.info(
@@ -126,8 +127,19 @@ def task():
 
 
 @task.command(name="create")
-@click.option("--message", "-m", required=True, multiple=True, help="")
-@click.option("--category", "-c", required=True, help="")
+@click.option(
+    "--message",
+    "-m",
+    required=True,
+    multiple=True,
+    help="Message of the content for the task(s)"
+)
+@click.option(
+    "--category",
+    "-c",
+    required=True,
+    help="Name of the category where the task is created"
+)
 def create_task(message, category) -> None:
     """Create a new task"""
     for msg in message:
