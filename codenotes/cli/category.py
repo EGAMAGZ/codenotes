@@ -221,26 +221,30 @@ class ShowCategory(BaseCLIAction):
         self.category_name = category_name
         self.max_items = max_items
 
-    def generate_task_table(self, category_id: int) -> Union[Table, Panel]:
+    def generate_task_table(self, category_id: int) -> Table:
         tasks = TaskDao.get_tasks_with_limit(category_id, self.max_items)
-        if tasks:
-            renderable: Union[Table, Panel] = Table()
 
-        else:
-            renderable = Panel(
-                Text("No tasks found.", justify="center")
+        table = Table(expand=True)
+        table.add_column("Content", ratio=1)
+        table.add_column("Completed")
+
+        for task in tasks:
+            table.add_row(
+                task.content,
+                "S"
             )
 
-        return renderable
+        return table
 
     def generate_task_stats(self, category_id: int) -> Panel:
         total_tasks = TaskDao.count_tasks(category_id)
         total_tasks_completed = TaskDao.count_tasks_completed(
             category_id
         )
-        try:
-            percentage = round((total_tasks * 100) / total_tasks)
-        except ZeroDivisionError:
+
+        if total_tasks > 0:
+            percentage = round((total_tasks_completed * 100) / total_tasks)
+        else:
             percentage = 0
 
         panel = Panel(
@@ -253,51 +257,53 @@ class ShowCategory(BaseCLIAction):
 
         return panel
 
-    def task_information(self, category_id: int) -> Columns:
+    def task_information(self, category_id: int) -> Group:
+        total_tasks = TaskDao.count_tasks(category_id)
 
-        columns = Columns(
-            [
+        if total_tasks > 0:
+            renderable = Table.grid(pad_edge=True, expand=True)
+            renderable.add_column("")
+            renderable.add_column("")
+            renderable.add_row(
                 self.generate_task_table(category_id),
                 self.generate_task_stats(category_id)
-            ], expand=True
-        )
-
-        return columns
-
-    def generate_table(self, category: CategoryModel) -> Table:
-        table = Table.grid(padding=1, pad_edge=True, expand=True)
-        table.title = f"[b]Category[/b]: {self.category_name}"
-        table.add_column(
-            "Information",
-            justify="center",
-            style="bold red",
-            no_wrap=True
-        )
-        table.add_column("Details")
-
-        table.add_row(
-            "Created at",
-            Panel(
-                Text(
-                    f"{category.created_at}",
-                    justify="center",
-                    style="yellow"
-                )
             )
+        else:
+            renderable = Panel(
+                Text("No task found", justify="center")
+            )
+
+        group = Group(
+            Panel.fit(
+                Text("Tasks", style="red")
+            ),
+            renderable
         )
-        table.add_row(
-            "Tasks",
+
+        return group
+
+    def generate_information(self, category: CategoryModel) -> Group:
+        group = Group(
+            Panel(
+                Text.assemble(
+                    "Category: ",
+                    (f"{self.category_name}", "bold"),
+                    justify="center"
+                ),
+                subtitle=f"Created at: [yellow]{category.created_at}[yellow]",
+                box=box.DOUBLE_EDGE
+            ),
             self.task_information(category.id)
         )
 
-        return table
+        return group
 
     def show(self) -> None:
         category = CategoryDao.get_by_name(self.category_name)
         if category:
             with self.print_formatted.console.status(
                     status="Searching") as status:
-                table = self.generate_table(category)
+                table = self.generate_information(category)
                 self.print_formatted.console.print(table)
                 status.stop()
         else:
