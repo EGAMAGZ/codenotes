@@ -111,7 +111,6 @@ class TestCategoryCli:
         expected_category = "TODOS"
 
         expected_tasks_found = "No task found"
-        expected_total_tasks = "0"
 
         args = 'category show "TODOS"'
 
@@ -122,7 +121,6 @@ class TestCategoryCli:
         assert expected_category in result.output
 
         assert expected_tasks_found in result.output
-        assert expected_total_tasks in result.output
 
         assert result.exit_code == 0
 

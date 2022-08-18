@@ -52,7 +52,7 @@ class TestTaskCli:
             (
                 'task create -m "New task #2" -m "New task #3" -c "TODOS"',
                 "Task #1 created successfully.\nTask #2 created successfully.",
-            ),
+            )
         ],
     )
     def test_create_task_in_a_category_that_exists(
@@ -62,6 +62,44 @@ class TestTaskCli:
         result = runner.invoke(main, args)
 
         assert expected_message in result.output
+
+    @pytest.mark.parametrize(
+        "args,expected_tasks",
+        [
+            (
+                'category show "TODOS"',
+                [
+                    'New task #1',
+                    'New task #2',
+                    'New task #3'
+                ]
+            ),
+            (
+                'category show "TODOS" --max-items 1',
+                [
+                    'New task #1',
+                ]
+            ), 
+            (
+                'category show "TODOS" --max-items 6',
+                [
+                    'New task #1',
+                    'New task #2',
+                    'New task #3'
+                ]
+            )
+        ]
+    )
+    def test_show_category_with_tasks_created_with_limit(self, args, expected_tasks) -> None:
+        runner = CliRunner()
+        result = runner.invoke(main, args)
+        expected_total_tasks = "Total: 3"
+        expected_completed_tasks = "Completed: 0"
+
+        assert expected_total_tasks in result.output
+        assert expected_completed_tasks in result.output
+
+        assert all(task in result.output for task in expected_tasks)
 
     @pytest.fixture(scope="class", autouse=True)
     def cleanup(self, request) -> None:
