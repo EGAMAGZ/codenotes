@@ -95,9 +95,11 @@ class TestTaskCli:
         result = runner.invoke(main, args)
         expected_total_tasks = "Total: 3"
         expected_completed_tasks = "Completed: 0"
+        expected_completion_percentage = "Completion percentage: 0"
 
         assert expected_total_tasks in result.output
         assert expected_completed_tasks in result.output
+        assert expected_completion_percentage in result.output
 
         assert all(task in result.output for task in expected_tasks)
 
