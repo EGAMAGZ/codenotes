@@ -3,7 +3,7 @@ from typing import List
 from rich.console import Console
 from rich.theme import Theme
 
-from codenotes.cli.theme import CODENOTES_THEME
+from codenotes.theme.theme import CODENOTES_THEME
 
 
 class PrintFormatted:

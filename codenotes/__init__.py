@@ -81,19 +81,19 @@ def search_category(category) -> None:
     required=True,
 )
 @click.option(
-    "--max-items",
-    type=int,
+    "--max-tasks",
+    type=click.IntRange(min=-1, max_open=True),
     default=5,
     show_default=True,
     help="Maximum number of items to show",
 )
-def show_category(category, max_items) -> None:
+def show_category(category, max_tasks) -> None:
     """Show information about all annotations associated to a category"""
     logging.info(
-        f"Command executed: category show -c {category} --max-items {max_items}"
+        f"Command executed: category show -c {category} --max-tasks {max_tasks}"
     )
 
-    show = ShowCategory(category, max_items)
+    show = ShowCategory(category, max_tasks)
     show.start()
 
 

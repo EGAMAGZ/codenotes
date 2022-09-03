@@ -84,7 +84,8 @@ class TestCategoryCli:
         "args",
         [
             "category show",
-            'category show "TODOS" --max-items',
+            'category show "TODOS" --max-tasks',
+            'category show "TODOS" --max-tasks -2',
             "category show New Category",
         ],
     )

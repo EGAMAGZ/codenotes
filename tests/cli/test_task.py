@@ -52,7 +52,7 @@ class TestTaskCli:
             (
                 'task create -m "New task #2" -m "New task #3" -c "TODOS"',
                 "Task #1 created successfully.\nTask #2 created successfully.",
-            )
+            ),
         ],
     )
     def test_create_task_in_a_category_that_exists(
@@ -69,28 +69,38 @@ class TestTaskCli:
             (
                 'category show "TODOS"',
                 [
-                    'New task #1',
-                    'New task #2',
-                    'New task #3'
+                    "New task #1",
+                    "New task #2",
+                    "New task #3"
                 ]
             ),
             (
-                'category show "TODOS" --max-items 1',
+                'category show "TODOS" --max-tasks 1',
                 [
-                    'New task #1',
-                ]
-            ), 
+                    "New task #1",
+                ],
+            ),
             (
-                'category show "TODOS" --max-items 6',
+                'category show "TODOS" --max-tasks 6',
                 [
-                    'New task #1',
-                    'New task #2',
-                    'New task #3'
+                    "New task #1",
+                    "New task #2",
+                    "New task #3"
+                ],
+            ),
+            (
+                'category show "TODOS" --max-tasks -1',
+                [
+                    "New task #1",
+                    "New task #2",
+                    "New task #3"
                 ]
             )
-        ]
+        ],
     )
-    def test_show_category_with_tasks_created_with_limit(self, args, expected_tasks) -> None:
+    def test_show_category_with_tasks_created_with_limit(
+        self, args, expected_tasks
+    ) -> None:
         runner = CliRunner()
         result = runner.invoke(main, args)
         expected_total_tasks = "Total: 3"
