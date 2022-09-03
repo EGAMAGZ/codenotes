@@ -1,5 +1,4 @@
 import logging
-from time import sleep
 
 from rich import box
 from rich.console import Group
