@@ -5,7 +5,8 @@ import click
 from codenotes.cli.category import CreateCategory, SearchCategory, \
     ShowCategory, DeleteCategory
 from codenotes.cli.task import CreateTask
-from codenotes.db import Base, engine
+from codenotes.db import create_all_db
+from codenotes.ui.app import run_app
 from codenotes.utils import get_base_dir
 
 BASE_DIR = get_base_dir()
@@ -22,14 +23,23 @@ def enable_logging() -> None:
     logging.info(f"Logging enable. Log file root: {LOG_ROOT}")
 
 
-@click.group()
+@click.group(invoke_without_command=True)
 @click.option("--log", is_flag=True, hidden=True)
-def main(log) -> None:
+@click.pass_context
+def main(ctx, log) -> None:
     """A simple CLI where you can save and view all your created annotations"""
     if log:
         enable_logging()
-    Base.metadata.create_all(engine)
+    create_all_db()
     logging.info("Database created all")
+
+    if ctx.invoked_subcommand is None:
+        run_app()
+
+
+@main.command()
+def ui():
+    pass
 
 
 @main.group()

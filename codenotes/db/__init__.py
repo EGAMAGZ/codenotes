@@ -13,3 +13,7 @@ Session = sessionmaker()
 Session.configure(bind=engine)
 
 Base = declarative_base()
+
+
+def create_all_db() -> None:
+    Base.metadata.create_all(engine)
