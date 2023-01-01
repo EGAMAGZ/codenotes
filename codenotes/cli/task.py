@@ -1,3 +1,4 @@
+import logging
 from typing import Tuple
 
 from codenotes.cli import BaseCLIAction
@@ -48,12 +49,16 @@ class CreateTask(BaseCLIAction):
         category = CategoryDao.get_by_name(self.category_name)
         if category:
             with self.print_formatted.console.status(
-                    status="Saving tasks...") as status:
+                    status="Saving tasks..."
+                ) as status:
                 for count, task in enumerate(self.tasks, start=1):
                     new_task = TaskModel(content=task, category=category)
                     TaskDao.create(new_task)
                     self.print_formatted.success(
                         f"Task #{count} created successfully."
+                    )
+                    logging.info(
+                        f"Task \"{task}\" created sucessfully."
                     )
                 status.stop()
 
@@ -61,6 +66,9 @@ class CreateTask(BaseCLIAction):
             self.print_formatted.console.print(
                 f"[missing]\"{self.category_name}\" category doesn't exist."
                 "[/missing]"
+            )
+            logging.info(
+                f"Category {self.category_name} doesn't exist.'"
             )
 
     def start(self) -> None:

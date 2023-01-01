@@ -418,12 +418,19 @@ class ShowCategory(BaseCLIAction):
                 status="Searching category..."
             ) as status:
                 table = self.generate_information(category)
+                
                 self.print_formatted.console.print(table)
+                logging.info(
+                    f"Category {self.category_name} showed"
+                )
                 status.stop()
         else:
             self.print_formatted.console.print(
                 f"[missing]\"{self.category_name}\" category doesn't exist."
                 "[/missing]"
+            )
+            logging.info(
+                f"Category {self.category_name} doesn't exist."
             )
 
     def start(self) -> None:

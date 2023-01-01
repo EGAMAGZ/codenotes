@@ -6,7 +6,6 @@ from codenotes.cli.category import CreateCategory, SearchCategory, \
     ShowCategory, DeleteCategory
 from codenotes.cli.task import CreateTask
 from codenotes.db import create_all_db
-from codenotes.ui.app import run_app
 from codenotes.utils import get_base_dir
 
 BASE_DIR = get_base_dir()
@@ -33,13 +32,13 @@ def main(ctx, log) -> None:
     create_all_db()
     logging.info("Database created all")
 
-    if ctx.invoked_subcommand is None:
-        run_app()
+    # if ctx.invoked_subcommand is None:
+    #     run_app()
 
 
-@main.command()
-def ui():
-    pass
+# @main.command()
+# def ui():
+#     pass
 
 
 @main.group()
