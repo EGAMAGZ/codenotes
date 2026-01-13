@@ -1,5 +1,5 @@
 pylint==2.6.0
-virtualenv==20.26.6
+virtualenv==20.36.1
 twine==3.3.0
 tox==3.24.0
 black==24.3.0
